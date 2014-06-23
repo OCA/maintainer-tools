@@ -29,12 +29,12 @@ egg.
 
 Get a token from Github
 
-   $ python -m tools.github_login USERNAME
+    $ python -m tools.github_login USERNAME
 
 Run a script
 
-   $ python -m tools.copy_maintainers
+    $ python -m tools.copy_maintainers
 
 You can use the `GITHUB_TOKEN` to specify the token
 
-   $ GITHUB_TOKEN=xxx python -m tools.copy_maintainers
+    $ GITHUB_TOKEN=xxx python -m tools.copy_maintainers
