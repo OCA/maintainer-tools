@@ -25,7 +25,7 @@ egg.
     $ git clone git@github.com:OCA/maintainers-tools.git
     $ virtualenv env
     $ . env/bin/activate
-    $ pip install -r requirements.txt
+    $ python setup.py develop
 
 Get a token from Github
 
