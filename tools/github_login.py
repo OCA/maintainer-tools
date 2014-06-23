@@ -69,10 +69,14 @@ def authorize_token(user):
     print("Token stored in configuration file")
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("username",
                         help="GitHub Username")
     args = parser.parse_args()
 
     authorize_token(args.username)
+
+
+if __name__ == '__main__':
+    main()
