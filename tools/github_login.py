@@ -29,8 +29,11 @@ def read_config(path):
 
 
 def login():
-    config = read_config(CREDENTIALS_FILE)
-    token = config.get('GitHub', 'token')
+    if os.environ.get('GITHUB_TOKEN'):
+        token = os.environ['GITHUB_TOKEN']
+    else:
+        config = read_config(CREDENTIALS_FILE)
+        token = config.get('GitHub', 'token')
     if not token:
         sys.exit("No token has been generated for this script. "
                  "Please run 'oca-github-login'.")
