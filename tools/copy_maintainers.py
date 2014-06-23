@@ -1,7 +1,9 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, print_function
 
-from github3 import login
 from getpass import getuser, getpass
+from .github_login import login
+
 
 MAINTAINERS_TEAM_ID = 844365
 BLACKLIST = [MAINTAINERS_TEAM_ID,
@@ -10,14 +12,7 @@ BLACKLIST = [MAINTAINERS_TEAM_ID,
 
 
 def main():
-    # user = getuser()
-    user = 'guewen'
-
-    password = ''
-    while not password:
-        password = getpass('Password for {0}: '.format(user))
-
-    gh = login(user, password=password)
+    gh = login()
 
     org = gh.organization('oca')
 
@@ -33,12 +28,12 @@ def main():
         if team.id in BLACKLIST:
             continue
         team_members = set(team.iter_members())
-        print "Team %s" % team.name
+        print("Team {0}".format(team.name))
         missing = maintainers - team_members
         if not missing:
-            print "All maintainers are registered"
+            print("All maintainers are registered")
         for member in missing:
-            print "Adding %s" % member.login
+            print("Adding {0}".format(member.login))
             team.add_member(member.login)
 
 
