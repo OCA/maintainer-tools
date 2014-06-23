@@ -35,6 +35,6 @@ Run a script
 
     $ python -m tools.copy_maintainers
 
-You can use the `GITHUB_TOKEN` to specify the token
+You can use the `GITHUB_TOKEN` environment variable to specify the token
 
     $ GITHUB_TOKEN=xxx python -m tools.copy_maintainers
