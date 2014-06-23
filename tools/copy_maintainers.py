@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function
 
-from getpass import getuser, getpass
 from .github_login import login
 
 
