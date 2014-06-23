@@ -7,7 +7,6 @@ import os
 import sys
 from getpass import getpass
 import github3
-from github3 import authorize, GitHubError
 
 CREDENTIALS_FILE = 'oca.cfg'
 
