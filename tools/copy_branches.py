@@ -6,9 +6,8 @@ import yaml
 from .github_login import login
 
 
-
 def main():
-    gh = login()
+    login()
     projects = resource_string(__name__, 'branches.yaml')
     projects = yaml.load(projects)
     for project in projects['projects']:
