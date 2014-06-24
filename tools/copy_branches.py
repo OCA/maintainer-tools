@@ -9,9 +9,12 @@ from .github_login import login
 
 def main():
     gh = login()
-    branches = resource_string(__name__, 'branches.yaml')
-    import pdb; pdb.set_trace()
-    org = gh.organization('oca')
+    projects = resource_string(__name__, 'branches.yaml')
+    projects = yaml.load(projects)
+    for project in projects['projects']:
+        gh_url = project['github']
+        for source, target in project['branches']:
+            print(source, '→', target, 'on', gh_url)
 
 
 if __name__ == '__main__':
