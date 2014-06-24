@@ -1,0 +1,22 @@
+# Config file .travis.yml
+
+language: python
+
+python:
+    - "pypy"
+    - "3.4"
+    - "3.3"
+    - "2.7"
+    - "2.6"
+
+install: 
+    - pip install coveralls flake8
+    - pip install -r requirements.txt
+
+script:
+    - python setup.py flake8
+    - coverage run setup.py test
+    - python setup.py install
+
+after_success:
+  coveralls
