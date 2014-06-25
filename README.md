@@ -9,7 +9,7 @@
 
 ## Usage
 
-Get a token from Github
+Get a token from Github, you may have to delete the existing one from Account settings -> Applications -> Personnal Access Token
 
     $ oca-github-login USERNAME
 
