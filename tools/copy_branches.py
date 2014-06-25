@@ -12,7 +12,6 @@ from __future__ import absolute_import, print_function
 
 import argparse
 import os
-import re
 import subprocess
 from contextlib import contextmanager
 from pkg_resources import resource_string
@@ -121,8 +120,9 @@ def main():
         exit("Path %s does not exist" % args.path)
     if args.mapping and not os.path.exists(args.mapping):
         exit("File %s does not exist" % args.mapping)
-    migration = Migrate(os.path.abspath(args.path), push=args.push,
-                                        mapping=args.mapping)
+    migration = Migrate(os.path.abspath(args.path),
+                        push=args.push,
+                        mapping=args.mapping)
     migration.copy_branches(only_projects=args.projects)
 
 
