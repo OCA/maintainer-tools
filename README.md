@@ -11,6 +11,10 @@
     $ . env/bin/activate
     $ python setup.py install
 
+If you want to use the `oca-copy-branches` command, you also have to install:
+https://github.com/felipec/git-remote-bzr. `git-remote-bzr` must be in the
+`$PATH`.
+
 ## Usage
 
 Get a token from Github, you may have to delete the existing one from Account settings -> Applications -> Personnal Access Token
