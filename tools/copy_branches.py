@@ -33,23 +33,18 @@ class Migrate(object):
         self.path = path
         self.push = push
 
-    def _clone_bzr(self, bzr_branch):
+    def _init_git(self, project):
         # we keep the serie's name so we can handle both projects:
         # lp:banking-addons/7.0
         # lp:banking-addons/bank-statement-reconcile-7.0
-        name = bzr_branch.replace('lp:', '').replace('/', '-')
+        name = project.replace('/', '-')
         repo = os.path.join(self.path, name)
         print('Working on', repo)
-        if os.path.exists(repo):
+        if not os.path.exists(repo):
+            os.mkdir(repo)
             with cd(repo):
-                print('  git fetch', 'from', bzr_branch)
-                subprocess.check_output(['git', 'fetch'])
-        else:
-            with cd(self.path):
-                print('  git clone', repo, 'from', bzr_branch)
-                subprocess.check_output(['git', 'clone',
-                                         "bzr::%s" % bzr_branch,
-                                         repo])
+                print('  git init', name)
+                subprocess.check_output(['git', 'init'])
         return repo
 
     def _add_remote(self, repo, name, remote):
@@ -86,26 +81,14 @@ class Migrate(object):
         projects = yaml.load(projects)
         for project in projects['projects']:
             gh_url = project['github']
+            gh_name = gh_url[15:-4]
             if only_projects:
-                gh_name = re.search('git@github.com:OCA/(.+).git',
-                                    gh_url).group(1)
                 if gh_name not in only_projects:
                     continue
-            master = None
-            branches = []
-            for source, target in project['branches']:
-                if target == 'master':
-                    master = source
-                else:
-                    branches.append((source, target))
-            assert master, "No master branch for %s" % gh_url
-            repo = self._clone_bzr(master)
-            for source, target in branches:
-                self._add_bzr_branch(repo, source, target)
+            repo = self._init_git(gh_name)
             self._add_remote(repo, 'github', gh_url)
-            self._push_to_github(repo, 'origin/master')
-            self._push_tags_to_github(repo)
-            for __, gh_branch in branches:
+            for source, gh_branch in project['branches']:
+                self._add_bzr_branch(repo, source, gh_branch)
                 refs = ('refs/remotes/{branch}/master:'
                         'refs/heads/{branch}'.format(branch=gh_branch))
                 self._push_to_github(repo, refs)
