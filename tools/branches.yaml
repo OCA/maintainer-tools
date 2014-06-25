@@ -2,6 +2,7 @@ projects:
   - github: git@github.com:OCA/connector.git
     branches:
     - ['lp:openerp-connector/7.0', master]
+    - ['lp:~acsone-openerp/openerp-connector/saas-3-openerp-connector', 'saas3']
   - github: git@github.com:OCA/connector-magento.git
     branches:
     - ['lp:openerp-connector-magento/7.0', master]
@@ -22,7 +23,8 @@ projects:
   - github: git@github.com:OCA/account-budgeting.git
     branches:
     - ['lp:account-budgeting/7.0', master]
-    - ['lp:account-budgeting/6.1', '6.1']
+    # git-remote-bzr fails on empty branches
+    # - ['lp:account-budgeting/6.1', '6.1']
   - github: git@github.com:OCA/account-closing.git
     branches:
     - ['lp:account-closing/7.0', master]

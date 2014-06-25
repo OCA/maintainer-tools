@@ -17,19 +17,24 @@ Dependency:
 """
 
 
-@contextmanager
-def cd(path):
-    cwd = os.getcwd()
-    os.chdir(path)
-    yield
-    os.chdir(cwd)
-
 
 class Migrate(object):
 
     def __init__(self, path):
         self.path = path
+        self.level = 0
 
+    @contextmanager
+    def cd(self, path):
+        cwd = os.getcwd()
+        os.chdir(path)
+        self.level += 1
+        yield
+        os.chdir(cwd)
+        self.level -= 1
+
+    def print(self, *args):
+        print('  ' * self.level, *args)
 
     def _clone_bzr(self, bzr_branch):
         # we keep the serie's name so we can handle both projects:
@@ -37,24 +42,35 @@ class Migrate(object):
         # lp:banking-addons/bank-statement-reconcile-7.0
         name = bzr_branch.replace('lp:', '').replace('/', '-')
         repo = os.path.join(self.path, name)
+        self.print('Working on', repo)
         if os.path.exists(repo):
-            with cd(repo):
-                subprocess.check_output(['git', 'pull', repo])
-                print('git pull', repo, 'from', bzr_branch)
+            with self.cd(repo):
+                self.print('git fetch', 'from', bzr_branch)
+                subprocess.check_output(['git', 'fetch'])
         else:
-            with cd(self.path):
+            with self.cd(self.path):
+                self.print('git clone', repo, 'from', bzr_branch)
                 subprocess.check_output(['git', 'clone',
                                          "bzr::%s" % bzr_branch,
                                          repo])
-                print('git clone', repo, 'from', bzr_branch)
         return repo
 
     def _add_bzr_branch(self, repo, bzr_branch, gh_branch):
-        print('\tAdd', bzr_branch, '→', gh_branch)
-        return
+        with self.cd(repo):
+            remotes = subprocess.check_output(['git', 'remote', '-v'])
+            remotes = remotes.split('\n')
+            remotes = set(remote.split('\t')[0] for remote in remotes)
+            if gh_branch not in remotes:
+                self.print('git remote add', gh_branch, bzr_branch)
+                subprocess.check_output(['git', 'remote', 'add',
+                                        gh_branch,
+                                        "bzr::%s" % bzr_branch])
+            self.print('git fetch', gh_branch, 'from', bzr_branch)
+            subprocess.check_output(['git', 'fetch', gh_branch])
 
     def _push_to_github(self, repo, gh_url):
-        print('\tPush to', gh_url)
+        with self.cd(repo):
+            self.print('git push', gh_url)
 
     def copy_branches(self):
         projects = resource_string(__name__, 'branches.yaml')
