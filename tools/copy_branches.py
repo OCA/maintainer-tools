@@ -29,9 +29,9 @@ def cd(path):
 
 class Migrate(object):
 
-    def __init__(self, path, dry_run=False):
+    def __init__(self, path, push=False):
         self.path = path
-        self.dry_run = dry_run
+        self.push = push
 
     def _clone_bzr(self, bzr_branch):
         # we keep the serie's name so we can handle both projects:
@@ -70,14 +70,14 @@ class Migrate(object):
     def _push_to_github(self, repo, refs):
         with cd(repo):
             print('  git push github', refs)
-            if not self.dry_run:
+            if self.push:
                 subprocess.check_output(
                     ['git', 'push', 'github', refs])
 
     def _push_tags_to_github(self, repo):
         with cd(repo):
             print('  git push github --tags')
-            if not self.dry_run:
+            if self.push:
                 subprocess.check_output(
                     ['git', 'push', 'github', '--tags'])
 
@@ -115,15 +115,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("path",
                         help="Branches directory")
-    parser.add_argument("--dry-run", dest="dry_run", action='store_true')
+    parser.add_argument("--no-push", dest="push", action='store_false')
+    parser.add_argument("--push", dest="push", action='store_true')
     parser.add_argument("--projects", nargs='*',
                         help="Name of the Github projects that you want to "
                              "migrate.")
-    parser.set_defaults(dry_run=False)
+    parser.set_defaults(push=False)
     args = parser.parse_args()
     if not os.path.exists(args.path):
         exit("Path %s does not exist" % args.path)
-    migration = Migrate(os.path.abspath(args.path), dry_run=args.dry_run)
+    migration = Migrate(os.path.abspath(args.path), push=args.push)
     migration.copy_branches(only_projects=args.projects)
 
 
