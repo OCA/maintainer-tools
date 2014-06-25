@@ -79,7 +79,7 @@ projects:
   - github: git@github.com:OCA/e-commerce-addons.git
     branches:
     - ['lp:e-commerce-addons/7.0', master]
-    - ['lp:e-commerce-addons/6.1', '6.1']
+    - ['lp:e-commerce-addons/oerp6.1-stable', '6.1']
   - github: git@github.com:OCA/geospatial-addons.git
     branches:
     - ['lp:geospatial-addons/7.0', master]
