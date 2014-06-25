@@ -29,9 +29,10 @@ def cd(path):
 
 class Migrate(object):
 
-    def __init__(self, path, push=False):
+    def __init__(self, path, push=False, mapping=None):
         self.path = path
         self.push = push
+        self.mapping = mapping
 
     def _init_git(self, project):
         # we keep the serie's name so we can handle both projects:
@@ -76,9 +77,16 @@ class Migrate(object):
                 subprocess.check_output(
                     ['git', 'push', 'github', '--tags'])
 
-    def copy_branches(self, only_projects=None):
-        projects = resource_string(__name__, 'branches.yaml')
+    def _parse_mapping(self):
+        if self.mapping:
+            projects = open(self.mapping, 'r')
+        else:
+            projects = resource_string(__name__, 'branches.yaml')
         projects = yaml.load(projects)
+        return projects
+
+    def copy_branches(self, only_projects=None):
+        projects = self._parse_mapping()
         for project in projects['projects']:
             gh_url = project['github']
             gh_name = gh_url[15:-4]
@@ -101,6 +109,9 @@ def main():
                         help="Branches directory")
     parser.add_argument("--no-push", dest="push", action='store_false')
     parser.add_argument("--push", dest="push", action='store_true')
+    parser.add_argument("--mapping",
+                        help="File that contains the declaration of the "
+                             "mapping.")
     parser.add_argument("--projects", nargs='*',
                         help="Name of the Github projects that you want to "
                              "migrate.")
@@ -108,7 +119,10 @@ def main():
     args = parser.parse_args()
     if not os.path.exists(args.path):
         exit("Path %s does not exist" % args.path)
-    migration = Migrate(os.path.abspath(args.path), push=args.push)
+    if args.mapping and not os.path.exists(args.mapping):
+        exit("File %s does not exist" % args.mapping)
+    migration = Migrate(os.path.abspath(args.path), push=args.push,
+                                        mapping=args.mapping)
     migration.copy_branches(only_projects=args.projects)
 
 
