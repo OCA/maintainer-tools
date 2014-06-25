@@ -3,6 +3,7 @@
 ## Installation
 
     $ git clone git@github.com:OCA/maintainers-tools.git
+    $ cd maintainers-tools
     $ virtualenv env
     $ . env/bin/activate
     $ python setup.py install
@@ -25,7 +26,7 @@ egg.
     $ git clone git@github.com:OCA/maintainers-tools.git
     $ virtualenv env
     $ . env/bin/activate
-    $ python setup.py develop
+    $ pip install -e maintainers-tools
 
 Get a token from Github
 
