@@ -139,11 +139,6 @@ projects:
     - ['lp:openerp-construction/7.0', master]
     - ['lp:openerp-construction/7.0', '7.0']
     - ['lp:openerp-construction/6.1', '6.1']
-  # NOTE: no branches in this project
-  # - github: git@github.com:OCA/edition-mgmt.git
-  #   branches:
-  #   - ['lp:openerp-edition/7.0', master]
-  #   - ['lp:openerp-edition/6.1', '6.1']
   - github: git@github.com:OCA/account-fiscal-rules.git
     branches:
     - ['lp:openerp-fiscal-rules/7.0', master]
