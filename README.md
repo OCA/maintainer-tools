@@ -24,10 +24,9 @@ As a developer, you want to launch the scripts without installing the
 egg. 
 
     $ git clone git@github.com:OCA/maintainers-tools.git
-    $ cd maintainers-tools
     $ virtualenv env
     $ . env/bin/activate
-    $ python setup.py develop
+    $ pip install -e maintainers-tools
 
 Get a token from Github
 
