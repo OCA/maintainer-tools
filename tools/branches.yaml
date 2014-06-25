@@ -162,7 +162,7 @@ projects:
   - github: git@github.com:OCA/manufacture-reports.git
     branches:
     - ['lp:openerp-mrp-reports/7.0', master]
-    - ['lp:openerp-mrp-reports/6.1', '6.1']
+    # - ['lp:openerp-mrp-reports/6.1', '6.1']  # no branch for 6.1
   # project missing
   # - github: git@github.com:OCA/openerp-pos.git
   #   branches:
@@ -179,19 +179,21 @@ projects:
   - github: git@github.com:OCA/program-mgmt.git
     branches:
     - ['lp:openerp-program/7.0', master]
-    - ['lp:openerp-program/6.1', '6.1']
+    # - ['lp:openerp-program/6.1', '6.1']  # no 6.1 branch
   - github: git@github.com:OCA/reporting-engines.git
     branches:
     - ['lp:openerp-reporting-engines/7.0', master]
     - ['lp:openerp-reporting-engines/6.1', '6.1']
   - github: git@github.com:OCA/connector-sage-50.git
     branches:
-    - ['lp:openerp-sage-50/7.0', master]
+    # NOTE: 7.0 is empty so take 6.1
+    - ['lp:openerp-sage-50/6.1', master]
     - ['lp:openerp-sage-50/6.1', '6.1']
-  - github: git@github.com:OCA/travel-mgmt.git
-    branches:
-    - ['lp:openerp-travel/7.0', master]
-    - ['lp:openerp-travel/6.1', '6.1']
+  # - github: git@github.com:OCA/travel-mgmt.git
+  #   branches:
+    # branch is empty
+    # - ['lp:openerp-travel/7.0', master]
+    # - ['lp:openerp-travel/6.1', '6.1']  # branch does not exist
   - github: git@github.com:OCA/partner-contact-management.git
     branches:
     - ['lp:partner-contact-management/7.0', master]
@@ -208,10 +210,11 @@ projects:
     branches:
     - ['lp:project-service/7.0', master]
     - ['lp:project-service/6.1', '6.1']
-  - github: git@github.com:OCA/purchase-financial.git
-    branches:
-    - ['lp:purchase-financial/7.0', master]
-    - ['lp:purchase-financial/6.1', '6.1']
+  # project is empty
+  # - github: git@github.com:OCA/purchase-financial.git
+  #   branches:
+  #   - ['lp:purchase-financial/7.0', master]
+  #   - ['lp:purchase-financial/6.1', '6.1']
   - github: git@github.com:OCA/purchase-report.git
     branches:
     - ['lp:purchase-report/7.0', master]
@@ -220,10 +223,11 @@ projects:
     branches:
     - ['lp:purchase-wkfl/7.0', master]
     - ['lp:purchase-wkfl/6.1', '6.1']
-  - github: git@github.com:OCA/connector-redmine.git
-    branches:
-    - ['lp:redmine-openerp/7.0', master]
-    - ['lp:redmine-openerp/6.1', '6.1']
+  # empty branches
+  # - github: git@github.com:OCA/connector-redmine.git
+  #   branches:
+  #   - ['lp:redmine-openerp/7.0', master]
+  #   - ['lp:redmine-openerp/6.1', '6.1']
   - github: git@github.com:OCA/report-print-send.git
     branches:
     - ['lp:report-print-send/7.0', master]
