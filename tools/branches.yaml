@@ -7,10 +7,10 @@ projects:
     branches:
     - ['lp:openerp-connector-magento/7.0', master]
     - ['lp:openerp-connector-magento/7.0', '7.0']
-  # project is missing
-  # - github: git@github.com:OCA/connector-ecommerce.git
-  #   branches:
-  #   - ['lp:openerp-connector-ecommerce/7.0', master]
+  - github: git@github.com:OCA/connector-ecommerce.git
+    branches:
+    - ['lp:openerp-connector-ecommerce/7.0', master]
+    - ['lp:openerp-connector-ecommerce/7.0', '7.0']
   - github: git@github.com:OCA/switzerland.git
     branches:
     - ['lp:openerp-swiss-localization/7.0', master]
@@ -27,8 +27,6 @@ projects:
     branches:
     - ['lp:account-budgeting/7.0', master]
     - ['lp:account-budgeting/7.0', '7.0']
-    # git-remote-bzr fails on empty branches
-    # - ['lp:account-budgeting/6.1', '6.1']
   - github: git@github.com:OCA/account-closing.git
     branches:
     - ['lp:account-closing/7.0', master]
@@ -39,11 +37,12 @@ projects:
     - ['lp:account-consolidation/7.0', master]
     - ['lp:account-consolidation/7.0', '7.0']
     - ['lp:account-consolidation/6.1', '6.1']
-  # project is missing
-  # - github: git@github.com:OCA/account-financial-report.git
-  #   branches:
-  #   - ['lp:account-financial-report/7.0', master]
-  #   - ['lp:account-financial-report/6.1', '6.1']
+  - github: git@github.com:OCA/account-financial-report.git
+    branches:
+    - ['lp:account-financial-report/7.0', master]
+    - ['lp:account-financial-report/7.0', '7.0']
+    - ['lp:account-financial-report/6.1', '6.1']
+    - ['lp:account-financial-report/6.0', '6.0']
   - github: git@github.com:OCA/account-financial-tools.git
     branches:
     - ['lp:account-financial-tools/7.0', master]
@@ -126,22 +125,21 @@ projects:
     - ['lp:multi-company/7.0', master]
     - ['lp:multi-company/7.0', '7.0']
     - ['lp:multi-company/6.1', '6.1']
-  # project is missing
-  # - github: git@github.com:OCA/oemedical.git
-  #   branches:
-  #   - ['lp:oemedical/7.0', master]
-  #   - ['lp:oemedical/6.1', '6.1']
+  - github: git@github.com:OCA/medical.git
+    branches:
+    - ['lp:oemedical', master]
+    - ['lp:oemedical', '7.0']
   - github: git@github.com:OCA/connector-accountedge.git
     branches:
     - ['lp:openerp-accountedge/7.0', master]
     - ['lp:openerp-accountedge/7.0', '7.0']
     - ['lp:openerp-accountedge/6.1', '6.1']
-  # project is missing
-  # - github: git@github.com:OCA/openerp-construction.git
-  #   branches:
-  #   - ['lp:openerp-construction/7.0', master]
-  #   - ['lp:openerp-construction/6.1', '6.1']
-  # no branches in this project
+  - github: git@github.com:OCA/construction.git
+    branches:
+    - ['lp:openerp-construction/7.0', master]
+    - ['lp:openerp-construction/7.0', '7.0']
+    - ['lp:openerp-construction/6.1', '6.1']
+  # NOTE: no branches in this project
   # - github: git@github.com:OCA/edition-mgmt.git
   #   branches:
   #   - ['lp:openerp-edition/7.0', master]
@@ -156,22 +154,15 @@ projects:
     - ['lp:openerp-hr/7.0', master]
     - ['lp:openerp-hr/7.0', '7.0']
     - ['lp:openerp-hr/6.1', '6.1']
-  # missing or renamed?
-  # - github: git@github.com:OCA/openerp-icm.git
-  #   branches:
-  #   - ['lp:openerp-icm/7.0', master]
-  #   - ['lp:openerp-icm/6.1', '6.1']
-  # missing or renamed?
-  # - github: git@github.com:OCA/openerp-isp.git
-  #   branches:
-  #   - ['lp:openerp-isp/7.0', master]
-  #   - ['lp:openerp-isp/6.1', '6.1']
-  # missing or renamed?
-  # - github: git@github.com:OCA/openerp-library.git
-  #   branches:
-  #   - ['lp:openerp-library/7.0', master]
-  #   - ['lp:openerp-library/6.1', '6.1']
-  #   no branches in project
+  - github: git@github.com:OCA/commission-mgmt.git
+    branches:
+    - ['lp:openerp-icm/7.0', master]
+    - ['lp:openerp-icm/7.0', '7.0']
+  - github: git@github.com:OCA/isp.git
+    branches:
+    - ['lp:openerp-isp/7.0', master]
+    - ['lp:openerp-isp/7.0', '7.0']
+  # NOTE:  no branches in project
   # - github: git@github.com:OCA/connector-lims.git
   #   branches:
   #   - ['lp:openerp-lims-connect/7.0', master]
@@ -190,12 +181,6 @@ projects:
     branches:
     - ['lp:openerp-mrp-reports/7.0', master]
     - ['lp:openerp-mrp-reports/7.0', '7.0']
-    # - ['lp:openerp-mrp-reports/6.1', '6.1']  # no branch for 6.1
-  # project missing
-  # - github: git@github.com:OCA/openerp-pos.git
-  #   branches:
-  #   - ['lp:openerp-pos/7.0', master]
-  #   - ['lp:openerp-pos/6.1', '6.1']
   - github: git@github.com:OCA/product-attributes.git
     branches:
     - ['lp:openerp-product-attributes/7.0', master]
@@ -210,7 +195,6 @@ projects:
     branches:
     - ['lp:openerp-program/7.0', master]
     - ['lp:openerp-program/7.0', '7.0']
-    # - ['lp:openerp-program/6.1', '6.1']  # no 6.1 branch
   - github: git@github.com:OCA/reporting-engines.git
     branches:
     - ['lp:openerp-reporting-engines/7.0', master]
@@ -222,11 +206,9 @@ projects:
     - ['lp:openerp-sage-50/6.1', master]
     - ['lp:openerp-sage-50/6.1', '7.0']
     - ['lp:openerp-sage-50/6.1', '6.1']
-  # - github: git@github.com:OCA/travel-mgmt.git
-  #   branches:
-    # branch is empty
-    # - ['lp:openerp-travel/7.0', master]
-    # - ['lp:openerp-travel/6.1', '6.1']  # branch does not exist
+  - github: git@github.com:OCA/travel-mgmt.git
+    branches:
+    - ['lp:openerp-travel/7.0', master]
   - github: git@github.com:OCA/partner-contact-management.git
     branches:
     - ['lp:partner-contact-management/7.0', master]
@@ -247,11 +229,6 @@ projects:
     - ['lp:project-service/7.0', master]
     - ['lp:project-service/7.0', '7.0']
     - ['lp:project-service/6.1', '6.1']
-  # project is empty
-  # - github: git@github.com:OCA/purchase-financial.git
-  #   branches:
-  #   - ['lp:purchase-financial/7.0', master]
-  #   - ['lp:purchase-financial/6.1', '6.1']
   - github: git@github.com:OCA/purchase-report.git
     branches:
     - ['lp:purchase-report/7.0', master]
@@ -262,21 +239,11 @@ projects:
     - ['lp:purchase-wkfl/7.0', master]
     - ['lp:purchase-wkfl/7.0', '7.0']
     - ['lp:purchase-wkfl/6.1', '6.1']
-  # empty branches
-  # - github: git@github.com:OCA/connector-redmine.git
-  #   branches:
-  #   - ['lp:redmine-openerp/7.0', master]
-  #   - ['lp:redmine-openerp/6.1', '6.1']
   - github: git@github.com:OCA/report-print-send.git
     branches:
     - ['lp:report-print-send/7.0', master]
     - ['lp:report-print-send/7.0', '7.0']
     - ['lp:report-print-send/6.1', '6.1']
-  # connector is missing
-  # - github: git@github.com:OCA/rt-openerp.git
-  #   branches:
-  #   - ['lp:rt-openerp/7.0', master]
-  #   - ['lp:rt-openerp/6.1', '6.1']
   - github: git@github.com:OCA/sale-financial.git
     branches:
     - ['lp:sale-financial/7.0', master]
@@ -322,11 +289,6 @@ projects:
     - ['lp:stock-logistic-warehouse/7.0', master]
     - ['lp:stock-logistic-warehouse/7.0', '7.0']
     - ['lp:stock-logistic-warehouse/6.1', '6.1']
-  # project is missing
-  # - github: git@github.com:OCA/sugarcrm-openerp.git
-  #   branches:
-  #   - ['lp:sugarcrm-openerp/7.0', master]
-  #   - ['lp:sugarcrm-openerp/6.1', '6.1']
   - github: git@github.com:OCA/web-addons.git
     branches:
     - ['lp:web-addons/7.0', master]
