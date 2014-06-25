@@ -146,10 +146,11 @@ projects:
   #   branches:
   #   - ['lp:openerp-library/7.0', master]
   #   - ['lp:openerp-library/6.1', '6.1']
-  - github: git@github.com:OCA/connector-lims.git
-    branches:
-    - ['lp:openerp-lims-connect/7.0', master]
-    - ['lp:openerp-lims-connect/6.1', '6.1']
+  #   no branches in project
+  # - github: git@github.com:OCA/connector-lims.git
+  #   branches:
+  #   - ['lp:openerp-lims-connect/7.0', master]
+  #   - ['lp:openerp-lims-connect/6.1', '6.1']
   - github: git@github.com:OCA/manufacture-mgmt.git
     branches:
     - ['lp:openerp-manufacturing/7.0', master]
