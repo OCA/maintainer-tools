@@ -38,6 +38,9 @@ To copy the branches of a particular project, put the name of the project (the G
 
     $ oca-copy-branches PATH --projects magento-connector
 
+The same tool can also be used to move other branches to GitHub, see
+https://github.com/OCA/maintainers-tools/wiki/How-to-move-a-Merge-Proposal-to-GitHub
+
 ## Developers
 
 As a developer, you want to launch the scripts without installing the
