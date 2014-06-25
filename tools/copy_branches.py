@@ -92,6 +92,7 @@ class Migrate(object):
                 refs = ('refs/remotes/{branch}/master:'
                         'refs/heads/{branch}'.format(branch=gh_branch))
                 self._push_to_github(repo, refs)
+            self._push_tags_to_github(repo)
 
 
 def main():
