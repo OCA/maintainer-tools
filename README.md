@@ -3,6 +3,7 @@
 ## Installation
 
     $ git clone git@github.com:OCA/maintainers-tools.git
+    $ cd maintainers-tools
     $ virtualenv env
     $ . env/bin/activate
     $ python setup.py install
@@ -23,6 +24,7 @@ As a developer, you want to launch the scripts without installing the
 egg. 
 
     $ git clone git@github.com:OCA/maintainers-tools.git
+    $ cd maintainers-tools
     $ virtualenv env
     $ . env/bin/activate
     $ python setup.py develop
