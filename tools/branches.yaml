@@ -1,8 +1,9 @@
 projects:
-  - github: git@github.com:OCA/connector.git
-    branches:
-    - ['lp:openerp-connector/7.0', master]
-    - ['lp:openerp-connector/7.0', '7.0']
+  # already switched
+  # - github: git@github.com:OCA/connector.git
+  #   branches:
+  #   - ['lp:openerp-connector/7.0', master]
+  #   - ['lp:openerp-connector/7.0', '7.0']
   - github: git@github.com:OCA/connector-magento.git
     branches:
     - ['lp:openerp-connector-magento/7.0', master]
