@@ -3,13 +3,10 @@
 language: python
 
 python:
-    - "pypy"
-    - "3.4"
-    - "3.3"
     - "2.7"
     - "2.6"
 
-install: 
+install:
     - pip install coveralls flake8
     - pip install -r requirements.txt
 
