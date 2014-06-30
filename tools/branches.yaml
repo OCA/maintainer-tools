@@ -104,11 +104,11 @@ projects:
     - ['lp:e-commerce-addons/7.0', master]
     - ['lp:e-commerce-addons/7.0', '7.0']
     - ['lp:e-commerce-addons/oerp6.1-stable', '6.1']
-  - github: git@github.com:OCA/geospatial-addons.git
-    branches:
-    - ['lp:geospatial-addons/7.0', master]
-    - ['lp:geospatial-addons/7.0', '7.0']
-    - ['lp:geospatial-addons/6.1', '6.1']
+  # - github: git@github.com:OCA/geospatial.git
+  #   branches:
+  #   - ['lp:geospatial/7.0', master]
+  #   - ['lp:geospatial/7.0', '7.0']
+  #   - ['lp:geospatial/6.1', '6.1']
   - github: git@github.com:OCA/hotel-management-system.git
     branches:
     - ['lp:hotel-management-system/7.0', master]
