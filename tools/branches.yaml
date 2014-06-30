@@ -52,11 +52,11 @@ projects:
     - ['lp:account-financial-report/7.0', '7.0']
     - ['lp:account-financial-report/6.1', '6.1']
     - ['lp:account-financial-report/6.0', '6.0']
-  - github: git@github.com:OCA/account-financial-tools.git
-    branches:
-    - ['lp:account-financial-tools/7.0', master]
-    - ['lp:account-financial-tools/7.0', '7.0']
-    - ['lp:account-financial-tools/6.1', '6.1']
+  # - github: git@github.com:OCA/account-financial-tools.git
+  #   branches:
+  #   - ['lp:account-financial-tools/7.0', master]
+  #   - ['lp:account-financial-tools/7.0', '7.0']
+  #   - ['lp:account-financial-tools/6.1', '6.1']
   - github: git@github.com:OCA/account-invoice-report.git
     branches:
     - ['lp:account-invoice-report/7.0', master]
