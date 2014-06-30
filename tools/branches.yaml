@@ -109,7 +109,7 @@ projects:
   #   - ['lp:geospatial/7.0', master]
   #   - ['lp:geospatial/7.0', '7.0']
   #   - ['lp:geospatial/6.1', '6.1']
-  - github: git@github.com:OCA/hotel-management-system.git
+  - github: git@github.com:OCA/vertical-hotel.git
     branches:
     - ['lp:hotel-management-system/7.0', master]
     - ['lp:hotel-management-system/7.0', '7.0']
@@ -134,7 +134,7 @@ projects:
     - ['lp:multi-company/7.0', master]
     - ['lp:multi-company/7.0', '7.0']
     - ['lp:multi-company/6.1', '6.1']
-  - github: git@github.com:OCA/medical.git
+  - github: git@github.com:OCA/vertical-medical.git
     branches:
     - ['lp:oemedical', master]
     - ['lp:oemedical', '7.0']
@@ -143,7 +143,7 @@ projects:
     - ['lp:openerp-accountedge/7.0', master]
     - ['lp:openerp-accountedge/7.0', '7.0']
     - ['lp:openerp-accountedge/6.1', '6.1']
-  - github: git@github.com:OCA/construction.git
+  - github: git@github.com:OCA/vertical-construction.git
     branches:
     - ['lp:openerp-construction/7.0', master]
     - ['lp:openerp-construction/7.0', '7.0']
@@ -215,7 +215,7 @@ projects:
     - ['lp:openerp-sage-50/6.1', master]
     - ['lp:openerp-sage-50/6.1', '7.0']
     - ['lp:openerp-sage-50/6.1', '6.1']
-  - github: git@github.com:OCA/travel-mgmt.git
+  - github: git@github.com:OCA/vertical-travel.git
     branches:
     - ['lp:openerp-travel/7.0', master]
   - github: git@github.com:OCA/partner-contact-management.git
