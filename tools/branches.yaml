@@ -148,6 +148,11 @@ projects:
     - ['lp:openerp-construction/7.0', master]
     - ['lp:openerp-construction/7.0', '7.0']
     - ['lp:openerp-construction/6.1', '6.1']
+  - github: git@github.com:OCA/crm.git
+    branches:
+    - ['lp:openerp-crm/7.0', master]
+    - ['lp:openerp-crm/7.0', '7.0']
+    - ['lp:openerp-crm/6.1', '6.1']
   - github: git@github.com:OCA/account-fiscal-rules.git
     branches:
     - ['lp:openerp-fiscal-rules/7.0', master]
