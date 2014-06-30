@@ -94,11 +94,11 @@ projects:
     - ['lp:contract-management/7.0', master]
     - ['lp:contract-management/7.0', '7.0']
     - ['lp:contract-management/6.1', '6.1']
-  - github: git@github.com:OCA/department-mgmt.git
-    branches:
-    - ['lp:department-mgmt/7.0', master]
-    - ['lp:department-mgmt/7.0', '7.0']
-    - ['lp:department-mgmt/6.1', '6.1']
+  #- github: git@github.com:OCA/department.git
+  #  branches:
+  #  - ['lp:department-mgmt/7.0', master]
+  #  - ['lp:department-mgmt/7.0', '7.0']
+  #  - ['lp:department-mgmt/6.1', '6.1']
   - github: git@github.com:OCA/e-commerce-addons.git
     branches:
     - ['lp:e-commerce-addons/7.0', master]
