@@ -158,12 +158,12 @@ projects:
     - ['lp:openerp-fiscal-rules/7.0', master]
     - ['lp:openerp-fiscal-rules/7.0', '7.0']
     - ['lp:openerp-fiscal-rules/6.1', '6.1']
-  - github: git@github.com:OCA/hr-mgmt.git
+  - github: git@github.com:OCA/hr.git
     branches:
     - ['lp:openerp-hr/7.0', master]
     - ['lp:openerp-hr/7.0', '7.0']
     - ['lp:openerp-hr/6.1', '6.1']
-  - github: git@github.com:OCA/commission-mgmt.git
+  - github: git@github.com:OCA/commission.git
     branches:
     - ['lp:openerp-icm/7.0', master]
     - ['lp:openerp-icm/7.0', '7.0']
@@ -176,12 +176,12 @@ projects:
   #   branches:
   #   - ['lp:openerp-lims-connect/7.0', master]
   #   - ['lp:openerp-lims-connect/6.1', '6.1']
-  - github: git@github.com:OCA/manufacture-mgmt.git
+  - github: git@github.com:OCA/manufacture.git
     branches:
     - ['lp:openerp-manufacturing/7.0', master]
     - ['lp:openerp-manufacturing/7.0', '7.0']
     - ['lp:openerp-manufacturing/6.1', '6.1']
-  - github: git@github.com:OCA/mgmtsystem.git
+  - github: git@github.com:OCA/management-system.git
     branches:
     - ['lp:openerp-mgmtsystem/7.0', master]
     - ['lp:openerp-mgmtsystem/7.0', '7.0']
@@ -200,7 +200,7 @@ projects:
     - ['lp:openerp-product-variant/7.0', master]
     - ['lp:openerp-product-variant/7.0', '7.0']
     - ['lp:openerp-product-variant/6.1', '6.1']
-  - github: git@github.com:OCA/program-mgmt.git
+  - github: git@github.com:OCA/program.git
     branches:
     - ['lp:openerp-program/7.0', master]
     - ['lp:openerp-program/7.0', '7.0']
@@ -218,7 +218,7 @@ projects:
   - github: git@github.com:OCA/vertical-travel.git
     branches:
     - ['lp:openerp-travel/7.0', master]
-  - github: git@github.com:OCA/partner-contact-management.git
+  - github: git@github.com:OCA/partner-contact.git
     branches:
     - ['lp:partner-contact-management/7.0', master]
     - ['lp:partner-contact-management/7.0', '7.0']
