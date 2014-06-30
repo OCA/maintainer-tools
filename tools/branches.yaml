@@ -84,7 +84,7 @@ projects:
     - ['lp:banking-addons/bank-statement-reconcile-7.0', master]
     - ['lp:banking-addons/bank-statement-reconcile-7.0', '7.0']
     - ['lp:banking-addons/bank-statement-reconcile-6.1', '6.1']
-  #- github: git@github.com:OCA/carriers-deliveries.git
+  #- github: git@github.com:OCA/carrier-delivery.git
   #  branches:
   #  - ['lp:carriers-deliveries/7.0', master]
   #  - ['lp:carriers-deliveries/7.0', '7.0']
@@ -153,7 +153,7 @@ projects:
     - ['lp:openerp-crm/7.0', master]
     - ['lp:openerp-crm/7.0', '7.0']
     - ['lp:openerp-crm/6.1', '6.1']
-  - github: git@github.com:OCA/account-fiscal-rules.git
+  - github: git@github.com:OCA/account-fiscal-rule.git
     branches:
     - ['lp:openerp-fiscal-rules/7.0', master]
     - ['lp:openerp-fiscal-rules/7.0', '7.0']
@@ -190,7 +190,7 @@ projects:
     branches:
     - ['lp:openerp-mrp-reports/7.0', master]
     - ['lp:openerp-mrp-reports/7.0', '7.0']
-  - github: git@github.com:OCA/product-attributes.git
+  - github: git@github.com:OCA/product-attribute.git
     branches:
     - ['lp:openerp-product-attributes/7.0', master]
     - ['lp:openerp-product-attributes/7.0', '7.0']
@@ -204,7 +204,7 @@ projects:
     branches:
     - ['lp:openerp-program/7.0', master]
     - ['lp:openerp-program/7.0', '7.0']
-  - github: git@github.com:OCA/reporting-engines.git
+  - github: git@github.com:OCA/reporting-engine.git
     branches:
     - ['lp:openerp-reporting-engines/7.0', master]
     - ['lp:openerp-reporting-engines/7.0', '7.0']
