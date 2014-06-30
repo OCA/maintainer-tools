@@ -46,7 +46,7 @@ projects:
     - ['lp:account-consolidation/7.0', master]
     - ['lp:account-consolidation/7.0', '7.0']
     - ['lp:account-consolidation/6.1', '6.1']
-  - github: git@github.com:OCA/account-financial-report.git
+  - github: git@github.com:OCA/account-financial-reporting.git
     branches:
     - ['lp:account-financial-report/7.0', master]
     - ['lp:account-financial-report/7.0', '7.0']
@@ -57,7 +57,7 @@ projects:
   #   - ['lp:account-financial-tools/7.0', master]
   #   - ['lp:account-financial-tools/7.0', '7.0']
   #   - ['lp:account-financial-tools/6.1', '6.1']
-  #- github: git@github.com:OCA/account-invoice-report.git
+  #- github: git@github.com:OCA/account-invoice-reporting.git
   #  branches:
   #  - ['lp:account-invoice-report/7.0', master]
   #  - ['lp:account-invoice-report/7.0', '7.0']
@@ -186,7 +186,7 @@ projects:
     - ['lp:openerp-mgmtsystem/7.0', master]
     - ['lp:openerp-mgmtsystem/7.0', '7.0']
     - ['lp:openerp-mgmtsystem/6.1', '6.1']
-  - github: git@github.com:OCA/manufacture-reports.git
+  - github: git@github.com:OCA/manufacture-reporting.git
     branches:
     - ['lp:openerp-mrp-reports/7.0', master]
     - ['lp:openerp-mrp-reports/7.0', '7.0']
@@ -238,7 +238,7 @@ projects:
     - ['lp:project-service/7.0', master]
     - ['lp:project-service/7.0', '7.0']
     - ['lp:project-service/6.1', '6.1']
-  - github: git@github.com:OCA/purchase-report.git
+  - github: git@github.com:OCA/purchase-reporting.git
     branches:
     - ['lp:purchase-report/7.0', master]
     - ['lp:purchase-report/7.0', '7.0']
@@ -258,7 +258,7 @@ projects:
     - ['lp:sale-financial/7.0', master]
     - ['lp:sale-financial/7.0', '7.0']
     - ['lp:sale-financial/6.1', '6.1']
-  - github: git@github.com:OCA/sale-reports.git
+  - github: git@github.com:OCA/sale-reporting.git
     branches:
     - ['lp:sale-reports/7.0', master]
     - ['lp:sale-reports/7.0', '7.0']
@@ -283,7 +283,7 @@ projects:
     - ['lp:stock-logistic-flows/7.0', master]
     - ['lp:stock-logistic-flows/7.0', '7.0']
     - ['lp:stock-logistic-flows/6.1', '6.1']
-  - github: git@github.com:OCA/stock-logistics-report.git
+  - github: git@github.com:OCA/stock-logistics-reporting.git
     branches:
     - ['lp:stock-logistic-report/7.0', master]
     - ['lp:stock-logistic-report/7.0', '7.0']
