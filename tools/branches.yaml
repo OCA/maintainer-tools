@@ -84,11 +84,11 @@ projects:
     - ['lp:banking-addons/bank-statement-reconcile-7.0', master]
     - ['lp:banking-addons/bank-statement-reconcile-7.0', '7.0']
     - ['lp:banking-addons/bank-statement-reconcile-6.1', '6.1']
-  - github: git@github.com:OCA/carriers-deliveries.git
-    branches:
-    - ['lp:carriers-deliveries/7.0', master]
-    - ['lp:carriers-deliveries/7.0', '7.0']
-    - ['lp:carriers-deliveries/6.1', '6.1']
+  #- github: git@github.com:OCA/carriers-deliveries.git
+  #  branches:
+  #  - ['lp:carriers-deliveries/7.0', master]
+  #  - ['lp:carriers-deliveries/7.0', '7.0']
+  #  - ['lp:carriers-deliveries/6.1', '6.1']
   - github: git@github.com:OCA/contract-management.git
     branches:
     - ['lp:contract-management/7.0', master]
