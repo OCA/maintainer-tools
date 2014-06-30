@@ -167,7 +167,7 @@ projects:
     branches:
     - ['lp:openerp-icm/7.0', master]
     - ['lp:openerp-icm/7.0', '7.0']
-  - github: git@github.com:OCA/isp.git
+  - github: git@github.com:OCA/vertical-isp.git
     branches:
     - ['lp:openerp-isp/7.0', master]
     - ['lp:openerp-isp/7.0', '7.0']
