@@ -277,31 +277,31 @@ projects:
     - ['lp:server-env-tools/7.0', master]
     - ['lp:server-env-tools/7.0', '7.0']
     - ['lp:server-env-tools/6.1', '6.1']
-  - github: git@github.com:OCA/stock-logistics-barcode.git
-    branches:
-    - ['lp:stock-logistic-barcode/7.0', master]
-    - ['lp:stock-logistic-barcode/7.0', '7.0']
-    - ['lp:stock-logistic-barcode/6.1', '6.1']
-  - github: git@github.com:OCA/stock-logistics-workflow.git
-    branches:
-    - ['lp:stock-logistic-flows/7.0', master]
-    - ['lp:stock-logistic-flows/7.0', '7.0']
-    - ['lp:stock-logistic-flows/6.1', '6.1']
-  - github: git@github.com:OCA/stock-logistics-reporting.git
-    branches:
-    - ['lp:stock-logistic-report/7.0', master]
-    - ['lp:stock-logistic-report/7.0', '7.0']
-    - ['lp:stock-logistic-report/6.1', '6.1']
-  - github: git@github.com:OCA/stock-logistics-tracking.git
-    branches:
-    - ['lp:stock-logistic-tracking/7.0', master]
-    - ['lp:stock-logistic-tracking/7.0', '7.0']
-    - ['lp:stock-logistic-tracking/6.1', '6.1']
-  - github: git@github.com:OCA/stock-logistics-warehouse.git
-    branches:
-    - ['lp:stock-logistic-warehouse/7.0', master]
-    - ['lp:stock-logistic-warehouse/7.0', '7.0']
-    - ['lp:stock-logistic-warehouse/6.1', '6.1']
+  # - github: git@github.com:OCA/stock-logistics-barcode.git
+  #   branches:
+  #   - ['lp:stock-logistic-barcode/7.0', master]
+  #   - ['lp:stock-logistic-barcode/7.0', '7.0']
+  #   - ['lp:stock-logistic-barcode/6.1', '6.1']
+  # - github: git@github.com:OCA/stock-logistics-workflow.git
+  #   branches:
+  #   - ['lp:stock-logistic-flows/7.0', master]
+  #   - ['lp:stock-logistic-flows/7.0', '7.0']
+  #   - ['lp:stock-logistic-flows/6.1', '6.1']
+  # - github: git@github.com:OCA/stock-logistics-reporting.git
+  #   branches:
+  #   - ['lp:stock-logistic-report/7.0', master]
+  #   - ['lp:stock-logistic-report/7.0', '7.0']
+  #   - ['lp:stock-logistic-report/6.1', '6.1']
+  # - github: git@github.com:OCA/stock-logistics-tracking.git
+  #   branches:
+  #   - ['lp:stock-logistic-tracking/7.0', master]
+  #   - ['lp:stock-logistic-tracking/7.0', '7.0']
+  #   - ['lp:stock-logistic-tracking/6.1', '6.1']
+  # - github: git@github.com:OCA/stock-logistics-warehouse.git
+  #   branches:
+  #   - ['lp:stock-logistic-warehouse/7.0', master]
+  #   - ['lp:stock-logistic-warehouse/7.0', '7.0']
+  #   - ['lp:stock-logistic-warehouse/6.1', '6.1']
   - github: git@github.com:OCA/web.git
     branches:
     - ['lp:web-addons/7.0', master]
