@@ -67,11 +67,11 @@ projects:
     - ['lp:account-invoicing/7.0', master]
     - ['lp:account-invoicing/7.0', '7.0']
     - ['lp:account-invoicing/6.1', '6.1']
-  - github: git@github.com:OCA/account-payment.git
-    branches:
-    - ['lp:account-payment/7.0', master]
-    - ['lp:account-payment/7.0', '7.0']
-    - ['lp:account-payment/6.1', '6.1']
+  # - github: git@github.com:OCA/account-payment.git
+  #  branches:
+  #  - ['lp:account-payment/7.0', master]
+  #  - ['lp:account-payment/7.0', '7.0']
+  #  - ['lp:account-payment/6.1', '6.1']
   - github: git@github.com:OCA/banking.git
     branches:
     - ['lp:banking-addons/7.0', master]
