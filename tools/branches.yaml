@@ -252,11 +252,11 @@ projects:
     - ['lp:purchase-wkfl/7.0', master]
     - ['lp:purchase-wkfl/7.0', '7.0']
     - ['lp:purchase-wkfl/6.1', '6.1']
-  - github: git@github.com:OCA/report-print-send.git
-    branches:
-    - ['lp:report-print-send/7.0', master]
-    - ['lp:report-print-send/7.0', '7.0']
-    - ['lp:report-print-send/6.1', '6.1']
+  #- github: git@github.com:OCA/report-print-send.git
+  #  branches:
+  #  - ['lp:report-print-send/7.0', master]
+  #  - ['lp:report-print-send/7.0', '7.0']
+  #  - ['lp:report-print-send/6.1', '6.1']
   - github: git@github.com:OCA/sale-financial.git
     branches:
     - ['lp:sale-financial/7.0', master]
