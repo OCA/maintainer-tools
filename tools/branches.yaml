@@ -232,11 +232,11 @@ projects:
     - ['lp:product-kitting/7.0', master]
     - ['lp:product-kitting/7.0', '7.0']
     - ['lp:product-kitting/6.1', '6.1']
-  - github: git@github.com:OCA/project-reporting.git
-    branches:
-    - ['lp:project-reporting/7.0', master]
-    - ['lp:project-reporting/7.0', '7.0']
-    - ['lp:project-reporting/6.1', '6.1']
+  #- github: git@github.com:OCA/project-reporting.git
+  #  branches:
+  #  - ['lp:project-reporting/7.0', master]
+  #  - ['lp:project-reporting/7.0', '7.0']
+  #  - ['lp:project-reporting/6.1', '6.1']
   #- github: git@github.com:OCA/project-service.git
   #  branches:
   #  - ['lp:project-service/7.0', master]
