@@ -204,10 +204,10 @@ projects:
     - ['lp:openerp-product-variant/7.0', master]
     - ['lp:openerp-product-variant/7.0', '7.0']
     - ['lp:openerp-product-variant/6.1', '6.1']
-  - github: git@github.com:OCA/program.git
-    branches:
-    - ['lp:openerp-program/7.0', master]
-    - ['lp:openerp-program/7.0', '7.0']
+  # - github: git@github.com:OCA/program.git
+  #  branches:
+  #  - ['lp:openerp-program/7.0', master]
+  #  - ['lp:openerp-program/7.0', '7.0']
   - github: git@github.com:OCA/reporting-engine.git
     branches:
     - ['lp:openerp-reporting-engines/7.0', master]
