@@ -89,11 +89,11 @@ projects:
   #  - ['lp:carriers-deliveries/7.0', master]
   #  - ['lp:carriers-deliveries/7.0', '7.0']
   #  - ['lp:carriers-deliveries/6.1', '6.1']
-  - github: git@github.com:OCA/contract-management.git
-    branches:
-    - ['lp:contract-management/7.0', master]
-    - ['lp:contract-management/7.0', '7.0']
-    - ['lp:contract-management/6.1', '6.1']
+  #- github: git@github.com:OCA/contract.git
+  #  branches:
+  #  - ['lp:contract-management/7.0', master]
+  #  - ['lp:contract-management/7.0', '7.0']
+  #  - ['lp:contract-management/6.1', '6.1']
   #- github: git@github.com:OCA/department.git
   #  branches:
   #  - ['lp:department-mgmt/7.0', master]
