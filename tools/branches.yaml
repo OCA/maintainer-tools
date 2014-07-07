@@ -72,13 +72,13 @@ projects:
   #  - ['lp:account-payment/7.0', master]
   #  - ['lp:account-payment/7.0', '7.0']
   #  - ['lp:account-payment/6.1', '6.1']
-  - github: git@github.com:OCA/banking.git
-    branches:
-    - ['lp:banking-addons/7.0', master]
-    - ['lp:banking-addons/7.0', '7.0']
-    - ['lp:banking-addons/6.1', '6.1']
-    - ['lp:banking-addons/6.0', '6.0']
-    - ['lp:banking-addons/5.0', '5.0']
+  # - github: git@github.com:OCA/banking.git
+  #  branches:
+  #  - ['lp:banking-addons/7.0', master]
+  #  - ['lp:banking-addons/7.0', '7.0']
+  #  - ['lp:banking-addons/6.1', '6.1']
+  #  - ['lp:banking-addons/6.0', '6.0']
+  #  - ['lp:banking-addons/5.0', '5.0']
   # - github: git@github.com:OCA/bank-statement-reconcile.git
   #  branches:
   #  - ['lp:banking-addons/bank-statement-reconcile-7.0', master]
