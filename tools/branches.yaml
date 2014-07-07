@@ -20,13 +20,13 @@ projects:
   #  - ['lp:openerp-swiss-localization/6.1', '6.1']
   #  - ['lp:openerp-swiss-localization/stable6.0', '6.0']
   #  - ['lp:openerp-swiss-localization/stable5.0', '5.0']
-  - github: git@github.com:OCA/l10n-italy.git
-    branches:
-    - ['lp:openobject-italia/7.0', master]
-    - ['lp:openobject-italia/7.0', '7.0']
-    - ['lp:openobject-italia/6.1', '6.1']
-    - ['lp:openobject-italia/6.0', '6.0']
-    - ['lp:openobject-italia/5.0', '5.0']
+  #- github: git@github.com:OCA/l10n-italy.git
+  #  branches:
+  #  - ['lp:openobject-italia/7.0', master]
+  #  - ['lp:openobject-italia/7.0', '7.0']
+  #  - ['lp:openobject-italia/6.1', '6.1']
+  #  - ['lp:openobject-italia/6.0', '6.0']
+  #  - ['lp:openobject-italia/5.0', '5.0']
   - github: git@github.com:OCA/account-analytic.git
     branches:
     - ['lp:account-analytic/7.0', master]
