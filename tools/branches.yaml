@@ -308,11 +308,11 @@ projects:
   #   - ['lp:stock-logistic-warehouse/7.0', master]
   #   - ['lp:stock-logistic-warehouse/7.0', '7.0']
   #   - ['lp:stock-logistic-warehouse/6.1', '6.1']
-  - github: git@github.com:OCA/web.git
-    branches:
-    - ['lp:web-addons/7.0', master]
-    - ['lp:web-addons/7.0', '7.0']
-    - ['lp:web-addons/6.1', '6.1']
+  #- github: git@github.com:OCA/web.git
+  #  branches:
+  #  - ['lp:web-addons/7.0', master]
+  #  - ['lp:web-addons/7.0', '7.0']
+  #  - ['lp:web-addons/6.1', '6.1']
   #- github: git@github.com:OCA/webkit-tools.git
   #  branches:
   #  - ['lp:webkit-utils/7.0', master]
