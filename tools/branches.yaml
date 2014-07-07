@@ -278,11 +278,11 @@ projects:
     - ['lp:sale-wkfl/7.0', master]
     - ['lp:sale-wkfl/7.0', '7.0']
     - ['lp:sale-wkfl/6.1', '6.1']
-  - github: git@github.com:OCA/server-tools.git
-    branches:
-    - ['lp:server-env-tools/7.0', master]
-    - ['lp:server-env-tools/7.0', '7.0']
-    - ['lp:server-env-tools/6.1', '6.1']
+  #- github: git@github.com:OCA/server-tools.git
+  #  branches:
+  #  - ['lp:server-env-tools/7.0', master]
+  #  - ['lp:server-env-tools/7.0', '7.0']
+  #  - ['lp:server-env-tools/6.1', '6.1']
   # - github: git@github.com:OCA/stock-logistics-barcode.git
   #   branches:
   #   - ['lp:stock-logistic-barcode/7.0', master]
