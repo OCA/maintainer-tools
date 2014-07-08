@@ -30,7 +30,7 @@ then
       export GIT_AUTHOR_NAME="Vincent Renaville"
       ;;
     *) 
-      echo "Unknown email: $GIT_AUTHOR_EMAIL"
+      echo "Unknown author email: $GIT_AUTHOR_EMAIL"
       exit 1
       ;;
   esac
@@ -52,7 +52,7 @@ then
       export GIT_COMMITTER_NAME="Alexandre Fayolle"
       ;;
     *) 
-      echo "Unknown email: $GIT_COMMITTER_EMAIL"
+      echo "Unknown committer email: $GIT_COMMITTER_EMAIL"
       exit 1
       ;;
   esac
