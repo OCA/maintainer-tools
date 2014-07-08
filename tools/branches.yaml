@@ -27,11 +27,11 @@ projects:
   #  - ['lp:openobject-italia/6.1', '6.1']
   #  - ['lp:openobject-italia/6.0', '6.0']
   #  - ['lp:openobject-italia/5.0', '5.0']
-  - github: git@github.com:OCA/account-analytic.git
-    branches:
-    - ['lp:account-analytic/7.0', master]
-    - ['lp:account-analytic/7.0', '7.0']
-    - ['lp:account-analytic/6.1', '6.1']
+  # - github: git@github.com:OCA/account-analytic.git
+  #   branches:
+  #   - ['lp:account-analytic/7.0', master]
+  #   - ['lp:account-analytic/7.0', '7.0']
+  #   - ['lp:account-analytic/6.1', '6.1']
   # - github: git@github.com:OCA/account-budgeting.git
   #   branches:
   #   - ['lp:account-budgeting/7.0', master]
