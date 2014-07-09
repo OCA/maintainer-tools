@@ -32,10 +32,10 @@ projects:
     - ['lp:account-analytic/7.0', master]
     - ['lp:account-analytic/7.0', '7.0']
     - ['lp:account-analytic/6.1', '6.1']
-  - github: git@github.com:OCA/account-budgeting.git
-    branches:
-    - ['lp:account-budgeting/7.0', master]
-    - ['lp:account-budgeting/7.0', '7.0']
+  # - github: git@github.com:OCA/account-budgeting.git
+  #   branches:
+  #   - ['lp:account-budgeting/7.0', master]
+  #   - ['lp:account-budgeting/7.0', '7.0']
   - github: git@github.com:OCA/account-closing.git
     branches:
     - ['lp:account-closing/7.0', master]
