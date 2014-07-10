@@ -190,10 +190,10 @@ projects:
     branches:
     - ['lp:openerp-mrp-reports/7.0', master]
     - ['lp:openerp-mrp-reports/7.0', '7.0']
-  - github: git@github.com:OCA/vertical-ngo.git
-    branches:
-    - ['lp:openerp-humanitarian-ngo', master]
-    - ['lp:openerp-humanitarian-ngo', '7.0']
+  #- github: git@github.com:OCA/vertical-ngo.git
+  #  branches:
+  #  - ['lp:openerp-humanitarian-ngo', master]
+  #  - ['lp:openerp-humanitarian-ngo', '7.0']
   #- github: git@github.com:OCA/product-attribute.git
   #  branches:
   #  - ['lp:openerp-product-attributes/7.0', master]
