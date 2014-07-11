@@ -158,11 +158,11 @@ projects:
     - ['lp:openerp-fiscal-rules/7.0', master]
     - ['lp:openerp-fiscal-rules/7.0', '7.0']
     - ['lp:openerp-fiscal-rules/6.1', '6.1']
-  - github: git@github.com:OCA/hr.git
-    branches:
-    - ['lp:openerp-hr/7.0', master]
-    - ['lp:openerp-hr/7.0', '7.0']
-    - ['lp:openerp-hr/6.1', '6.1']
+#  - github: git@github.com:OCA/hr.git
+#    branches:
+#    - ['lp:openerp-hr/7.0', master]
+#    - ['lp:openerp-hr/7.0', '7.0']
+#    - ['lp:openerp-hr/6.1', '6.1']
   - github: git@github.com:OCA/commission.git
     branches:
     - ['lp:openerp-icm/7.0', master]
