@@ -4,10 +4,10 @@ projects:
   #   branches:
   #   - ['lp:openerp-connector/7.0', master]
   #   - ['lp:openerp-connector/7.0', '7.0']
-  - github: git@github.com:OCA/connector-magento.git
-    branches:
-    - ['lp:openerp-connector-magento/7.0', master]
-    - ['lp:openerp-connector-magento/7.0', '7.0']
+  # - github: git@github.com:OCA/connector-magento.git
+  #   branches:
+  #   - ['lp:openerp-connector-magento/7.0', master]
+  #   - ['lp:openerp-connector-magento/7.0', '7.0']
   # - github: git@github.com:OCA/connector-ecommerce.git
   #   branches:
   #   - ['lp:openerp-connector-ecommerce/7.0', master]
