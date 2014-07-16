@@ -213,12 +213,12 @@ projects:
     - ['lp:openerp-reporting-engines/7.0', master]
     - ['lp:openerp-reporting-engines/7.0', '7.0']
     - ['lp:openerp-reporting-engines/6.1', '6.1']
-  - github: git@github.com:OCA/rma.git
-    branches:
-    - ['lp:openerp-rma/7.0', master]
-    - ['lp:openerp-rma/7.0', '7.0']
-    - ['lp:openerp-rma/6.1', '6.1']
-    - ['lp:openerp-rma/6.0', '6.0']
+  # - github: git@github.com:OCA/rma.git
+  #   branches:
+  #   - ['lp:openerp-rma/7.0', master]
+  #   - ['lp:openerp-rma/7.0', '7.0']
+  #   - ['lp:openerp-rma/6.1', '6.1']
+  #   - ['lp:openerp-rma/6.0', '6.0']
   - github: git@github.com:OCA/connector-sage-50.git
     branches:
     # NOTE: 7.0 is empty so take 6.1
