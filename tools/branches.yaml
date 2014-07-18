@@ -41,11 +41,11 @@ projects:
     - ['lp:account-closing/7.0', master]
     - ['lp:account-closing/7.0', '7.0']
     - ['lp:account-closing/6.1', '6.1']
-  - github: git@github.com:OCA/account-consolidation.git
-    branches:
-    - ['lp:account-consolidation/7.0', master]
-    - ['lp:account-consolidation/7.0', '7.0']
-    - ['lp:account-consolidation/6.1', '6.1']
+  # - github: git@github.com:OCA/account-consolidation.git
+  #   branches:
+  #   - ['lp:account-consolidation/7.0', master]
+  #   - ['lp:account-consolidation/7.0', '7.0']
+  #   - ['lp:account-consolidation/6.1', '6.1']
   - github: git@github.com:OCA/account-financial-reporting.git
     branches:
     - ['lp:account-financial-report/7.0', master]
