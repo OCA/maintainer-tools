@@ -225,9 +225,9 @@ projects:
     - ['lp:openerp-sage-50/6.1', master]
     - ['lp:openerp-sage-50/6.1', '7.0']
     - ['lp:openerp-sage-50/6.1', '6.1']
-  - github: git@github.com:OCA/vertical-travel.git
-    branches:
-    - ['lp:openerp-travel/7.0', master]
+#  - github: git@github.com:OCA/vertical-travel.git
+#    branches:
+#    - ['lp:openerp-travel/7.0', master]
   - github: git@github.com:OCA/partner-contact.git
     branches:
     - ['lp:partner-contact-management/7.0', master]
