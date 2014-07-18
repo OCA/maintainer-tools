@@ -119,11 +119,11 @@ projects:
     - ['lp:hr-timesheet/7.0', master]
     - ['lp:hr-timesheet/7.0', '7.0']
     - ['lp:hr-timesheet/6.1', '6.1']
-  - github: git@github.com:OCA/knowledge.git
-    branches:
-    - ['lp:knowledge-addons/7.0', master]
-    - ['lp:knowledge-addons/7.0', '7.0']
-    - ['lp:knowledge-addons/6.1', '6.1']
+#  - github: git@github.com:OCA/knowledge.git
+#    branches:
+#    - ['lp:knowledge-addons/7.0', master]
+#    - ['lp:knowledge-addons/7.0', '7.0']
+#    - ['lp:knowledge-addons/6.1', '6.1']
   - github: git@github.com:OCA/margin-analysis.git
     branches:
     - ['lp:margin-analysis/7.0', master]
