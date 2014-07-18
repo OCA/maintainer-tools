@@ -219,12 +219,12 @@ projects:
   #   - ['lp:openerp-rma/7.0', '7.0']
   #   - ['lp:openerp-rma/6.1', '6.1']
   #   - ['lp:openerp-rma/6.0', '6.0']
-  - github: git@github.com:OCA/connector-sage-50.git
-    branches:
-    # NOTE: 7.0 is empty so take 6.1
-    - ['lp:openerp-sage-50/6.1', master]
-    - ['lp:openerp-sage-50/6.1', '7.0']
-    - ['lp:openerp-sage-50/6.1', '6.1']
+#  - github: git@github.com:OCA/connector-sage-50.git
+#    branches:
+#    # NOTE: 7.0 is empty so take 6.1
+#    - ['lp:openerp-sage-50/6.1', master]
+#    - ['lp:openerp-sage-50/6.1', '7.0']
+#    - ['lp:openerp-sage-50/6.1', '6.1']
 #  - github: git@github.com:OCA/vertical-travel.git
 #    branches:
 #    - ['lp:openerp-travel/7.0', master]
