@@ -228,11 +228,11 @@ projects:
 #  - github: git@github.com:OCA/vertical-travel.git
 #    branches:
 #    - ['lp:openerp-travel/7.0', master]
-  - github: git@github.com:OCA/partner-contact.git
-    branches:
-    - ['lp:partner-contact-management/7.0', master]
-    - ['lp:partner-contact-management/7.0', '7.0']
-    - ['lp:partner-contact-management/6.1', '6.1']
+#  - github: git@github.com:OCA/partner-contact.git
+#    branches:
+#    - ['lp:partner-contact-management/7.0', master]
+#    - ['lp:partner-contact-management/7.0', '7.0']
+#    - ['lp:partner-contact-management/6.1', '6.1']
   - github: git@github.com:OCA/product-kitting.git
     branches:
     - ['lp:product-kitting/7.0', master]
