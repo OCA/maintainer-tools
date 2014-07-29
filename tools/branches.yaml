@@ -114,11 +114,11 @@ projects:
     - ['lp:hotel-management-system/7.0', master]
     - ['lp:hotel-management-system/7.0', '7.0']
     - ['lp:hotel-management-system/6.1', '6.1']
-  - github: git@github.com:OCA/hr-timesheet.git
-    branches:
-    - ['lp:hr-timesheet/7.0', master]
-    - ['lp:hr-timesheet/7.0', '7.0']
-    - ['lp:hr-timesheet/6.1', '6.1']
+#  - github: git@github.com:OCA/hr-timesheet.git
+#    branches:
+#    - ['lp:hr-timesheet/7.0', master]
+#    - ['lp:hr-timesheet/7.0', '7.0']
+#    - ['lp:hr-timesheet/6.1', '6.1']
 #  - github: git@github.com:OCA/knowledge.git
 #    branches:
 #    - ['lp:knowledge-addons/7.0', master]
