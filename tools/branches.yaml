@@ -273,11 +273,11 @@ projects:
   #  - ['lp:sale-reports/7.0', master]
   #  - ['lp:sale-reports/7.0', '7.0']
   #  - ['lp:sale-reports/6.1', '6.1']
-  - github: git@github.com:OCA/sale-workflow.git
-    branches:
-    - ['lp:sale-wkfl/7.0', master]
-    - ['lp:sale-wkfl/7.0', '7.0']
-    - ['lp:sale-wkfl/6.1', '6.1']
+#  - github: git@github.com:OCA/sale-workflow.git
+#    branches:
+#    - ['lp:sale-wkfl/7.0', master]
+#    - ['lp:sale-wkfl/7.0', '7.0']
+#    - ['lp:sale-wkfl/6.1', '6.1']
   #- github: git@github.com:OCA/server-tools.git
   #  branches:
   #  - ['lp:server-env-tools/7.0', master]
