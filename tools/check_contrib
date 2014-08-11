@@ -1,0 +1,111 @@
+#!/usr/bin/python
+
+import subprocess
+import itertools
+import operator
+import argparse
+
+OCA_PROJECTS = {
+    'accounting': ['account-analytic',
+                   'account-budgeting',
+                   'account-closing',
+                   'account-consolidation',
+                   'account-financial-tools',
+                   'account-financial-reporting',
+                   'account-invoice-reporting',
+                   'account-invoicing',
+                   'account-fiscal-rule',
+                   ],
+    ## 'backport': ['OCB',
+    ##              ],
+    'banking': ['banking',
+                'bank-statement-reconcile',
+                'account-payment',
+                ],
+    'community':['maintainers-tools',
+                 'maintainer-quality-tools',
+                 'runbot-addons',
+                 ],
+    'connector': ['connector',
+                  'connector-ecommerce',
+                  ],
+    'account edge connector': ['connector-accountedge'],
+    'connector lims': ['connector-lims'],
+    'connector magento': ['connector-magento'],
+    'connector prestashop': ['connector-prestashop'],
+    'connector sage': ['connector-sage-50'],
+    'crm sales': ['sale-workflow',
+                  'crm',
+                  'partner-contact',
+                  'sale-financial',
+                  'sale-reporting',
+                  'commission',
+                  ],
+    'document': ['knowledge'],
+    'ecommerce': ['e-commerce'],
+
+
+    }
+SINCE = '2012-01-01'
+
+def get_contributions(projects, since, merges):
+    cmd =['git', 'log', '--pretty=format:%ai %ae']
+    if since is not None:
+        cmd += ['--since', since]
+    if merges:
+        cmd += ['--merges']
+    if isinstance(projects, (str, unicode)):
+        projects =  [projects]
+    for project in projects:
+        contributions = {}
+        for repo in OCA_PROJECTS[project]:
+            pipe = subprocess.Popen(cmd, stdout=subprocess.PIPE, cwd=repo)
+            out, error = pipe.communicate()
+            for line in out.splitlines():
+                try:
+                    date, hour, tz, author = line.split()
+                except ValueError:
+                    print line
+                    continue
+                contributions.setdefault(author, []).append(date)
+        yield project, contributions
+
+def top_contributors(projects, since=SINCE, merges=False, top=5):
+    for project, contributions in get_contributions(projects, since, merges):
+        contributors = sorted(contributions.iteritems(),
+                              key=lambda x: len(x[1]),
+                              reverse=True)
+        for author, contribs in contributors[:top]:
+            yield project, author, len(contribs), min(contribs), max(contribs)
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--since',
+                        metavar='YYYY-MM-DD',
+                        default=None,
+                        help='only consider contributions since YYYY-MM-DD')
+    parser.add_argument('--merges',
+                        default=False,
+                        action='store_true',
+                        help='only consider merges')
+    project_names = sorted(OCA_PROJECTS)
+    args = parser.parse_args()
+    grouped = itertools.groupby(top_contributors(project_names,
+                                                 since=args.since,
+                                                 merges=args.merges),
+                                operator.itemgetter(0))
+    for project, contribs  in grouped:
+        print project
+        for _p, author, nb_contrib, earliest, latest in contribs:
+            info = {'project': project,
+                    'author': author,
+                    'nb_contrib': nb_contrib,
+                    'earliest': earliest,
+                    'latest': latest
+                     }
+            print '     %(author)-35s:\t%(nb_contrib) 4d %(earliest)s %(latest)s' % info
+        print
+
+if __name__ == "__main__":
+    main()
+
