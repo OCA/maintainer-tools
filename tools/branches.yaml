@@ -124,11 +124,11 @@ projects:
 #    - ['lp:knowledge-addons/7.0', master]
 #    - ['lp:knowledge-addons/7.0', '7.0']
 #    - ['lp:knowledge-addons/6.1', '6.1']
-  - github: git@github.com:OCA/margin-analysis.git
-    branches:
-    - ['lp:margin-analysis/7.0', master]
-    - ['lp:margin-analysis/7.0', '7.0']
-    - ['lp:margin-analysis/6.1', '6.1']
+#  - github: git@github.com:OCA/margin-analysis.git
+#    branches:
+#    - ['lp:margin-analysis/7.0', master]
+#    - ['lp:margin-analysis/7.0', '7.0']
+#    - ['lp:margin-analysis/6.1', '6.1']
   - github: git@github.com:OCA/multi-company.git
     branches:
     - ['lp:multi-company/7.0', master]
