@@ -45,6 +45,13 @@ To copy the branches of a particular project, put the name of the project (the G
 The same tool can also be used to move other branches to GitHub, see
 https://github.com/OCA/maintainers-tools/wiki/How-to-move-a-Merge-Proposal-to-GitHub
 
+**Set labels on OCA repository on GitHub**
+
+Set standardized labels to ease the issue workflow on all repositories with same colors
+This tools will also warn you what are the specific labels on some repository
+
+    $ oca-set-repo-labels
+
 ## Developers
 
 As a developer, you want to launch the scripts without installing the
