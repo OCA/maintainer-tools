@@ -181,11 +181,11 @@ projects:
     - ['lp:openerp-manufacturing/7.0', master]
     - ['lp:openerp-manufacturing/7.0', '7.0']
     - ['lp:openerp-manufacturing/6.1', '6.1']
-  - github: git@github.com:OCA/management-system.git
-    branches:
-    - ['lp:openerp-mgmtsystem/7.0', master]
-    - ['lp:openerp-mgmtsystem/7.0', '7.0']
-    - ['lp:openerp-mgmtsystem/6.1', '6.1']
+#  - github: git@github.com:OCA/management-system.git
+#    branches:
+#    - ['lp:openerp-mgmtsystem/7.0', master]
+#    - ['lp:openerp-mgmtsystem/7.0', '7.0']
+#    - ['lp:openerp-mgmtsystem/6.1', '6.1']
   - github: git@github.com:OCA/manufacture-reporting.git
     branches:
     - ['lp:openerp-mrp-reports/7.0', master]
