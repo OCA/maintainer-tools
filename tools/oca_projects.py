@@ -23,16 +23,16 @@ OCA_PROJECTS = {
                    'account-invoicing',
                    'account-fiscal-rule',
                    ],
-    ## 'backport': ['OCB',
-    ##              ],
+    # 'backport': ['OCB',
+    #              ],
     'banking': ['banking',
                 'bank-statement-reconcile',
                 'account-payment',
                 ],
-    'community':['maintainers-tools',
-                 'maintainer-quality-tools',
-                 'runbot-addons',
-                 ],
+    'community': ['maintainers-tools',
+                  'maintainer-quality-tools',
+                  'runbot-addons',
+                  ],
     'connector': ['connector',
                   'connector-ecommerce',
                   ],
@@ -117,6 +117,7 @@ _OCA_REPOSITORY_NAMES = set(OCA_REPOSITORY_NAMES)
 _URL_MAPPINGS = {'git': 'git@github.com:OCA/%s.git',
                  'https': 'https://github.com/OCA/%s.git',
                  }
+
 def url(project_name, protocol='git'):
     """get the URL for an OCA project repository"""
     if project_name not in _OCA_REPOSITORY_NAMES:
