@@ -118,6 +118,7 @@ _URL_MAPPINGS = {'git': 'git@github.com:OCA/%s.git',
                  'https': 'https://github.com/OCA/%s.git',
                  }
 
+
 def url(project_name, protocol='git'):
     """get the URL for an OCA project repository"""
     if project_name not in _OCA_REPOSITORY_NAMES:

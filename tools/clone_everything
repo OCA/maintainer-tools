@@ -1,78 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env python
+import subprocess
 
-PROJECTS="account-analytic \
-account-budgeting \
-account-closing \
-account-consolidation \
-account-financial-reporting \
-account-financial-tools \
-account-fiscal-rule \
-account-invoice-reporting \
-account-invoicing \
-account-payment \
-bank-statement-reconcile \
-banking \
-l10n-belgium \
-l10n-canada \
-carriers-delivery \
-commission \
-connector \
-connector-accountedge \
-connector-cmis \
-connector-ecommerce \
-connector-lims \
-connector-magento \
-connector-sage-50 \
-vertical-construction \
-contract \
-crm \
-department \
-e-commerce \
-vertical-editing \
-france \
-geospatial \
-vertical-hotel \
-hr \
-hr-timesheet \
-vertical-isp \
-l10n-italy \
-knowledge \
-l10n-luxembourg \
-manufacture \
-manufacture-reporting \
-margin-analysis \
-vertical-medical \
-management-system \
-multi-company \
-vertical-ngo \
-partner-contact \
-product-attribute \
-product-kitting \
-product-variant \
-program \
-project-reporting \
-project-service \
-purchase-reporting \
-purchase-workflow \
-report-print-send \
-reporting-engine \
-rma \
-sale-financial \
-sale-reporting \
-sale-workflow \
-server-tools \
-l10n-spain \
-stock-logistics-barcode \
-stock-logistics-workflow \
-stock-logistics-reporting \
-stock-logistics-tracking \
-stock-logistics-warehouse \
-l10n-switzerland \
-vertical-travel \
-web \
-webkit-utils"
+from oca_projects import OCA_REPOSITORY_NAMES, url
 
-for PROJ in $PROJECTS ;
-do
-    git clone git@github.com:OCA/${PROJ}.git ${PROJ}
-done
+
+def main():
+    for project in OCA_REPOSITORY_NAMES:
+        cmd = ['git', 'clone', url(project), project]
+        subprocess.call(cmd)
+
+
+if __name__ == '__main__':
+    main()
