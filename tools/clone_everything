@@ -38,7 +38,7 @@ vertical-isp \
 l10n-italy \
 knowledge \
 l10n-luxembourg \
-manufacture-mgmt \
+manufacture \
 manufacture-reporting \
 margin-analysis \
 vertical-medical \
@@ -75,8 +75,4 @@ webkit-utils"
 for PROJ in $PROJECTS ;
 do
     git clone git@github.com:OCA/${PROJ}.git ${PROJ}
-    #pushd $PROJ
-    #git remote set-url origin git@github.com:OCA/${PROJ}.git
-    #git remote update
-    #popd
 done
