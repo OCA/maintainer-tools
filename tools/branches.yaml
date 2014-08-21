@@ -134,10 +134,10 @@ projects:
     - ['lp:multi-company/7.0', master]
     - ['lp:multi-company/7.0', '7.0']
     - ['lp:multi-company/6.1', '6.1']
-  - github: git@github.com:OCA/vertical-medical.git
-    branches:
-    - ['lp:oemedical', master]
-    - ['lp:oemedical', '7.0']
+  # - github: git@github.com:OCA/vertical-medical.git
+  #   branches:
+  #   - ['lp:oemedical', master]
+  #   - ['lp:oemedical', '7.0']
 #  - github: git@github.com:OCA/connector-accountedge.git
 #    branches:
 #    - ['lp:openerp-accountedge/7.0', master]
