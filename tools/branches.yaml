@@ -321,3 +321,8 @@ projects:
   - github: git@github.com:OCA/community-data-files.git
    branches:
    - ['lp:openerp-data/7.0', master]
+  - github: git@github.com:OCA/connector-prestashop.git
+   branches:
+   - ['lp:prestashoperpconnect/7.0', master]
+   - ['lp:prestashoperpconnect/7.0', '7.0']
+   - ['lp:prestashoperpconnect/6.1', '6.1']
