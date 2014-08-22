@@ -248,11 +248,11 @@ projects:
   #  - ['lp:project-service/7.0', master]
   #  - ['lp:project-service/7.0', '7.0']
   #  - ['lp:project-service/6.1', '6.1']
-  - github: git@github.com:OCA/purchase-reporting.git
-    branches:
-    - ['lp:purchase-report/7.0', master]
-    - ['lp:purchase-report/7.0', '7.0']
-    - ['lp:purchase-report/6.1', '6.1']
+  # - github: git@github.com:OCA/purchase-reporting.git
+  #   branches:
+  #   - ['lp:purchase-report/7.0', master]
+  #   - ['lp:purchase-report/7.0', '7.0']
+  #   - ['lp:purchase-report/6.1', '6.1']
   #- github: git@github.com:OCA/purchase-workflow.git
   #  branches:
   #  - ['lp:purchase-wkfl/7.0', master]
