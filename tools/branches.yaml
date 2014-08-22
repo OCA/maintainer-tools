@@ -129,11 +129,11 @@ projects:
 #    - ['lp:margin-analysis/7.0', master]
 #    - ['lp:margin-analysis/7.0', '7.0']
 #    - ['lp:margin-analysis/6.1', '6.1']
-  - github: git@github.com:OCA/multi-company.git
-    branches:
-    - ['lp:multi-company/7.0', master]
-    - ['lp:multi-company/7.0', '7.0']
-    - ['lp:multi-company/6.1', '6.1']
+  # - github: git@github.com:OCA/multi-company.git
+  #   branches:
+  #   - ['lp:multi-company/7.0', master]
+  #   - ['lp:multi-company/7.0', '7.0']
+  #   - ['lp:multi-company/6.1', '6.1']
   # - github: git@github.com:OCA/vertical-medical.git
   #   branches:
   #   - ['lp:oemedical', master]
