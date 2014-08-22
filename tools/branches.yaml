@@ -199,11 +199,11 @@ projects:
   #  - ['lp:openerp-product-attributes/7.0', master]
   #  - ['lp:openerp-product-attributes/7.0', '7.0']
   #  - ['lp:openerp-product-attributes/6.1', '6.1']
-  - github: git@github.com:OCA/product-variant.git
-    branches:
-    - ['lp:openerp-product-variant/7.0', master]
-    - ['lp:openerp-product-variant/7.0', '7.0']
-    - ['lp:openerp-product-variant/6.1', '6.1']
+  # - github: git@github.com:OCA/product-variant.git
+  #   branches:
+  #   - ['lp:openerp-product-variant/7.0', master]
+  #   - ['lp:openerp-product-variant/7.0', '7.0']
+  #   - ['lp:openerp-product-variant/6.1', '6.1']
   # - github: git@github.com:OCA/program.git
   #  branches:
   #  - ['lp:openerp-program/7.0', master]
