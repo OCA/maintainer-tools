@@ -318,3 +318,6 @@ projects:
   #  - ['lp:webkit-utils/7.0', master]
   #  - ['lp:webkit-utils/7.0', '7.0']
   #  - ['lp:webkit-utils/6.1', '6.1']
+  - github: git@github.com:OCA/community-data-files.git
+   branches:
+   - ['lp:openerp-data/7.0', master]
