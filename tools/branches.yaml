@@ -263,11 +263,11 @@ projects:
   #  - ['lp:report-print-send/7.0', master]
   #  - ['lp:report-print-send/7.0', '7.0']
   #  - ['lp:report-print-send/6.1', '6.1']
-  - github: git@github.com:OCA/sale-financial.git
-    branches:
-    - ['lp:sale-financial/7.0', master]
-    - ['lp:sale-financial/7.0', '7.0']
-    - ['lp:sale-financial/6.1', '6.1']
+  # - github: git@github.com:OCA/sale-financial.git
+  #   branches:
+  #   - ['lp:sale-financial/7.0', master]
+  #   - ['lp:sale-financial/7.0', '7.0']
+  #   - ['lp:sale-financial/6.1', '6.1']
   #- github: git@github.com:OCA/sale-reporting.git
   #  branches:
   #  - ['lp:sale-reports/7.0', master]
