@@ -163,10 +163,10 @@ projects:
 #    - ['lp:openerp-hr/7.0', master]
 #    - ['lp:openerp-hr/7.0', '7.0']
 #    - ['lp:openerp-hr/6.1', '6.1']
-  - github: git@github.com:OCA/commission.git
-    branches:
-    - ['lp:openerp-icm/7.0', master]
-    - ['lp:openerp-icm/7.0', '7.0']
+#  - github: git@github.com:OCA/commission.git
+#    branches:
+#    - ['lp:openerp-icm/7.0', master]
+#    - ['lp:openerp-icm/7.0', '7.0']
   - github: git@github.com:OCA/vertical-isp.git
     branches:
     - ['lp:openerp-isp/7.0', master]
