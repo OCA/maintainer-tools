@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function
 
-from .github_login import login
+import sys
+from . import github_login
+from . import odoo_login
 
 
 MAINTAINERS_TEAM_ID = 844365
@@ -9,10 +11,10 @@ BLACKLIST = [MAINTAINERS_TEAM_ID,
              829420  # 'Owners' team
              ]
 
+def copy_users(odoo):
+    gh = github_login.login()
 
-def main():
-    gh = login()
-
+    sys.exit('not implemented')
     org = gh.organization('oca')
 
     teams = org.iter_teams()
@@ -34,6 +36,12 @@ def main():
         for member in missing:
             print("Adding {0}".format(member.login))
             team.add_member(member.login)
+
+
+def main():
+    args = odoo_login.get_args()
+    odoo = odoo_login.login(args.username, args.store)
+    copy_users(odoo)
 
 
 if __name__ == '__main__':
