@@ -35,8 +35,7 @@ def login(username, store):
     return client
 
 
-def get_args():
-    parser = argparse.ArgumentParser()
+def add_args(parser):
     parser.add_argument("-u", "--username",
                         help="Odoo Username. When a username is not provided,"
                              " it will read the configuration file.")
@@ -44,11 +43,12 @@ def get_args():
                         action='store_true',
                         help="Store the username and password in a "
                              "configuration file. Warning, clear text!"),
-    return parser.parse_args()
 
 
 def main():
-    args = get_args()
+    parser = argparse.ArgumentParser()
+    add_args(parser)
+    args = parser.parse_args()
     login(args.username, args.store)
 
 
