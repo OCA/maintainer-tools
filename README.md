@@ -21,7 +21,10 @@ Get a token from Github, you may have to delete the existing one from Account se
 
     $ oca-github-login USERNAME
 
-**Copy the users from the maintainers team to the other teams**
+**Copy the users from the teams configured on community.odoo.com to the GitHub teams**
+
+The partners on odoo must have their GitHub login set otherwise they won't be added in
+the GitHub teams.
 
     $ oca-copy-maintainers
 
