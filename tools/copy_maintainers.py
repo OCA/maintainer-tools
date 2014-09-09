@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function
 
+import argparse
 import sys
 from . import github_login
 from . import odoo_login
@@ -11,8 +12,11 @@ BLACKLIST = [MAINTAINERS_TEAM_ID,
              829420  # 'Owners' team
              ]
 
-def copy_users(odoo):
+
+def copy_users(odoo, team):
     gh = github_login.login()
+
+
 
     sys.exit('not implemented')
     org = gh.organization('oca')
@@ -39,9 +43,15 @@ def copy_users(odoo):
 
 
 def main():
-    args = odoo_login.get_args()
+    parser = argparse.ArgumentParser()
+    # get the odoo login specific args
+    odoo_login.add_args(parser)
+    parser.add_argument("-t", "--team",
+                        help="Name of the team to synchronize.")
+    args = parser.parse_args()
+
     odoo = odoo_login.login(args.username, args.store)
-    copy_users(odoo)
+    copy_users(odoo, args.team)
 
 
 if __name__ == '__main__':
