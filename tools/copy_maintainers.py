@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function
 
+"""
+oca-copy-maintainers
+
+Copy the users from the teams configured on community.odoo.com to the
+GitHub teams
+
+"""
+
 import argparse
 import sys
 from operator import attrgetter
