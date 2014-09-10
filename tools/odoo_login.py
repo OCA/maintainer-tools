@@ -2,7 +2,6 @@
 from __future__ import absolute_import, print_function
 
 import argparse
-import ConfigParser
 import sys
 import erppeek
 from getpass import getpass
