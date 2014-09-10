@@ -1,9 +1,15 @@
 #!/bin/sh
+# This script is meant to keep the github OCA/OCB and odoo/odoo in sync.
+# Technically, it simply merges odoo into the repective branch in OCB, thereby
+# keeping commit identifiers stable (that as opposed to a rebase approach,
+# where commit hashes are rewritten)
+# The following variables can be overriden by a file called ocb-sync.sh.conf
+# in the same directory as this file.
 
 ODOO="git@github.com:/odoo/odoo.git"
 OCB="git@github.com:/OCA/OCB.git"
 BRANCHES="8.0 7.0"
-GITDIR="/tmp/git"
+GITDIR="/var/tmp/git"
 
 if [ -f $(dirname $0)/$(basename $0).conf ]; then
     . $(dirname $0)/$(basename $0).conf
