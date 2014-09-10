@@ -3,20 +3,16 @@ from __future__ import absolute_import, print_function
 
 import argparse
 import sys
+from operator import attrgetter
 from . import github_login
 from . import odoo_login
-
-
-MAINTAINERS_TEAM_ID = 844365
-BLACKLIST = [MAINTAINERS_TEAM_ID,
-             829420  # 'Owners' team
-             ]
+from . import colors
 
 
 def copy_users(odoo, team=None, dry_run=False):
     gh = github_login.login()
 
-    # called Project on odoo, but we use 'team' as in GitHub
+    # on odoo, the model is a project, but they are teams on GitHub
     Project = odoo.model('project.project')
     if team:
         projects = Project.browse([('name', '=', team)])
@@ -25,33 +21,56 @@ def copy_users(odoo, team=None, dry_run=False):
     else:
         projects = Project.browse([])
 
+    print('Fetching teams...')
     org = gh.organization('oca')
-    for project in projects:
-        name = project.name
-        print('Syncing %s' % name)
-        teams = list(org.iter_teams())
+    github_teams = list(org.iter_teams())
+    valid = []
+    not_found = []
+    for odoo_project in sorted(projects, key=attrgetter('name')):
+        for github_team in github_teams:
+            if github_team.name == odoo_project.name:
+                valid.append((odoo_project, github_team))
+                break
+        else:
+            not_found.append(odoo_project)
 
+    no_github_login = set()
+    for odoo_project, github_team in valid:
+        print()
+        print('Syncing project "%s"' % odoo_project.name)
+        users = [odoo_project.user_id]
+        users += odoo_project.members
+        logins = set()
+        for user in users:
+            if user.x_github_login:
+                logins.add(user.x_github_login)
+            else:
+                no_github_login.add("%s (%s)" % (user.name, user.login))
+        current_logins = set(user.login for user in github_team.iter_members())
 
-    sys.exit('not implemented')
+        keep_logins = logins.intersection(current_logins)
+        remove_logins = current_logins - logins
+        add_logins = logins - current_logins
+        print("Add   ", colors.GREEN + ', '.join(add_logins) + colors.ENDC)
+        print("Keep  ", ', '.join(keep_logins))
+        print("Remove", colors.FAIL + ', '.join(remove_logins) + colors.ENDC)
+        if not dry_run:
+            for login in add_logins:
+                github_team.add_member(login)
+            for login in remove_logins:
+                github_team.remove_member(login)
 
-    maintainers_team = next((team for team in teams if
-                            team.id == MAINTAINERS_TEAM_ID),
-                            None)
-    assert maintainers_team, "Maintainers Team not found"
+    if no_github_login:
+        print()
+        print('Following users miss GitHub login:')
+        print(colors.FAIL + '\n'.join(user for user in no_github_login) +
+              colors.ENDC)
 
-    maintainers = set(maintainers_team.iter_members())
-
-    for team in teams:
-        if team.id in BLACKLIST:
-            continue
-        team_members = set(team.iter_members())
-        print("Team {0}".format(team.name))
-        missing = maintainers - team_members
-        if not missing:
-            print("All maintainers are registered")
-        for member in missing:
-            print("Adding {0}".format(member.login))
-            team.add_member(member.login)
+    if not_found:
+        print()
+        print('The following odoo projects have no team in GitHub:')
+        for project in not_found:
+            print(project.name)
 
 
 def main():
