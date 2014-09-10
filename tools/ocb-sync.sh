@@ -30,6 +30,7 @@ git fetch --all
 for BRANCH in $BRANCHES; do
     git checkout origin/$BRANCH -B $BRANCH
     git pull --ff-only
-    git merge --no-edit odoo/$BRANCH || break
-    git push -u origin $BRANCH
+    git merge --no-edit odoo/$BRANCH || exit 1
+    git push -u origin $BRANCH || exit 1
 done
+exit 0
