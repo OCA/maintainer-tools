@@ -22,12 +22,15 @@ def copy_users(odoo, team=None, dry_run=False):
 
     # on odoo, the model is a project, but they are teams on GitHub
     Project = odoo.model('project.project')
+    base_domain = [('privacy_visibility = public'),
+                   ('state != template')]
     if team:
-        projects = Project.browse([('name', '=', team)])
+        domain = [('name', '=', team)] + base_domain
+        projects = Project.browse(domain)
         if not projects:
             sys.exit('Project %s not found.' % team)
     else:
-        projects = Project.browse([])
+        projects = Project.browse(base_domain)
 
     print('Fetching teams...')
     org = gh.organization('oca')
