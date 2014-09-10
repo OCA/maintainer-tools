@@ -13,15 +13,27 @@ BLACKLIST = [MAINTAINERS_TEAM_ID,
              ]
 
 
-def copy_users(odoo, team):
+def copy_users(odoo, team=None, dry_run=False):
     gh = github_login.login()
 
+    # called Project on odoo, but we use 'team' as in GitHub
+    Project = odoo.model('project.project')
+    if team:
+        projects = Project.browse([('name', '=', team)])
+        if not projects:
+            sys.exit('Project %s not found.' % team)
+    else:
+        projects = Project.browse([])
+
+    org = gh.organization('oca')
+    for project in projects:
+        name = project.name
+        print('Syncing %s' % name)
+        teams = list(org.iter_teams())
 
 
     sys.exit('not implemented')
-    org = gh.organization('oca')
 
-    teams = org.iter_teams()
     maintainers_team = next((team for team in teams if
                             team.id == MAINTAINERS_TEAM_ID),
                             None)
@@ -43,15 +55,18 @@ def copy_users(odoo, team):
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    # get the odoo login specific args
-    odoo_login.add_args(parser)
-    parser.add_argument("-t", "--team",
-                        help="Name of the team to synchronize.")
+    parser = argparse.ArgumentParser(parents=[odoo_login.get_parser()])
+    group = parser.add_argument_group('Copy maintainers options')
+    group.add_argument("-t", "--team",
+                       help="Name of the team to synchronize.")
+    group.add_argument("--dry-run",
+                       action='store_true',
+                       help="Prints the actions to do, "
+                            "but does not apply them")
     args = parser.parse_args()
 
     odoo = odoo_login.login(args.username, args.store)
-    copy_users(odoo, args.team)
+    copy_users(odoo, team=args.team, dry_run=args.dry_run)
 
 
 if __name__ == '__main__':
