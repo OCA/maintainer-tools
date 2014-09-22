@@ -31,6 +31,6 @@ for BRANCH in $BRANCHES; do
     git checkout origin/$BRANCH -B $BRANCH
     git pull --ff-only
     git merge --no-edit odoo/$BRANCH || exit 1
-    git push -u origin origin/$BRANCH || exit 1
+    git push -u origin HEAD:$BRANCH || exit 1
 done
 exit 0
