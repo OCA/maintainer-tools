@@ -10,6 +10,8 @@ import re
 import argparse
 import sys
 
+from progressbar import ProgressBar
+
 
 github_link = "[{REPO}](https://github.com/{ORG}/{REPO})"
 travis_badge = (
@@ -46,10 +48,15 @@ def generate_badge_file(username, password, org_name, exclude):
     all_branch_names = set()
     repo_branch_names = dict()
     org = gh.organization(org_name)
-    for repo in org.iter_repos():
+    pbar = ProgressBar(
+        maxval=org.public_repos + org.private_repos
+    )
+    for i, repo in enumerate(org.iter_repos()):
         branch_names = set(branch.name for branch in repo.iter_branches())
         repo_branch_names[repo.name] = branch_names
         all_branch_names.update(branch_names)
+        pbar.update(i)
+    pbar.finish()
     all_branch_names -= exclude
     all_branch_names = sorted(all_branch_names)
     line = "repo | " + " | ".join(all_branch_names)
