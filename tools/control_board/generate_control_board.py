@@ -54,7 +54,9 @@ def generate_badge_file(username, password, org_name, exclude):
     line = "repo | " + " | ".join(all_branch_names)
     out += line + "\n" + re.sub("[^|]", "-", line) + "\n"
     for repo in sorted(repo_branch_names):
-        branch_name_list = repo_branch_names[repo]
+        branch_name_list = set(repo_branch_names[repo])
+        if not branch_name_list.intersection(all_branch_names):
+            continue
         line = repo + " | " + " | ".join(
             get_badges(org_name, repo, branch)
             if branch in branch_name_list else ""
