@@ -11,6 +11,7 @@ import argparse
 import sys
 
 
+github_link = "[{REPO}](https://github.com/{ORG}/{REPO})"
 travis_badge = (
     "[![Build Status]"
     "(https://travis-ci.org/{ORG}/{REPO}.svg?branch={BRANCH})]"
@@ -57,7 +58,8 @@ def generate_badge_file(username, password, org_name, exclude):
         branch_name_list = set(repo_branch_names[repo])
         if not branch_name_list.intersection(all_branch_names):
             continue
-        line = repo + " | " + " | ".join(
+        repo_link = github_link.format(ORG=org_name, REPO=repo)
+        line = repo_link + " | " + " | ".join(
             get_badges(org_name, repo, branch)
             if branch in branch_name_list else ""
             for branch in all_branch_names
