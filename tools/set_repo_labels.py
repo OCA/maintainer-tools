@@ -14,6 +14,8 @@ REPO_TO_IGNORE = [
 
 # here is the list of labels we need in each repo
 all_labels = {
+    '7.0': '000000',
+    '8.0': '000000',
     'bug': 'fc2929',
     'duplicate': 'cccccc',
     'enhancement': '84b6eb',
