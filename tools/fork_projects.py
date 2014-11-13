@@ -5,6 +5,9 @@ Script to fork all project from a organization to other organization
 '''
 
 import argparse
+import sys
+
+import github3
 
 from .github_login import login
 
@@ -20,7 +23,13 @@ def fork(organization_from, organization_to):
     org_to = gh_login.organization(organization_to)
     all_repos = gh_login.iter_user_repos(organization_from)
     for repo in all_repos:
-        repo.create_fork(org_to)
+        try:
+            repo.create_fork(org_to)
+            sys.stdout.write("Repo forked: " + repo.name + '\n')
+        except github3.models.GitHubError, msg:
+            sys.stdout.write("Error repo not forked: {repo_name} \n"
+                             "{msg_error}\n".format(repo_name=repo.name,
+                                                    msg_error=msg.message))
 
 
 def main():
