@@ -6,7 +6,7 @@ Script to fork all project from a organization to other organization
 
 import argparse
 
-from github_login import login
+from .github_login import login
 
 
 def fork(organization_from, organization_to):
