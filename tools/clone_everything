@@ -1,14 +1,38 @@
 #!/usr/bin/env python
+
+import argparse
 import subprocess
 
 from oca_projects import OCA_REPOSITORY_NAMES, url
+import os
 
 
-def main():
+def clone(organization_remotes=None):
     for project in OCA_REPOSITORY_NAMES:
         cmd = ['git', 'clone', url(project), project]
         subprocess.call(cmd)
 
+        if organization_remotes:
+            for organization_remote in organization_remotes.split(','):
+                cmd = ['git', '--git-dir=' + os.path.join(project, '.git'),
+                       'remote', 'add', organization_remote,
+                       url(project, org_name=organization_remote)]
+                subprocess.call(cmd)
+                cmd = ['git', '--git-dir=' + os.path.join(project, '.git'),
+                       'fetch', organization_remote]
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--organization-remotes", dest="org_remotes",
+                        help="Specify additional remote to add"
+                        " (separated by commas).\n"
+                        "This is used after of clone, add organization"
+                        " remote into git branch cloned",
+                        nargs=1, default=None)
+    args = parser.parse_args()
+    org_remotes = args.org_remotes and args.org_remotes[0] or None
+    clone(organization_remotes=org_remotes)
 
 if __name__ == '__main__':
     main()

@@ -114,13 +114,13 @@ OCA_REPOSITORY_NAMES.sort()
 
 _OCA_REPOSITORY_NAMES = set(OCA_REPOSITORY_NAMES)
 
-_URL_MAPPINGS = {'git': 'git@github.com:OCA/%s.git',
-                 'https': 'https://github.com/OCA/%s.git',
+_URL_MAPPINGS = {'git': 'git@github.com:%s/%s.git',
+                 'https': 'https://github.com/%s/%s.git',
                  }
 
 
-def url(project_name, protocol='git'):
+def url(project_name, protocol='git', org_name='OCA'):
     """get the URL for an OCA project repository"""
     if project_name not in _OCA_REPOSITORY_NAMES:
         raise ValueError('Unknown project', project_name)
-    return _URL_MAPPINGS[protocol] % project_name
+    return _URL_MAPPINGS[protocol] % (org_name, project_name)
