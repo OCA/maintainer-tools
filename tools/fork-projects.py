@@ -8,6 +8,7 @@ import argparse
 
 from github_login import login
 
+
 def fork(organization_from, organization_to):
     '''
     Method to fork all project from a organization to other organization
@@ -20,6 +21,7 @@ def fork(organization_from, organization_to):
     all_repos = gh_login.iter_user_repos(organization_from)
     for repo in all_repos:
         repo.create_fork(org_to)
+
 
 def main():
     '''
