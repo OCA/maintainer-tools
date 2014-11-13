@@ -17,8 +17,8 @@ def clone(organization_remotes=None):
                 cmd = ['git', '--git-dir=' + os.path.join(project, '.git'),
                        'remote', 'add', organization_remote,
                        url(project, org_name=organization_remote)]
-
                 subprocess.call(cmd)
+
                 cmd = ['git', '--git-dir=' + os.path.join(project, '.git'),
                        'fetch', organization_remote]
                 subprocess.call(cmd)
