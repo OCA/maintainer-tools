@@ -27,21 +27,22 @@ def fork(organization_from, organization_to):
         try:
             repo.create_fork(org_to)
             forked = True
-        except github3.models.GitHubError, error_attemp1:
+        except github3.models.GitHubError, github_error:
+            pass
+        except TypeError:
             try:
+                #  If has TypeError then use string to fix it
                 repo.create_fork(organization_to)
                 forked = True
-            except github3.models.GitHubError, error_attemp2:
+            except github3.models.GitHubError, github_error:
                 pass
         if forked:
             sys.stdout.write("Repo forked: " + repo.name + '\n')
         else:
             sys.stdout.write("Error repo not forked: {repo_name} \n"
-                             "Attemp1 error: {error_attemp1}\n"
-                             "Attemp2 error: {error_attemp2}\n"
+                             "Error msg: {github_error}\n"
                              .format(repo_name=repo.name,
-                                     error_attemp1=error_attemp1.message,
-                                     error_attemp2=error_attemp2.message))
+                                     github_error=github_error.message))
 
 
 def main():
