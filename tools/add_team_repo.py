@@ -24,8 +24,10 @@ def add_team_repo(repositories, org, team):
                     team_get = team_obj
     # Repo object for the org and repositories given
     for repo in github3.iter_user_repos(org):
-        for repository in repositories:
-            if str(repo.name) == repository:
+        if repositories == None:
+            team_get.add_repo(repo)
+        else:
+            if str(repo.name) in repositories:
                 team_get.add_repo(repo)
 
 def main():
@@ -37,6 +39,11 @@ def main():
                                      "https://github3py.readthedocs.org/\
                                      en/latest/orgs.html"
                                      "#add-team-repo")
+    parser.add_argument('--all-repo-enable',
+                        action='store_true',
+                        default=False,
+                        help=" Use this command to assign team to all\
+                        repositories of the organization.")
     parser.add_argument('-l',
                         '--list',
                         help="The names of repositories to use."
@@ -51,9 +58,11 @@ def main():
                         help="The name of the team to add to repository.")
 
     args = parser.parse_args()
-    
-    repo_list = [str(item) for item in args.list.split(',')]
-    #~ res = add_team_repo(repo_list, args.org, args.team)
+
+    repo_list = None
+    if args.list:
+        repo_list = [str(item) for item in args.list.split(',')]
+    res = add_team_repo(repo_list, args.org, args.team)
 
 
 if __name__ == '__main__':
