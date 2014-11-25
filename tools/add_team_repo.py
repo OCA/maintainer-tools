@@ -22,7 +22,7 @@ def add_team_repo(repositories, org, team):
             for team_obj in org_obj.iter_teams():
                 if str(team_obj.name) == team:
                     team_get = team_obj
-    # Repo object for the org anb repositories given
+    # Repo object for the org and repositories given
     for repo in github3.iter_user_repos(org):
         for repository in repositories:
             if str(repo.name) == repository:
