@@ -18,7 +18,7 @@ def add_team_repo(repositories, org, team):
     team_get = None
     # Team object for the org and team given
     for org_obj in user.iter_orgs():
-        if (str(org_obj.__dict__.get('login'))).lower() == org.lower():
+        if (str(org_obj.login)).lower() == org.lower():
             for team_obj in org_obj.iter_teams():
                 if str(team_obj.name) == team:
                     team_get = team_obj
@@ -53,7 +53,7 @@ def main():
     args = parser.parse_args()
     
     repo_list = [str(item) for item in args.list.split(',')]
-    res = add_team_repo(repo_list, args.org, args.team)
+    #~ res = add_team_repo(repo_list, args.org, args.team)
 
 
 if __name__ == '__main__':
