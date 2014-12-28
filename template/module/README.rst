@@ -6,19 +6,27 @@ This module was written to extend the functionality of ... to support ... and al
 Installation
 ============
 
-To install this module:
+To install this module, you need to:
 
  * do this ...
 
 Configuration
 =============
 
- * Go to ...
+To configure this module, you need to:
+
+ * go to ...
 
 Usage
 =====
 
- * Go to ...
+To use this module, you need to:
+
+ * go to ...
+
+For further information, please visit:
+
+ * https://www.odoo.com/forum/help-1
 
 Known issues / Roadmap
 ======================
