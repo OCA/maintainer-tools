@@ -25,7 +25,7 @@ def main():
                                 'login': partner.email,
                                 'groups_id': [(4, grp_project_user.id, 0)],
                                 })
-        print('created user', user, 'for', partner.x_github_login)
+        print(u'created user', user, u'for', partner.x_github_login)
 
 if __name__ == '__main__':
     main()
