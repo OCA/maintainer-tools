@@ -7,6 +7,8 @@ This enables adding them to project teams in the OCA instance.
 """
 from __future__ import absolute_import, print_function
 
+import xmlrpclib
+
 from . odoo_login import login, get_parser
 
 
@@ -21,11 +23,16 @@ def main():
     members_with_gh = ResPartner.search([('x_github_login', '!=', False),
                                          ('user_ids', '=', False)])
     for partner in ResPartner.browse(members_with_gh):
-        user = ResUsers.create({'partner_id': partner.id,
-                                'login': partner.email,
-                                'groups_id': [(4, grp_project_user.id, 0)],
-                                })
-        print(u'created user', user, u'for', partner.x_github_login)
+        try:
+            user = ResUsers.create({'partner_id': partner.id,
+                                    'login': partner.email,
+                                    'groups_id': [(4, grp_project_user.id, 0)],
+                                    })
+        except xmlrpclib.Fault as exc:
+            print('unable to create user for partner %r: '
+                  'missing email address' % partner.x_github_login)
+        else:
+            print(u'created user %r for partner %r' % (user, partner.x_github_login))
 
 if __name__ == '__main__':
     main()
