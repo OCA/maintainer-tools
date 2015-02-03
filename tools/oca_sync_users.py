@@ -23,7 +23,7 @@ def main():
     for partner in ResPartner.browse(members_with_gh):
         user = ResUsers.create({'partner_id': partner.id,
                                 'login': partner.email,
-                                'group_ids': [(4, grp_project_user.id, 0)],
+                                'groups_id': [(4, grp_project_user.id, 0)],
                                 })
         print('created user', user, 'for', partner.x_github_login)
 
