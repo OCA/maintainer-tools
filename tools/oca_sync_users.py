@@ -17,18 +17,15 @@ def main():
     ResPartner = client.ResPartner
     ResUsers = client.ResUsers
     ResGroups = client.ResGroups
-    grp_project_user = ResGroups.search([('category_id.name', '=', 'Project'),
-                                         ('name', '=', 'User')])
-    members_with_gh = ResPartner.search([('x_github_login', '!=', False)])
+    grp_project_user = ResGroups.get('project.group_project_user')
+    members_with_gh = ResPartner.search([('x_github_login', '!=', False),
+                                         ('user_ids', '=', False)])
     for partner in ResPartner.browse(members_with_gh):
-        print('checking', partner.x_github_login)
-        user = ResUsers.search([('partner_id', '=', partner.id)])
-        if not user:
-            user = ResUsers.create({'partner_id': partner.id,
-                                    'login': partner.email,
-                                    'group_ids': [(4, grp_project_user.id, 0)],
-                                    })
-            print('created user', user)
+        user = ResUsers.create({'partner_id': partner.id,
+                                'login': partner.email,
+                                'group_ids': [(4, grp_project_user.id, 0)],
+                                })
+        print('created user', user, 'for', partner.x_github_login)
 
 if __name__ == '__main__':
     main()
