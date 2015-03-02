@@ -22,6 +22,8 @@ def main():
     grp_project_user = ResGroups.get('project.group_project_user')
     members_with_gh = ResPartner.search([('x_github_login', '!=', False),
                                          ('user_ids', '=', False)])
+    if not members_with_gh:
+        return
     for partner in ResPartner.browse(members_with_gh):
         try:
             user = ResUsers.create({'partner_id': partner.id,
