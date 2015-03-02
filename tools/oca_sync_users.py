@@ -30,11 +30,13 @@ def main():
                                     'login': partner.email,
                                     'groups_id': [(4, grp_project_user.id, 0)],
                                     })
-        except xmlrpclib.Fault as exc:
-            print('unable to create user for partner %r: '
-                  'missing email address' % partner.x_github_login)
+        except xmlrpclib.Fault:
+            print('unable to create user for partner %r (%s) : '
+                  'probable email address issue' % (partner.x_github_login,
+                                                    partner.id))
         else:
-            print(u'created user %r for partner %r' % (user, partner.x_github_login))
+            print(u'created user %r for partner %r' % (user,
+                                                       partner.x_github_login))
 
 if __name__ == '__main__':
     main()
