@@ -2,36 +2,18 @@
 from __future__ import absolute_import, print_function
 
 import argparse
-import ConfigParser
 import os
 import sys
 from getpass import getpass
 import github3
-
-CREDENTIALS_FILE = 'oca.cfg'
-
-
-def init_config(path):
-    config = ConfigParser.ConfigParser()
-    config.add_section("GitHub")
-    config.set("GitHub", "token", "")
-    with open(path, "wb") as config_file:
-        config.write(config_file)
-
-
-def read_config(path):
-    if not os.path.exists(CREDENTIALS_FILE):
-        init_config(CREDENTIALS_FILE)
-    config = ConfigParser.ConfigParser()
-    config.read(CREDENTIALS_FILE)
-    return config
+from . config import read_config, write_config
 
 
 def login():
     if os.environ.get('GITHUB_TOKEN'):
         token = os.environ['GITHUB_TOKEN']
     else:
-        config = read_config(CREDENTIALS_FILE)
+        config = read_config()
         token = config.get('GitHub', 'token')
     if not token:
         sys.exit("No token has been generated for this script. "
@@ -40,7 +22,7 @@ def login():
 
 
 def authorize_token(user):
-    config = read_config(CREDENTIALS_FILE)
+    config = read_config()
     if config.get('GitHub', 'token'):
         print("The token already exists.")
         sys.exit()
@@ -66,8 +48,7 @@ def authorize_token(user):
         raise
 
     config.set("GitHub", "token", auth.token)
-    with open(CREDENTIALS_FILE, 'w') as fd:
-        config.write(fd)
+    write_config(config)
     print("Token stored in configuration file")
 
 
