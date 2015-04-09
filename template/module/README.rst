@@ -43,8 +43,8 @@ Credits
 Contributors
 ------------
 
-* Firsname Lastname <email.address@example.org>
-* Second Guy <second.guy@example.org>
+* Firstname Lastname <email.address@example.org>
+* Second Person <second.person@example.org>
 
 Maintainer
 ----------
