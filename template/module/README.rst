@@ -44,6 +44,7 @@ Contributors
 ------------
 
 * Firsname Lastname <email.address@example.org>
+* Second Guy <second.guy@example.org>
 
 Maintainer
 ----------
