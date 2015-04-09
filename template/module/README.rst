@@ -1,5 +1,5 @@
 .. image:: https://img.shields.io/badge/licence-AGPL--3-blue.svg
-    :alt: License
+    :alt: License: AGPL-3
 
 Module name
 ===========
@@ -12,30 +12,30 @@ Installation
 
 To install this module, you need to:
 
- * do this ...
+* do this ...
 
 Configuration
 =============
 
 To configure this module, you need to:
 
- * go to ...
+* go to ...
 
 Usage
 =====
 
 To use this module, you need to:
 
- * go to ...
+* go to ...
 
 For further information, please visit:
 
- * https://www.odoo.com/forum/help-1
+* https://www.odoo.com/forum/help-1
 
 Known issues / Roadmap
 ======================
 
- * ...
+* ...
 
 Credits
 =======
@@ -43,7 +43,8 @@ Credits
 Contributors
 ------------
 
-* Firsname Lastname <email.address@example.org>
+* Firstname Lastname <email.address@example.org>
+* Second Person <second.person@example.org>
 
 Maintainer
 ----------
