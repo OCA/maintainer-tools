@@ -1,49 +1,66 @@
-#Team
+Team
+====
 
 * Team name must not contain odoo or openerp
 * Team name for localization is "Belgium Maintainers" for Belgium
 
-#Project / Repository
+Project / Repository
+====================
 
 * Project name must not contain odoo or openerp
 * Project name for localization is "l10n_Belgium" for Belgium
 * Project name for connectors is "connector-magento" for Magento connector
 
-# Branch
+Branch
+======
 
-# Module
+
+Module
+======
 
 * Prefer the use of the singular form in module name (or use 'multi')
 * Use the description template (rst or html) provided on http://github.com/oca/maintainer-tools
 
-# Python Code
+Python Code
+===========
 
 * Follow Python PEP 8: https://www.python.org/dev/peps/pep-0008/ 
 * Do not use deprecated features
 
-# XML Code
+XML Code
+========
 
-# JS Code
+JS Code
+=======
 
-# Menu
+Menu
+====
 
-# Reporting
+Reporting
+=========
 
-# Translation
+Translation
+===========
 
-# Security
+Security
+========
 
-# Tests
+Tests
+=====
 
-# Demo data
+Demo data
+=========
 
-# Migration
+Migration
+=========
 
-# Issue 
+Issue
+=====
 
 * Issues are used for blueprints and bugs.
 
-# Commit
+Commit
+======
 
 * Write a helpful commit message
 * Use a commit tag in each message. This tag should be one of:
@@ -77,9 +94,11 @@ Note
 Avoid big commits
 Don't make a commit that will impact lots of modules. Try to split it into different commits where impacted modules are different (It will be helpful when we are going to revert that module separately).
 
-# Pull request
+Pull request
+============
 
-# Review
+Review
+======
 
 Peer review is the only way to ensure good quality of the code and to be able to rely on the others devs. The peer review in this project will be made by making Merge Proposal. It will serve the following main purposes:
 
