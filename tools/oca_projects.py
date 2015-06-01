@@ -10,6 +10,8 @@ OCA_REPOSITORY_NAMES: list of OCA repository names
 
 """
 
+from github_login import login
+
 ALL = ['OCA_PROJECTS', 'OCA_REPOSITORY_NAMES', 'url']
 
 OCA_PROJECTS = {
@@ -107,9 +109,27 @@ OCA_PROJECTS = {
     'web': ['web'],
     }
 
-OCA_REPOSITORY_NAMES = []
-for repos in OCA_PROJECTS.itervalues():
-    OCA_REPOSITORY_NAMES += repos
+
+def get_repositories():
+    ignored = set([
+        'odoo-community.org',
+        'community-data-files',
+        'contribute-md-template',
+        'website',
+        ])
+    gh = login()
+    all_repos = [repo.name for repo in gh.iter_user_repos('OCA')
+                 if repo not in ignored]
+    return all_repos
+
+try:
+    OCA_REPOSITORY_NAMES = get_repositories()
+except Exception as exc:
+    print exc
+    OCA_REPOSITORY_NAMES = []
+    for repos in OCA_PROJECTS.itervalues():
+        OCA_REPOSITORY_NAMES += repos
+
 OCA_REPOSITORY_NAMES.sort()
 
 _OCA_REPOSITORY_NAMES = set(OCA_REPOSITORY_NAMES)

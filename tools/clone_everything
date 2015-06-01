@@ -9,9 +9,12 @@ import os
 
 def clone(organization_remotes=None):
     for project in OCA_REPOSITORY_NAMES:
-        cmd = ['git', 'clone', url(project), project]
-        subprocess.call(cmd)
-
+        cmd = ['git', 'clone', '--quiet', url(project), project]
+        try:
+            subprocess.check_call(cmd)
+        except:
+            cmd = ['git', '--git-dir=' + os.path.join(project, '.git'), 'fetch', '--all']
+            subprocess.call(cmd)
         if organization_remotes:
             for organization_remote in organization_remotes.split(','):
                 cmd = ['git', '--git-dir=' + os.path.join(project, '.git'),
