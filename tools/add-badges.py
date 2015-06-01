@@ -45,6 +45,21 @@ for repo_list_line in open('repositories.txt'):
             sys.stdout.write(readme_line)
             if not stuff_added and 'travis-ci.org' in readme_line:
                 sys.stdout.write(new_lines)
+
+        transifex_folder = "OCA-" + repo_name + version.replace('.', '-')
+        transifex_lines = (
+            "Translation Status\n"
+            "------------------\n"
+            "[![Transifex Status]"
+            "(https://www.transifex.com/projects/p/{0}/chart/image_png)]"
+            "(https://www.transifex.com/projects/p/{0})\n".format(
+                transifex_folder
+            )
+        )
+
+        with open("REAMDME.md", "a") as readme_file:  # append
+            readme_file.write(transifex_lines)
+
         subprocess.check_call(['git', 'add', '--all'])
         subprocess.check_call(
             ['git', 'commit', '-m', 'add new badges and codeclimate']
