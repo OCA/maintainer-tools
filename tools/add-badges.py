@@ -17,11 +17,11 @@ for repo_list_line in open('repositories.txt'):
     for version in ['6.1', '7.0', '8.0']:
         try:
             subprocess.check_call(['git', 'checkout', '--quiet', version])
-            subprocess.check_call(['git', 'reset', '--hard'])
-            subprocess.check_call(['git', 'clean', '-fxd'])
         except subprocess.CalledProcessError:
             continue
 
+        subprocess.check_call(['git', 'reset', '--hard'])
+        subprocess.check_call(['git', 'clean', '-fxd'])
         new_lines = (
             "[![Runbot Build Status]"
             "(http://runbot.odoo-community.org/runbot/badge/flat/{0}/{1}.svg)]"
