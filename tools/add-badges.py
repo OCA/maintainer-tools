@@ -47,6 +47,7 @@ for repo_list_line in open('repos_with_ids.txt'):
             sys.stdout.write(readme_line)
             if not stuff_added and 'travis-ci.org' in readme_line:
                 sys.stdout.write(new_lines)
+                stuff_added = True
 
         transifex_folder = "OCA-" + repo_name + version.replace('.', '-')
         transifex_lines = (
