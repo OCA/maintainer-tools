@@ -65,7 +65,13 @@ for repo_list_line in open('repos_with_ids.txt'):
 
         subprocess.check_call(['git', 'add', '--all'])
         subprocess.check_call(
-            ['git', 'commit', '-m', 'add new badges and codeclimate']
+            ['git', 'commit', '-m',
+             '''\
+add badges and files for transifex, runbot, codeclimate
+
+This is an automatic commit done with the add-badges.py script
+in maintainers-tools.
+''']
         )
 
         # stop here!
