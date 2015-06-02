@@ -32,6 +32,7 @@ for repo_list_line in open('repos_with_ids.txt'):
             )
         )
 
+        # template file is in OCA/maintainer-quality-tools
         if not os.path.exists('.codeclimate.yml'):
             new_lines += (
                 "[![Code Climate]"
@@ -41,6 +42,10 @@ for repo_list_line in open('repos_with_ids.txt'):
                 )
             )
             shutil.copy('../.codeclimate.yml', '.')
+
+        # template file is in OCA/maintainer-quality-tools
+        if not os.path.exists('CONTRIBUTING.md'):
+            shutil.copy('../CONTRIBUTING.md', '.')
 
         stuff_added = False
         for readme_line in fileinput.input('README.md', inplace=1):
