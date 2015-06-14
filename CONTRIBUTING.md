@@ -184,13 +184,6 @@ Use the following pattern:
 </record>
 ```
 
-These rules should be followed even when a view is inherited, the module name
-prevents xid conflicts. In the case where a view inherited has a name which
-does not follow the guidelines set above, prefer naming the inherited view
-after the original over using a name which follows the guidelines. This eases
-looking up the original view and other inheritance if they all have the same
-name.
-
 #### Inherited XML
 
 A module can extend a view only one time.
@@ -230,7 +223,7 @@ The imports are ordered as
 3. Imports from Odoo modules (rarely, and only if necessary)
 4. Local imports in the relative form
 
-Inside these 3 groups, the imported lines are alphabetically sorted.
+Inside these 4 groups, the imported lines are alphabetically sorted.
 
 ```python
 # 1: imports of python lib
