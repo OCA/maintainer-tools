@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-This script is meant to pull the translations from Transiflex .
-Technically, it will pull the translations from transiflex,
+This script is meant to pull the translations from Transilex .
+Technically, it will pull the translations from transilex,
 compare it with the po files in the repository and replace it if needed
 """
 
@@ -11,10 +11,7 @@ import os, shutil
 import difflib
 import re
 from config import read_config, write_config
-
-from git import Repo
 from oca_projects import OCA_REPOSITORY_NAMES
-
 
 config = read_config()
 # Github parameter
