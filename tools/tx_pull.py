@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """
-This script is meant to pull the translations from Transilex .
-Technically, it will pull the translations from transilex,
+This script is meant to pull the translations from Transifex .
+Technically, it will pull the translations from transifex,
 compare it with the po files in the repository and replace it if needed
 """
 
 from transifex.api import TransifexAPI
-import os, shutil
+import os
+import shutil
 import difflib
 import re
-from config import read_config, write_config
-from oca_projects import OCA_REPOSITORY_NAMES
+from config import read_config
+# from oca_projects import OCA_REPOSITORY_NAMES
 
 config = read_config()
 # Github parameter
@@ -32,6 +33,7 @@ tx_password = config.get('Transifex', 'password')
 URL = "http://transifex.com"
 TXAPI = TransifexAPI(tx_username, tx_password, URL)
 
+
 def treat_project(tx_project, repo, branch):
 
     resources = TXAPI.list_resources(tx_project)
@@ -41,8 +43,8 @@ def treat_project(tx_project, repo, branch):
 
     for resource in resources:
         slug = resource.get('slug')
-        path_to_resource = os.path.join(WORKDIR, "translations",
-                                         tx_project, slug)
+        path_to_resource = os.path.join(
+            WORKDIR, "translations", tx_project, slug)
         languages = TXAPI.list_languages(tx_project, slug)
 
         print 'Getting po file for resource %s' % slug
@@ -86,6 +88,7 @@ def treat_project(tx_project, repo, branch):
         ref = repo.ref('heads/{}'.format(branch))
         ref.update(c.sha)
 
+
 def main():
     connected = TXAPI.ping()
 
@@ -99,7 +102,7 @@ def main():
     os.makedirs(WORKDIR)
     os.makedirs(WORKDIR + "/translations")
 
-    for oca_project in ['management-system']:#OCA_REPOSITORY_NAMES:
+    for oca_project in ['management-system']:  # OCA_REPOSITORY_NAMES:
         tx_project_v8 = "OCA-%s-8-0" % oca_project
 
         if not TXAPI.project_exists(tx_project_v8):
