@@ -4,6 +4,7 @@ import subprocess
 import fileinput
 import sys
 import shutil
+import pdb
 
 # Runbot urls need the repo id from the table in the runbot server.
 # This file is the output of a select id, name from there.
@@ -80,6 +81,6 @@ in maintainers-tools.
         )
 
         # stop here!
-        import pdb; pdb.set_trace()  # XXX BREAKPOINT
+        pdb.set_trace()
 
     os.chdir('..')
