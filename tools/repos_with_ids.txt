@@ -89,3 +89,5 @@
 161|github.com/OCA/vertical-travel
 158|github.com/OCA/vertical-isp
 160|github.com/OCA/vertical-ngo
+199|github.com/OCA/event
+200|github.com/OCA/survey
