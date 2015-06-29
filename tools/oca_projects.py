@@ -10,6 +10,8 @@ OCA_REPOSITORY_NAMES: list of OCA repository names
 
 """
 
+from github_login import login
+
 ALL = ['OCA_PROJECTS', 'OCA_REPOSITORY_NAMES', 'url']
 
 OCA_PROJECTS = {
@@ -42,13 +44,15 @@ OCA_PROJECTS = {
     'connector magento': ['connector-magento'],
     'connector prestashop': ['connector-prestashop'],
     'connector sage': ['connector-sage-50'],
-    'crm sales': ['sale-workflow',
-                  'crm',
-                  'partner-contact',
-                  'sale-financial',
-                  'sale-reporting',
-                  'commission',
-                  ],
+    'crm sales marketing': ['sale-workflow',
+                            'crm',
+                            'partner-contact',
+                            'sale-financial',
+                            'sale-reporting',
+                            'commission',
+                            'event',
+                            'survey',
+                            ],
     'document': ['knowledge'],
     'ecommerce': ['e-commerce'],
     'financial control': ['margin-analysis'],
@@ -123,20 +127,38 @@ OCA_PROJECTS = {
     'web': ['web'],
     }
 
-OCA_REPOSITORY_NAMES = []
-for repos in OCA_PROJECTS.itervalues():
-    OCA_REPOSITORY_NAMES += repos
+
+def get_repositories():
+    ignored = set([
+        'odoo-community.org',
+        'community-data-files',
+        'contribute-md-template',
+        'website',
+        ])
+    gh = login()
+    all_repos = [repo.name for repo in gh.iter_user_repos('OCA')
+                 if repo not in ignored]
+    return all_repos
+
+try:
+    OCA_REPOSITORY_NAMES = get_repositories()
+except Exception as exc:
+    print exc
+    OCA_REPOSITORY_NAMES = []
+    for repos in OCA_PROJECTS.itervalues():
+        OCA_REPOSITORY_NAMES += repos
+
 OCA_REPOSITORY_NAMES.sort()
 
 _OCA_REPOSITORY_NAMES = set(OCA_REPOSITORY_NAMES)
 
-_URL_MAPPINGS = {'git': 'git@github.com:OCA/%s.git',
-                 'https': 'https://github.com/OCA/%s.git',
+_URL_MAPPINGS = {'git': 'git@github.com:%s/%s.git',
+                 'https': 'https://github.com/%s/%s.git',
                  }
 
 
-def url(project_name, protocol='git'):
+def url(project_name, protocol='git', org_name='OCA'):
     """get the URL for an OCA project repository"""
     if project_name not in _OCA_REPOSITORY_NAMES:
         raise ValueError('Unknown project', project_name)
-    return _URL_MAPPINGS[protocol] % project_name
+    return _URL_MAPPINGS[protocol] % (org_name, project_name)

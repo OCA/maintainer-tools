@@ -21,9 +21,33 @@ Get a token from Github, you may have to delete the existing one from Account se
 
     $ oca-github-login USERNAME
 
-**Copy the users from the maintainers team to the other teams**
+**Copy the users from the teams configured on community.odoo.com to the GitHub teams**
+
+Goal: members of the teams should never be added directly on GitHub.
+They should be added on https://community.odoo.com. This script will
+sync all the teams from odoo to GitHub.
+
+Prerequisites:
+
+* Your odoo user must have read accesses to the projects and users.
+* The partners on odoo must have their GitHub login set otherwise they won't
+  be added in the GitHub teams.
+* Your GitHub user must have owners rights on the OCA organization to be
+  able to add or remove members.
+* The odoo project must have the same name than the GitHub teams.
+
+Run the script in "dry-run" mode:
+
+    $ oca-copy-maintainers --dry-run
+
+Apply the changes on GitHub:
 
     $ oca-copy-maintainers
+
+The first time it runs, it will ask you for your odoo's username and
+password. You may store them using the `--store` option, but be warned
+that the password is stored in clear text.
+
 
 **Migrate the Launchpad branches to GitHub**
 
@@ -58,9 +82,10 @@ As a developer, you want to launch the scripts without installing the
 egg. 
 
     $ git clone git@github.com:OCA/maintainers-tools.git
+    $ cd maintainers-tools
     $ virtualenv env
     $ . env/bin/activate
-    $ pip install -e maintainers-tools
+    $ pip install -e .
 
 **Get a token from Github**
 
