@@ -254,8 +254,9 @@ from . import utils
    and are generally more efficient
 * The same applies for recordset methods: use `filtered`, `mapped`, `sorted`,
   ...
-* Use the `UserError` defined in `openerp.exceptions` instead of overriding
-  `Warning`, or find a more appropriate exception in `exceptions.py`
+* Exceptions: Use `from openerp.exceptions import Warning as UserError` (v8)
+  or `from openerp.exceptions import UserError` (v9)
+  or find a more appropriate exception in `openerp.exceptions.py`
 * Document your code
     * Docstring on methods should explain the purpose of a function,
       not a summary of the code
