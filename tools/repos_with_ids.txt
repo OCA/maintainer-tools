@@ -89,5 +89,15 @@
 161|github.com/OCA/vertical-travel
 158|github.com/OCA/vertical-isp
 160|github.com/OCA/vertical-ngo
+189|github.com/OCA/l10n-spain
+190|github.com/OCA/l10n-norway
+192|github.com/OCA/l10n-taiwan
+193|github.com/OCA/l10n-mexico
+194|github.com/OCA/l10n-venezuela
+195|github.com/OCA/l10n-colombia
+196|github.com/OCA/l10n-costa-rica
+197|github.com/OCA/l10n-india
+198|github.com/OCA/l10n-china
 199|github.com/OCA/event
 200|github.com/OCA/survey
+201|github.com/OCA/l10n-ireland
