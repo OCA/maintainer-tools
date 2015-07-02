@@ -10,10 +10,15 @@ CREDENTIALS_FILE = 'oca.cfg'
 def init_config():
     config = ConfigParser.ConfigParser()
     config.add_section("GitHub")
+    config.set("GitHub", "username", "")
     config.set("GitHub", "token", "")
     config.add_section("odoo")
     config.set("odoo", "username", "")
     config.set("odoo", "password", "")
+    config.add_section("Transifex")
+    config.set("Transifex", "username", "")
+    config.set("Transifex", "password", "")
+    config.set("Transifex", "num_retries", 3)
     write_config(config)
 
 
