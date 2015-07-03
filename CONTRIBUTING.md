@@ -12,7 +12,9 @@ section.
 
 ## Modules
 
-* Prefer the use of the singular form in module name (or use "multi")
+* Use of the singular form in module name (or use "multi"),
+  except when compound of module name or object Odoo
+  that is already in the plural (i.e. mrp_operations_....).
 * Use the [description template](https://github.com/OCA/maintainer-tools/tree/master/template/module)
 
 ### Directories
@@ -506,7 +508,7 @@ Please respect a few basic rules:
 * Two reviewers must approve a merge proposal in order to be able to merge it
 * 5 calendar days must be given to be able to merge it
 * A MP can be merged in less that 5 calendar days if and only if it is approved
-  by 3 reviewers. If you are in a hurry just send a mail at 
+  by 3 reviewers. If you are in a hurry just send a mail at
   openerp-community-reviewer@lists.launchpad.net or ask by IRC (FreeNode
   server, openobject channel).
 * Is the module generic enough to be part of community addons?
