@@ -101,3 +101,4 @@
 199|github.com/OCA/event
 200|github.com/OCA/survey
 201|github.com/OCA/l10n-ireland
+203|github.com/OCA/l10n-usa
