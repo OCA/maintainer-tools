@@ -84,6 +84,7 @@ OCA_PROJECTS = {
     'l10n-spain': ['l10n-spain'],
     'l10n-switzerland': ['l10n-switzerland'],
     'l10n-taiwan': ['l10n-taiwan'],
+    'l10n-usa': ['l10n-usa'],
     'l10n-venezuela': ['l10n-venezuela'],
     'logistics': ['carrier-delivery',
                   'stock-logistics-barcode',
