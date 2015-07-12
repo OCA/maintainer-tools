@@ -137,12 +137,12 @@ egg.
 
 **Get a token from Github**
 
-    $ python -m tools.github_login USERNAME
+    $ python -m oca.tools.github_login USERNAME
 
 **Run a script**
 
-    $ python -m tools.copy_maintainers
+    $ python -m oca.tools.copy_maintainers
 
 You can use the `GITHUB_TOKEN` environment variable to specify the token
 
-    $ GITHUB_TOKEN=xxx python -m tools.copy_maintainers
+    $ GITHUB_TOKEN=xxx python -m oca.tools.copy_maintainers
