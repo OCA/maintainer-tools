@@ -34,7 +34,22 @@ def authorize_token(user):
     scopes = ['repo', 'read:org', 'write:org', 'admin:org']
 
     try:
-        auth = github3.authorize(user, password, scopes, note, note_url)
+        # Python 2
+        prompt = raw_input
+    except NameError:
+        # Python 3
+        prompt = input
+
+    def two_factor_prompt():
+        code = ''
+        while not code:
+            # The user could accidentally press Enter before being ready,
+            # let's protect them from doing that.
+            code = prompt('Enter 2FA code: ')
+        return code
+    try:
+        auth = github3.authorize(user, password, scopes, note, note_url,
+                                 two_factor_callback=two_factor_prompt)
     except github3.GitHubError as err:
         if err.code == 422:
             for error in err.errors:
