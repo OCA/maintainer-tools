@@ -1,4 +1,4 @@
-ERPpeek==1.5.3
+ERPpeek==1.6.1
 PyYAML==3.11
 argparse==1.2.1
 bzr==2.6.0
