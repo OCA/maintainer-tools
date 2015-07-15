@@ -581,7 +581,7 @@ maintainability in an ecosystem of many smaller modules.
 
 The differences include:
 
-* [Module Structure](#model-structure)
+* [Module Structure](#modules)
     * Using one file per model
     * Separating data and demo data xml folders
     * Not changing xml_ids while inheriting
