@@ -28,6 +28,7 @@ A module is organised in a few directory:
 * `views/`: contains the views and templates
 * `static/`: contains the web assets, separated into `css/`, `js/`, `img/`,
   `lib/`, ...
+* `wizards/`: wizard model and views
 
 ### File naming
 
@@ -90,9 +91,13 @@ addons/<my_module_name>/
 |-- views/
 |   |-- <main_model>.xml
 |   `-- <inherited_main_model>_views.xml
-`-- templates/
-    |-- <main_model>.xml
-    `-- <inherited_main_model>.xml
+|-- templates/
+|   |-- <main_model>.xml
+|   `-- <inherited_main_model>.xml
+`-- wizards/
+    |-- __init__.py
+    |-- <wizard_model>.py
+    `-- <wizard_model>.xml
 ```
 
 Filename should only use only `[a-z0-9_]`
