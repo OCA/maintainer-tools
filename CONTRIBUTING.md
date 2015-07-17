@@ -244,6 +244,10 @@ from openerp.addons.web.controllers.main import login_redirect
 from . import utils
 ```
 
+ * Note:
+   * You can use [isort](https://pypi.python.org/pypi/isort/) to auto sort import's.
+   * Install with `pip install isort` and use with `isort myfile.py`.
+
 ### Idioms
 
 * Each python file should have ``# -*- coding: utf-8 -*-`` as first line
