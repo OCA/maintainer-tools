@@ -215,7 +215,7 @@ name.
 ### PEP8 options
 
 Using the linter flake8 can help to see syntax and semantic warning or error.
-Project Source Code should adhere to PEP8 and PyFlakes standards standards with
+Project Source Code should adhere to PEP8 and PyFlakes standards with
 a few exceptions:
 
 * In `__init__.py` only
