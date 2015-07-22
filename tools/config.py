@@ -16,9 +16,10 @@ def init_config():
     config.set("odoo", "username", "")
     config.set("odoo", "password", "")
     config.add_section("Transifex")
-    config.set("Transifex", "username", "")
+    config.set("Transifex", "username", "transbot@odoo-community.org")
     config.set("Transifex", "password", "")
     config.set("Transifex", "num_retries", 3)
+    config.set("Transifex", "organization", "OCA")
     write_config(config)
 
 
