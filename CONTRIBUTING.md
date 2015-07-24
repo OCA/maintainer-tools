@@ -23,10 +23,10 @@ A module is organised in a few directory:
 
 * `data/`: data xml
 * `demo/`: demo xml
-* `report/`: reporting models (BI/analysis), print report templates (QWeb, Webkit, RML, ...)
+* `report/`: reporting models (BI/analysis),  Webkit/RML print report templates
 * `models/`: models definition
 * `controllers/`: contains controllers (http routes)
-* `views/`: contains the views and templates
+* `views/`: contains the views and templates, and QWeb report print templates
 * `static/`: contains the web assets, separated into `css/`, `js/`, `img/`,
   `lib/`, ...
 * `wizards/`: wizard model and views
