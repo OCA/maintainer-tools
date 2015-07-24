@@ -75,8 +75,8 @@ addons/<my_module_name>/
 |   |-- __init__.py
 |   |-- report.xml
 |   |-- <bi_reporting_model>.py
-|   |-- <rml_report_name>.rml
-|   |-- <rml_report_name>.py
+|   |-- report_<rml_report_name>.rml
+|   |-- report_<rml_report_name>.py
 |   |-- <webkit_report_name>.mako
 |-- security/
 |   |-- ir.model.access.csv
@@ -99,7 +99,7 @@ addons/<my_module_name>/
 |-- views/
 |   |-- <main_model>.xml
 |   `-- <inherited_main_model>_views.xml
-|   |-- <qweb_report>_report.xml
+|   |-- report_<qweb_report>.xml
 |-- templates/
 |   |-- <main_model>.xml
 |   `-- <inherited_main_model>.xml
