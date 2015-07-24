@@ -23,6 +23,7 @@ A module is organised in a few directory:
 
 * `data/`: data xml
 * `demo/`: demo xml
+* `report/`: reporting models (BI/analysis), print report templates (QWeb, Webkit, RML, ...)
 * `models/`: models definition
 * `controllers/`: contains controllers (http routes)
 * `views/`: contains the views and templates
