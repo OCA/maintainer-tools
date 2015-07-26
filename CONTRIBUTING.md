@@ -17,6 +17,24 @@ section.
   that is already in the plural (i.e. mrp_operations_....).
 * Use the [description template](https://github.com/OCA/maintainer-tools/tree/master/template/module)
 
+### Version numbers
+
+The version number in the module manifest should be the Odoo major
+version (e.g. `8.0`) followed by the module `x.y` version numbers.
+For example: `8.0.1.0` is expected for the first release of an 8.0
+module.
+
+The `x.y` version numbers follow the semantics `breaking.feature`:
+  * `x` increments when changes can break modules extending on it
+  * `y` increments when non-breaking new features are added
+
+If applicable, breaking changes are expected to include instruction
+or scripts to perform migration on current installations.
+
+Unless fitting in the above criteria, bugfixes are not required
+to increment module version numbers.
+
+
 ### Directories
 
 A module is organised in a few directory:
