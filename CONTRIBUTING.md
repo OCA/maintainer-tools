@@ -347,7 +347,7 @@ partner_id = partners[0].id
   pointer directly to the `default` parameter does not allow for inheritance.
 
   ```python
-  a_field(..., default=lambda self: self._default_get)
+  a_field(..., default=lambda self: self._default_get())
   ```
 
 * In a Model attribute order should be
