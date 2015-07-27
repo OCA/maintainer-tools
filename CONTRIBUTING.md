@@ -21,13 +21,14 @@ section.
 
 A module is organised in a few directory:
 
+* `controllers/`: contains controllers (http routes)
 * `data/`: data xml
 * `demo/`: demo xml
 * `models/`: models definition
-* `controllers/`: contains controllers (http routes)
-* `views/`: contains the views and templates
+* `report/`: reporting models (BI/analysis), Webkit/RML print report templates
 * `static/`: contains the web assets, separated into `css/`, `js/`, `img/`,
   `lib/`, ...
+* `views/`: contains the views and templates, and QWeb report print templates
 * `wizards/`: wizard model and views
 
 ### File naming
@@ -41,10 +42,10 @@ views/res_partner.xml.
 For model named `<main_model>` the following files may be created:
 
 * `models/<main_model>.py`
-* `views/<main_model>.xml`
-* `templates/<main_model>.xml`
 * `data/<main_model>.xml`
 * `demo/<main_model>.xml`
+* `templates/<main_model>.xml`
+* `views/<main_model>.xml`
 
 For `controller`, the only file should be named `main.py`.
 
@@ -70,6 +71,13 @@ addons/<my_module_name>/
 |   |-- __init__.py
 |   |-- <main_model>.py
 |   `-- <inherited_model>.py
+|-- report/
+|   |-- __init__.py
+|   |-- report.xml
+|   |-- <bi_reporting_model>.py
+|   |-- report_<rml_report_name>.rml
+|   |-- report_<rml_report_name>.py
+|   |-- <webkit_report_name>.mako
 |-- security/
 |   |-- ir.model.access.csv
 |   `-- <main_model>_security.xml
@@ -91,6 +99,7 @@ addons/<my_module_name>/
 |-- views/
 |   |-- <main_model>.xml
 |   `-- <inherited_main_model>_views.xml
+|   |-- report_<qweb_report>.xml
 |-- templates/
 |   |-- <main_model>.xml
 |   `-- <inherited_main_model>.xml
