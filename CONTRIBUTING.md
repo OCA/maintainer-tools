@@ -323,16 +323,25 @@ class account_invoice(orm.Model):
 ```
 
 #### Variable name :
-* use camelcase for model variable
-* use underscore lowercase notation for common variable.
+* use underscore lowercase notation for common variable (snake_case)
 * since new API works with record or recordset instead of id list, don't suffix
   variable name with `_id` or `_ids` if they do not contain an id or a list of
   ids.
 
 ```python
-ResPartner = self.env['res.partner']
-partners = ResPartner.browse(ids)
-partner_id = partners[0].id
+    ...
+    res_partner = self.env['res.partner']
+    partners = res_partner.browse(ids)
+    partner_id = partners[0].id
+```
+
+* Use underscore uppercase notation for global variables or constants
+```python
+...
+CONSTANT_VAR1 = 'Value'
+...
+class...
+...
 ```
 
 ### Field
@@ -609,6 +618,8 @@ The differences include:
     * More python idioms
     * A way to deal with long comma-separated lines
     * Hints on documentation
+    * Don't use CamelCase for model variable
+    * Use underscore uppercase notation for global variables or constants
 * [Fields](#fields)
     * A hint for function defaults
 * [Tests Section Added](#tests)
