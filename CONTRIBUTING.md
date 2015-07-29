@@ -258,6 +258,10 @@ except ImportError:
   _logger.info('Can not `import external_dependency_python_N`.')
 ```
 
+#### README
+If your module use extras dependencies of python or binaries, please explain how to install them in the `README.rst` file in the section `Installation`.
+
+
 ## Python
 
 ### PEP8 options
