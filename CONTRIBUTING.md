@@ -219,6 +219,45 @@ name.
 </record>
 ```
 
+### External dependencies
+
+#### `__openerp__.py`
+If your module use extras dependencies of python or binaries you should add to `__openerp__py` file the section `external_dependencies`.
+
+```python
+{
+    'name': 'Module of example',
+    'depends': ['base'],
+    ...
+    'external_dependencies': {
+        'bin': [
+            'external_dependency_binary_1',
+            'external_dependency_binary_2',
+            ...
+            'external_dependency_binary_N',
+        ],
+        'python': [
+            'external_dependency_python_1',
+            'external_dependency_python_2',
+            ...
+            'external_dependency_python_N',
+        ],
+    },
+    ...
+    'installable': True,
+}
+```
+
+#### ImportError
+In python files where you use a `import external_dependency_python_N` you will need to add a `try-except` with a info log.
+
+```python
+try:
+  import external_dependency_python_N
+except ImportError:
+  _logger.info('Can not `import external_dependency_python_N`.')
+```
+
 ## Python
 
 ### PEP8 options
@@ -603,6 +642,7 @@ The differences include:
     * Using one file per model
     * Separating data and demo data xml folders
     * Not changing xml_ids while inheriting
+    * Add guideline to use external dependencies
 * [Python](#python)
     * Fuller PEP8 compliance
     * Using relative import for local files
