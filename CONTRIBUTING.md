@@ -248,6 +248,7 @@ If your module use extras dependencies of python or binaries you should add to `
 ```
 
 An entry in `bin` needs to be in `PATH` identify with `which external_dependency_binary_N` command.
+
 An entry in `python` needs to be in `PYTHONPATH` identify with `python -c "import external_dependency_python_N"` command.
 
 #### ImportError
