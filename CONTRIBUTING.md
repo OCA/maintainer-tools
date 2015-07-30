@@ -226,8 +226,7 @@ If your module use extras dependencies of python or binaries you should add to `
 
 ```python
 {
-    'name': 'Module of example',
-    'depends': ['base'],
+    'name': 'Example Module',
     ...
     'external_dependencies': {
         'bin': [
@@ -248,6 +247,9 @@ If your module use extras dependencies of python or binaries you should add to `
 }
 ```
 
+An entry in `bin` needs to be in `PATH` identify with `which external_dependency_binary_N` command.
+An entry in `python` needs to be in `PYTHONPATH` identify with `python -c "import external_dependency_python_N"` command.
+
 #### ImportError
 In python files where you use a `import external_dependency_python_N` you will need to add a `try-except` with a info log.
 
@@ -255,7 +257,7 @@ In python files where you use a `import external_dependency_python_N` you will n
 try:
   import external_dependency_python_N
 except ImportError:
-  _logger.info('Can not `import external_dependency_python_N`.')
+  _logger.debug('Can not `import external_dependency_python_N`.')
 ```
 
 #### README
