@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Instructions: https://www.odoo.com/documentation/8.0/reference/module.html
 {
     "name": "Module name",
