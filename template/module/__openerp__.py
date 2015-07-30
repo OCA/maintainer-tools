@@ -8,7 +8,7 @@
     "license": "AGPL-3",
     "website": "https://odoo-community.org/",
     "author": "Odoo Community Association (OCA)",
-    "application": True,
+    "application": False,
     "installable": True,
     "external_dependencies": {
         "python": [],
