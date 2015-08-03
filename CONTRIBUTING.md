@@ -219,6 +219,52 @@ name.
 </record>
 ```
 
+### External dependencies
+
+#### `__openerp__.py`
+If your module use extras dependencies of python or binaries you should add to `__openerp__py` file the section `external_dependencies`.
+
+```python
+{
+    'name': 'Example Module',
+    ...
+    'external_dependencies': {
+        'bin': [
+            'external_dependency_binary_1',
+            'external_dependency_binary_2',
+            ...
+            'external_dependency_binary_N',
+        ],
+        'python': [
+            'external_dependency_python_1',
+            'external_dependency_python_2',
+            ...
+            'external_dependency_python_N',
+        ],
+    },
+    ...
+    'installable': True,
+}
+```
+
+An entry in `bin` needs to be in `PATH` identify with `which external_dependency_binary_N` command.
+
+An entry in `python` needs to be in `PYTHONPATH` identify with `python -c "import external_dependency_python_N"` command.
+
+#### ImportError
+In python files where you use a `import external_dependency_python_N` you will need to add a `try-except` with a info log.
+
+```python
+try:
+  import external_dependency_python_N
+except ImportError:
+  _logger.debug('Can not `import external_dependency_python_N`.')
+```
+
+#### README
+If your module use extras dependencies of python or binaries, please explain how to install them in the `README.rst` file in the section `Installation`.
+
+
 ## Python
 
 ### PEP8 options
@@ -612,6 +658,7 @@ The differences include:
     * Using one file per model
     * Separating data and demo data xml folders
     * Not changing xml_ids while inheriting
+    * Add guideline to use external dependencies
 * [Python](#python)
     * Fuller PEP8 compliance
     * Using relative import for local files
