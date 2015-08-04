@@ -32,6 +32,11 @@ For further information, please visit:
 
 * https://www.odoo.com/forum/help-1
 
+Demo
+====
+
+To try this module, you can use `Runbot <https://runbot.odoo-community.org/runbot/{repo_id}/{branch}>`_ and connect using "admin" as login and password.
+
 Known issues / Roadmap
 ======================
 
