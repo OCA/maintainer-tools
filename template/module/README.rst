@@ -28,14 +28,14 @@ To use this module, you need to:
 
 * go to ...
 
+`Try it live! <https://runbot.odoo-community.org/runbot/{repo_id}/{branch}>`_
+
+.. repo_id is available in https://github.com/OCA/maintainer-tools/blob/master/tools/repos_with_ids.txt
+.. branch is "8.0" for example
+
 For further information, please visit:
 
 * https://www.odoo.com/forum/help-1
-
-Demo
-====
-
-To try this module, you can use `Runbot <https://runbot.odoo-community.org/runbot/{repo_id}/{branch}>`_ and connect using "admin" as login and password.
 
 Known issues / Roadmap
 ======================
