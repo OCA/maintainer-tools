@@ -400,6 +400,9 @@ class...
   (example: sale_order_line_ids)
 * `Many2One` fields should have `_id` as suffix
   (example: partner_id, user_id, ...)
+* If the technical name of the field (the variable name) is the same to the string of the label, don't put `string` parameter for new API fields, because it's automatically taken. If your variable name contains "_" in the name, they are converted to spaces when creating the automatic string and each word is capitalized.
+  (example: old api `'name': fields.char('Name', ...)`
+            new api `'name': fields.Char(...)`)
 * Method conventions
     * Compute Field: the compute method pattern is `_compute_<field_name>`
     * Search method: the search method pattern is `_search_<field_name>`
@@ -674,6 +677,7 @@ The differences include:
     * Use underscore uppercase notation for global variables or constants
 * [Fields](#fields)
     * A hint for function defaults
+    * Use default label string if is posible.
 * [Tests Section Added](#tests)
 * [Git](#git)
     * No prefixing of commits
