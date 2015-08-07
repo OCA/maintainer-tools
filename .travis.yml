@@ -1,4 +1,5 @@
 # Config file .travis.yml
+sudo: false
 
 language: python
 

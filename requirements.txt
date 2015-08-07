@@ -5,4 +5,5 @@ bzr==2.6.0
 github3.py==0.9.0
 requests==2.3.0
 uritemplate.py==0.3.0
+-e git+https://github.com/charbeljc/pystache.git#egg=pystache-master
 
