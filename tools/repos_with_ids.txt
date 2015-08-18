@@ -103,3 +103,4 @@
 201|github.com/OCA/l10n-ireland
 203|github.com/OCA/l10n-usa
 204|github.com/OCA/l10n-iran
+205|github.com/OCA/social
