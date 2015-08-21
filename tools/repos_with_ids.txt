@@ -105,3 +105,4 @@
 204|github.com/OCA/l10n-iran
 205|github.com/OCA/social
 206|github.com/OCA/l10n-united-kingdom
+186|github.com/OCA/website
