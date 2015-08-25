@@ -154,6 +154,8 @@ When declaring a record in XML,
   action/menu/views, the convention may not be applicable.
 * Use naming convention defined at the next point
 * The tag `<data>` is only used to set not-updatable data with `noupdate=1`
+* Do not prefix the xmlid by the current module's name (`<record id="view_id"...`, not `<record id="current_module.view_id"...`)
+
 
 ```xml
 <record id="view_id" model="ir.ui.view">
@@ -168,6 +170,20 @@ When declaring a record in XML,
     </field>
 </record>
 ```
+
+### Records
+
+* For records of model `ir.filters` use explicit `user_id` field.
+
+```xml
+<record id="filter_id" model="ir.filters">
+    <field name="name">Filter name</field>
+    <field name="model_id">filter.model</field>
+    <field name="user_id" eval="False"/>
+</record>
+```
+
+More info [here](https://github.com/odoo/odoo/pull/8218)
 
 ### Naming xml_id
 
@@ -278,7 +294,7 @@ An entry in `bin` needs to be in `PATH` identify with `which external_dependency
 An entry in `python` needs to be in `PYTHONPATH` identify with `python -c "import external_dependency_python_N"` command.
 
 #### ImportError
-In python files where you use a `import external_dependency_python_N` you will need to add a `try-except` with a info log.
+In python files where you use a `import external_dependency_python_N` you will need to add a `try-except` with a debug log.
 
 ```python
 try:
@@ -688,6 +704,9 @@ The differences include:
     * Separating data and demo data xml folders
     * Not changing xml_ids while inheriting
     * Add guideline to use external dependencies
+* [XML](#xml-files)
+    * Avoid use current module in xml_id
+    * Use explicit `user_id` field for records of model `ir.filters`
 * [Python](#python)
     * Fuller PEP8 compliance
     * Using relative import for local files
@@ -696,7 +715,7 @@ The differences include:
     * Hints on documentation
     * Don't use CamelCase for model variable
     * Use underscore uppercase notation for global variables or constants
-* [Fields](#fields)
+* [Field](#field)
     * A hint for function defaults
     * Use default label string if is posible.
 * [Tests Section Added](#tests)
