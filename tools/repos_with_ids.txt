@@ -106,3 +106,4 @@
 205|github.com/OCA/social
 206|github.com/OCA/l10n-united-kingdom
 186|github.com/OCA/website
+207|github.com/OCA/connector-woocommerce
