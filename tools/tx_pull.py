@@ -87,7 +87,6 @@ To contribute to this module, please visit http://odoo-community.org.
 
 import argparse
 import os.path
-import os
 import re
 
 import polib
@@ -96,148 +95,200 @@ from slumber import API, exceptions
 from . import github_login
 from .config import read_config
 
+
+def get_parser():
+    parser = argparse.ArgumentParser(
+        description='Pull OCA Transifex updated translations to GitHub',
+        add_help=True)
+    parser.add_argument(
+        '-p', '--projects', dest='projects', nargs='+',
+        default=[], help='List of slugs of Transifex projects to pull')
+    parser.add_argument(
+        '-e', '--email', dest='email',
+        help=('Provides an email address used to commit on github if the one '
+              'associated to the github account is not pulbic'))
+    parser.add_argument(
+        '-t', '--target-org', dest='target',
+        help=('By default, translation are committed in github on OCA. This '
+              'arg lets you provide an alternative org'))
+    return parser
+
 TX_USERNAME_DEFAULT = 'transbot@odoo-community.org'
 TX_ORG_DEFAULT = "OCA"
-# Read arguments
-parser = argparse.ArgumentParser(
-    description=u'Pull OCA Transifex updated translations to GitHub')
-parser.add_argument(
-    '-p', '--projects', dest='projects', nargs='+',
-    default=[], help='List of slugs of Transifex projects to pull')
-args = parser.parse_args()
-# Read config
-config = read_config()
-gh_token = config.get('GitHub', 'token')
-tx_username = config.get('Transifex', 'username') \
-    or os.environ.get('TRANSIFEX_USER') \
-    or TX_USERNAME_DFT
-tx_password = config.get('Transifex', 'password') \
-    or os.environ.get('TRANSIFEX_PASSWORD')
-tx_num_retries = config.get('Transifex', 'num_retries') \
-    or os.environ.get('TRANSIFEX_RETRIES')
-tx_org = config.get('Transifex', 'organization') \
-    or os.environ.get('TRANSIFEX_ORGANIZATION') \
-    or TX_ORG_DEFAULT
-# Connect to GitHub
-github = github_login.login()
-gh_user = github.user()
-
-gh_credentials = {'name': gh_user.name or str(gh_user),
-                  'email': gh_user.email}
-
-# Connect to Transifex
-tx_url = "https://www.transifex.com/api/2/"
-tx_api = API(tx_url, auth=(tx_username, tx_password))
+TX_URL = "https://www.transifex.com/api/2/"
 
 
-def _load_po_dict(po_file):
-    po_dict = {}
-    for po_entry in po_file:
-        if po_entry.msgstr:
-            key = u'\n'.join(x[0] for x in po_entry.occurrences)
-            key += u'\nmsgid "%s"' % po_entry.msgid
-            po_dict[key] = po_entry.msgstr
-    return po_dict
+class TransifexPuller(object):
+    def __init__(self, target=None, email=None):
+        # Read config
+        config = read_config()
+        self.gh_token = config.get('GitHub', 'token')
+        tx_username = (
+            config.get('Transifex', 'username') or
+            os.environ.get('TRANSIFEX_USER') or
+            TX_USERNAME_DEFAULT)
+        tx_password = (
+            config.get('Transifex', 'password') or
+            os.environ.get('TRANSIFEX_PASSWORD'))
+        self.tx_num_retries = (
+            config.get('Transifex', 'num_retries') or
+            os.environ.get('TRANSIFEX_RETRIES'))
+        self.tx_org = (
+            config.get('Transifex', 'organization') or
+            os.environ.get('TRANSIFEX_ORGANIZATION') or
+            TX_ORG_DEFAULT)
+        self.gh_org = target or self.tx_org
+        # Connect to GitHub
+        self.github = github_login.login()
+        gh_user = self.github.user()
 
+        if not gh_user.email and not email:
+            raise Exception(
+                'Email required to commit to github. Plz provides one on '
+                'the command line or make the one of your github profile '
+                'public.')
+        self.gh_credentials = {'name': gh_user.name or str(gh_user),
+                               'email': gh_user.email or email}
 
-def process_project(tx_project):
-    print "Processing project '%s'..." % tx_project['name']
-    tx_slug = tx_project['slug']
-    regex = r'(?P<org>)' + tx_org + \
-        '\-(?P<repo>[A-Za-z\-\_]+)\-(?P<branch>[A-Za-z0-9.\-\_]+)'
-    match_object = re.search(regex, tx_slug)
+        # Connect to Transifex
+        self.tx_api = API(TX_URL, auth=(tx_username, tx_password))
 
-    oca_project = match_object.group('repo')
-    gh_repo = github.repository(tx_org, oca_project)
-    oca_branch = match_object.group('branch').replace('-', '.')
-    gh_branch = gh_repo.branch(oca_branch)
-    tree_data = []
-    tree_sha = gh_branch.commit.commit.tree.sha
-    resources = tx_api.project(tx_project['slug']).resources().get()
-    for resource in resources:
-        print "Checking resource %s..." % resource['name']
-        resource = tx_api.project(tx_project['slug']).resource(
-            resource['slug']).get(details=True)
-        for lang in resource['available_languages']:
-            cont = 0
-            tx_lang = False
-            while cont < tx_num_retries and not tx_lang:
-                # for some weird reason, sometimes Transifex fails to answer
-                # some requests, so this retry mechanism handles this problem
+    @classmethod
+    def _load_po_dict(cls, po_file):
+        po_dict = {}
+        for po_entry in po_file:
+            if po_entry.msgstr:
+                key = u'\n'.join(x[0] for x in po_entry.occurrences)
+                key += u'\nmsgid "%s"' % po_entry.msgid
+                po_dict[key] = po_entry.msgstr
+        return po_dict
+
+    @classmethod
+    def _get_oca_project_info(cls, tx_project):
+        """Retrieve project and branch on github from transifex project
+        information
+        """
+        # use the project name since it's always formatted using the convention
+        # my-project (version)
+        # The usage of the name is required since it's hard to find a rule
+        # that covers the following cases when using the tx_slug
+        # OCA-l10n-xxx-8-0
+        # OCA-l10n-xxx-master
+        # OCA XXX_xxx-xxx
+        tx_name = tx_project['name']
+        regex = r'(?P<repo>[^\s]+) \((?P<branch>[^\s]+)\)'
+        match_object = re.search(regex, tx_name)
+        oca_project = match_object.group('repo')
+        oca_branch = match_object.group('branch').replace('-', '.')
+        return oca_project, oca_branch
+
+    def process_projects(self, projects=None):
+        """For each project, get translations from transifex and push to
+        the corresponding project in gihub """
+        tx_projects = []
+        if projects:
+            # Check that provided projects are correct
+            for project_slug in projects:
                 try:
-                    tx_lang = tx_api.project(tx_project['slug']).resource(
-                        resource['slug']).translation(lang['code']).get()
-                except exceptions.HttpClientError:
-                    tx_lang = False
-                    cont += 1
-            if tx_lang:
-                try:
-                    tx_po_file = polib.pofile(tx_lang['content'])
-                    tx_po_dict = _load_po_dict(tx_po_file)
-                    # Discard empty languages
-                    if not tx_po_dict:
-                        continue
-                    gh_i18n_path = os.path.join('/', resource['slug'], "i18n")
-                    gh_file_path = os.path.join(
-                        gh_i18n_path, lang['code'] + '.po')
-                    gh_file = gh_repo.contents(gh_file_path, gh_branch.name)
-                    if gh_file:
-                        gh_po_file = polib.pofile(
-                            gh_file.decoded.decode('utf-8'))
-                        gh_po_dict = _load_po_dict(gh_po_file)
-                        unmatched_items = (set(gh_po_dict.items()) ^
-                                           set(tx_po_dict.items()))
-                        if not unmatched_items:
-                            print "...no change in %s" % gh_file_path
-                            continue
-                    print '..replacing %s' % gh_file_path
-                    new_file_blob = gh_repo.create_blob(
-                        tx_lang['content'], encoding='utf-8')
-                    tree_data.append({
-                        'path': gh_file_path[1:],
-                        'mode': '100644',
-                        'type': 'blob',
-                        'sha': new_file_blob})
-                except (KeyboardInterrupt, SystemExit):
-                    raise
+                    tx_project = self.tx_api.project(project_slug).get()
+                    tx_projects.append(tx_project)
                 except:
-                    print "ERROR: processing lang '%s'" % lang['code']
-            else:
-                print "ERROR: fetching lang '%s'" % lang['code']
-    if tree_data:
-        tree = gh_repo.create_tree(tree_data, tree_sha)
-        message = 'OCA Transbot updated translations from Transifex'
-        print "message", message
-        commit = gh_repo.create_commit(
-            message=message, tree=tree.sha, parents=[gh_branch.commit.sha],
-            author=gh_credentials, committer=gh_credentials)
-        print "git pushing"
-        ## UNCOMMENT THIS LINE gh_repo.ref('heads/{}'.format(gh_branch.name)).update(commit.sha)
+                    print "ERROR: Transifex project slug %s is invalid" % (
+                        project_slug)
+                    return
+        else:
+            start = 1
+            temp_projects = []
+            print "Getting Transifex projects..."
+            while temp_projects or start == 1:
+                temp_projects = self.tx_api.projects().get(start=start)
+                start += len(temp_projects)
+                tx_projects += temp_projects
+        for tx_project in tx_projects:
+            if self.tx_org + '-' in tx_project['slug']:
+                self._process_project(tx_project)
+
+    def _process_project(self, tx_project):
+        print "Processing project '%s'..." % tx_project['name']
+        oca_project, oca_branch = self._get_oca_project_info(tx_project)
+        # get a reference to the github repo and branch where to push the
+        # the translations
+        gh_repo = self.github.repository(self.gh_org, oca_project)
+        gh_branch = gh_repo.branch(oca_branch)
+        tree_data = []
+
+        tx_project_api = self.tx_api.project(tx_project['slug'])
+        resources = tx_project_api.resources().get()
+        for resource in resources:
+            print "Checking resource %s..." % resource['name']
+            tx_resource_api = tx_project_api.resource(resource['slug'])
+            resource = tx_resource_api.get(details=True)
+            for lang in resource['available_languages']:
+                cont = 0
+                tx_lang = False
+                while cont < self.tx_num_retries and not tx_lang:
+                    # for some weird reason, sometimes Transifex fails to
+                    # some requests, so this retry mechanism handles this
+                    # problem
+                    try:
+                        tx_lang = tx_resource_api.translation(
+                            lang['code']).get()
+                    except exceptions.HttpClientError:
+                        tx_lang = False
+                        cont += 1
+                if tx_lang:
+                    try:
+                        tx_po_file = polib.pofile(tx_lang['content'])
+                        tx_po_dict = self._load_po_dict(tx_po_file)
+                        # Discard empty languages
+                        if not tx_po_dict:
+                            continue
+                        gh_i18n_path = os.path.join(
+                            '/', resource['slug'], "i18n")
+                        gh_file_path = os.path.join(
+                            gh_i18n_path, lang['code'] + '.po')
+                        gh_file = gh_repo.contents(
+                            gh_file_path, gh_branch.name)
+                        if gh_file:
+                            gh_po_file = polib.pofile(
+                                gh_file.decoded.decode('utf-8'))
+                            gh_po_dict = self._load_po_dict(gh_po_file)
+                            unmatched_items = (set(gh_po_dict.items()) ^
+                                               set(tx_po_dict.items()))
+                            if not unmatched_items:
+                                print "...no change in %s" % gh_file_path
+                                continue
+                        print '..replacing %s' % gh_file_path
+                        new_file_blob = gh_repo.create_blob(
+                            tx_lang['content'], encoding='utf-8')
+                        tree_data.append({
+                            'path': gh_file_path[1:],
+                            'mode': '100644',
+                            'type': 'blob',
+                            'sha': new_file_blob})
+                    except (KeyboardInterrupt, SystemExit):
+                        raise
+                    except:
+                        print "ERROR: processing lang '%s'" % lang['code']
+                else:
+                    print "ERROR: fetching lang '%s'" % lang['code']
+        if tree_data:
+            tree_sha = gh_branch.commit.commit.tree.sha
+            tree = gh_repo.create_tree(tree_data, tree_sha)
+            message = 'OCA Transbot updated translations from Transifex'
+            print "message", message
+            commit = gh_repo.create_commit(
+                message=message, tree=tree.sha, parents=[gh_branch.commit.sha],
+                author=self.gh_credentials, committer=self.gh_credentials)
+            print "git pushing"
+            gh_repo.ref('heads/{}'.format(gh_branch.name)).update(commit.sha)
 
 
 def main():
-    projects = []
-    if args.projects:
-        # Check that provided projects are correct
-        for project_slug in args.projects:
-            try:
-                tx_project = tx_api.project(project_slug).get()
-                projects.append(tx_project)
-            except:
-                print "ERROR: Transifex project slug %s is invalid" % (
-                    project_slug)
-                return
-    else:
-        start = 1
-        temp_projects = []
-        print "Getting Transifex projects..."
-        while temp_projects or start == 1:
-            temp_projects = tx_api.projects().get(start=start)
-            start += len(temp_projects)
-            projects += temp_projects
-    for project in projects:
-        if tx_org + '-' in project['slug']:
-            process_project(project)
+    parser = get_parser()
+    args = parser.parse_args()
+    tp = TransifexPuller(args.target, args.email)
+    tp.process_projects(args.projects)
 
 
 if __name__ == '__main__':
