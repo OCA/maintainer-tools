@@ -44,6 +44,7 @@ OCA_PROJECTS = {
     'connector magento': ['connector-magento'],
     'connector prestashop': ['connector-prestashop'],
     'connector sage': ['connector-sage-50'],
+    'connector WooCommerce': ['connector-woocommerce'],
     'crm sales marketing': ['sale-workflow',
                             'crm',
                             'partner-contact',
