@@ -144,7 +144,7 @@ class TransifexPuller(object):
 
         if not gh_user.email and not email:
             raise Exception(
-                'Email required to commit to github. Plz provides one on '
+                'Email required to commit to github. Please provide one on '
                 'the command line or make the one of your github profile '
                 'public.')
         self.gh_credentials = {'name': gh_user.name or str(gh_user),
