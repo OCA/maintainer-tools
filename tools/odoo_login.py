@@ -8,8 +8,8 @@ from getpass import getpass
 from . config import read_config, write_config
 
 
-ODOO_URL = 'https://community.odoo.com'
-ODOO_DB = 'community'
+ODOO_URL = 'https://odoo-community.org'
+ODOO_DB = 'openerp_oca_prod'
 
 
 def login(username, store):
