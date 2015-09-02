@@ -51,7 +51,9 @@ def copy_users(odoo, team=None, dry_run=False):
         print('Syncing project "%s"' % odoo_project.name)
         users = [odoo_project.user_id]
         users += odoo_project.members
-        logins = set()
+        logins = set(['oca-transbot',
+                      'OCA-git-bot',
+                      ])
         for user in users:
             if user.x_github_login:
                 logins.add(user.x_github_login)
@@ -67,7 +69,7 @@ def copy_users(odoo, team=None, dry_run=False):
         print("Remove", colors.FAIL + ', '.join(remove_logins) + colors.ENDC)
         if not dry_run:
             for login in add_logins:
-                github_team.add_member(login)
+                github_team.invite(login)
             for login in remove_logins:
                 github_team.remove_member(login)
 
