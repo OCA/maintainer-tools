@@ -51,7 +51,9 @@ def copy_users(odoo, team=None, dry_run=False):
         print('Syncing project "%s"' % odoo_project.name)
         users = [odoo_project.user_id]
         users += odoo_project.members
-        logins = set()
+        logins = set(['oca-transbot',
+                      'OCA-git-bot',
+                      ])
         for user in users:
             if user.x_github_login:
                 logins.add(user.x_github_login)
