@@ -119,6 +119,7 @@ OCA_PROJECTS = {
               'server-tools',
               'community-data-files',
               ],
+    'vertical association': ['vertical-association'],
     'vertical hotel': ['vertical-hotel'],
     'vertical ISP': ['vertical-isp'],
     'vertical editing': ['vertical-editing'],
