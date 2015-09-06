@@ -669,10 +669,12 @@ It makes sense to be picky in the following cases:
 * Respect of Odoo/community conventions
 * Code design and best practices
 
-
-
 The long description try to explain the **why** not the **what**, the **what**
 can be seen in the diff.
+
+Pull requests can be closed if:
+
+* the contributor has not replied to the comments for 6 months
 
 ## Github
 
