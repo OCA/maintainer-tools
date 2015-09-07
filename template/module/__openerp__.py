@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 # © <YEAR(s)> <AUTHOR(s)>
-
-# Instructions: https://www.odoo.com/documentation/8.0/reference/module.html
 {
     "name": "Module name",
     "summary": "Module summary",
