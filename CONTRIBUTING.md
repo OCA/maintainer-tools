@@ -322,27 +322,35 @@ a few exceptions:
 
 The imports are ordered as
 
-1. Externals libs (One per line sorted and splitted in python stdlib)
-2. Imports of `openerp`
-3. Imports from Odoo modules (rarely, and only if necessary)
-4. Local imports in the relative form
+1. Standard library imports
+2. Related third party imports (One per line sorted and splitted in python stdlib)
+3. Odoo imports (`openerp`)
+4. Imports from Odoo modules (rarely, and only if necessary)
+5. Local imports in the relative form
 
-Inside these 4 groups, the imported lines are alphabetically sorted.
+Inside these 5 groups, the imported lines are alphabetically sorted.
 
 ```python
 # 1: imports of python lib
 import base64
+import logging
+_logger = logging.getLogger(__name__)
 import re
 import time
-# 2:  imports of openerp
+# 2:  import of third party lib
+try:
+  import external_dependency_python_N
+except ImportError:
+  _logger.debug('Can not `import external_dependency_python_N`.')
+# 3:  imports of openerp
 import openerp
 from openerp import api, fields, models  # alphabetically ordered
 from openerp.tools.safe_eval import safe_eval as eval
 from openerp.tools.translate import _
-# 3:  imports from odoo modules
+# 4:  imports from odoo modules
 from openerp.addons.website.models.website import slug
 from openerp.addons.web.controllers.main import login_redirect
-# 4: local imports
+# 5: local imports
 from . import utils
 ```
 
