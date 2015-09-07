@@ -5,7 +5,7 @@
     "name": "Module name",
     "summary": "Module summary",
     "version": "8.0.1.0.0",
-    "category": "Module category",
+    "category": "Uncategorized",
     "license": "AGPL-3",
     "website": "https://odoo-community.org/",
     "author": "Odoo Community Association (OCA)",
