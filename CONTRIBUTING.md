@@ -674,7 +674,7 @@ can be seen in the diff.
 
 Pull requests can be closed if:
 
-* the contributor has not replied to the comments for 6 months
+* there is no activity for 6 months
 
 ## Github
 
