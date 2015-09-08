@@ -16,6 +16,7 @@
         "bin": [],
     },
     "depends": [
+        "base",
     ],
     "data": [
     ],
