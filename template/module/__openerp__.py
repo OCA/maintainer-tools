@@ -6,9 +6,9 @@
     "summary": "Module summary",
     "version": "8.0.1.0.0",
     "category": "Uncategorized",
-    "license": "AGPL-3",
     "website": "https://odoo-community.org/",
     "author": "<AUTHOR(S)>, Odoo Community Association (OCA)",
+    "license": "AGPL-3",
     "application": False,
     "installable": True,
     "external_dependencies": {
