@@ -357,7 +357,7 @@ from . import utils
 # 6: Import of unknown third party lib
 _logger = logging.getLogger(__name__)
 try:
-  import external_dependency_python_N  ########### 3rd party here?
+  import external_dependency_python_N
 except ImportError:
   _logger.debug('Can not `import external_dependency_python_N`.')
 ```
