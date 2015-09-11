@@ -329,7 +329,7 @@ The imports are ordered as
 5. Local imports in the relative form
 6. Unknown third party imports (One per line sorted and splitted in python stdlib)
 
-Inside these 5 groups, the imported lines are alphabetically sorted.
+Inside these 6 groups, the imported lines are alphabetically sorted.
 
 ```python
 # 1: imports of python lib
