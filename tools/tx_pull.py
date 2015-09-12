@@ -88,6 +88,7 @@ To contribute to this module, please visit http://odoo-community.org.
 import argparse
 import os.path
 import re
+import time
 
 import polib
 from slumber import API, exceptions
@@ -272,6 +273,8 @@ class TransifexPuller(object):
                         print "ERROR: processing lang '%s'" % lang['code']
                 else:
                     print "ERROR: fetching lang '%s'" % lang['code']
+            print "Sleeping a minute..."
+            time.sleep(60)
         if tree_data:
             tree_sha = gh_branch.commit.commit.tree.sha
             tree = gh_repo.create_tree(tree_data, tree_sha)
@@ -282,6 +285,8 @@ class TransifexPuller(object):
                 author=self.gh_credentials, committer=self.gh_credentials)
             print "git pushing"
             gh_repo.ref('heads/{}'.format(gh_branch.name)).update(commit.sha)
+        print "Sleeping 5 minutes..."
+        time.sleep(300)
 
 
 def main():
