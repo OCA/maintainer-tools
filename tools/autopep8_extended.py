@@ -20,7 +20,28 @@ class Pep8Extended(object):
                       'should use CamelCase. Change of "{old_class_name}" '
                       'to "{new_class_name}" next (lines,columns): '
                       '{lines_columns}',
+            'CW0002': 'VIM comment found',
         }
+
+    def check_cw0002(self):
+        'Detect vim comment'
+        msg_code = 'CW0002'
+        check_result = []
+        msg = self.msgs[msg_code]
+        line_no = 0
+        for line in self.source:
+            column = 0
+            line_no += 1
+            line = line.strip()
+            if line.startswith('#') and \
+               line[1:].strip().lower().startswith('vim:'):
+                check_result.append({
+                    'id': msg_code,
+                    'line': line_no,
+                    'column': column,
+                    'info': msg,
+                })
+        return check_result
 
     def strip_coding_comment(self):
         '''Remove coding comment if found in first two lines
@@ -156,6 +177,21 @@ autopep8._execute_pep8 = _execute_pep8
 
 
 class FixPEP8(autopep8.FixPEP8):
+    def fix_cw0002(self, result):
+        """Delete vim comment
+        :param result: Dict with next values
+            {
+            'id': code,
+            'line': line_number,
+            'column': column_number,
+            'info': msg
+            }
+        :return: List of integers with lines deleted
+        """
+        line = result['line']
+        self.source[line - 1] = ''
+        lines_modified = [line]
+        return lines_modified
 
     def fix_cw0001(self, result):
         '''

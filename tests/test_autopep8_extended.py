@@ -97,6 +97,19 @@ class HelloWorld():
         content_expected = content
         self.run_test(msgs, content, content_expected)
 
+    def test_vim_comment(self):
+        "Test delete vim comment"
+        msgs = ["CW0002"]
+        content = """hello1 = 'world1'
+# vim:comment
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+#vim:comment
+#vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+hello2 = 'world2'
+"""
+        content_expected = "hello1 = 'world1'\nhello2 = 'world2'\n"
+        self.run_test(msgs, content, content_expected)
+
 
 if __name__ == '__main__':
     unittest.main()
