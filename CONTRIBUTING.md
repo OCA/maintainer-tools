@@ -368,7 +368,7 @@ except ImportError:
 
 ### Idioms
 
-* Each python file should have ``# -*- coding: utf-8 -*-`` as first line
+* Each python file should have ``# coding: utf-8`` or ``# -*- coding: utf-8 -*-`` as first line
 * Prefer `%` over `.format()`, prefer `%(varname)` instead of positional.
   This is better for translation and clarity.
 * Always favor **Readability** over **conciseness** or using the language
@@ -724,7 +724,9 @@ The differences include:
     * Avoid use current module in xml_id
     * Use explicit `user_id` field for records of model `ir.filters`
 * [Python](#python)
+    Use Python standards
     * Fuller PEP8 compliance
+    * use ``# coding: utf-8`` or ``# -*- coding: utf-8 -*-`` in first line
     * Using relative import for local files
     * More python idioms
     * A way to deal with long comma-separated lines
