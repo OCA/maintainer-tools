@@ -62,7 +62,7 @@ OCA_PROJECTS = {
            'hr',
            'department',
            ],
-    'inter-company': ['inter-company'],
+    'connector-odoo2odoo': ['connector-odoo2odoo'],
     'multi-company': ['multi-company'],
     'l10n-argentina': ['l10n-argentina'],
     'l10n-belgium': ['l10n-belgium'],
