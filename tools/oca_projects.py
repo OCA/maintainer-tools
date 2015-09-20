@@ -123,7 +123,7 @@ OCA_PROJECTS = {
     'vertical association': ['vertical-association'],
     'vertical hotel': ['vertical-hotel'],
     'vertical ISP': ['vertical-isp'],
-    'vertical editing': ['vertical-editing'],
+    'vertical edition': ['vertical-edition'],
     'vertical medical': ['vertical-medical'],
     'vertical NGO': ['vertical-ngo',
                      # XXX
