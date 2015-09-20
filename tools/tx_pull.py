@@ -273,6 +273,11 @@ class TransifexPuller(object):
                         print "ERROR: processing lang '%s'" % lang['code']
                 else:
                     print "ERROR: fetching lang '%s'" % lang['code']
+            # Wait a minute before the next file to avoid reaching Transifex
+            # API limitations
+            # TODO: Request the API to get the date for the next request
+            # http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/\
+            # content/Determining_Limits_Programmatically-d1e1039.html
             print "Sleeping a minute..."
             time.sleep(60)
         if tree_data:
@@ -285,6 +290,11 @@ class TransifexPuller(object):
                 author=self.gh_credentials, committer=self.gh_credentials)
             print "git pushing"
             gh_repo.ref('heads/{}'.format(gh_branch.name)).update(commit.sha)
+        # Wait 5 minutes before the next project to avoid reaching Transifex
+        # API limitations
+        # TODO: Request the API to get the date for the next request
+        # http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/\
+        # content/Determining_Limits_Programmatically-d1e1039.html
         print "Sleeping 5 minutes..."
         time.sleep(300)
 
