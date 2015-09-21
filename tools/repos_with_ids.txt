@@ -108,3 +108,4 @@
 186|github.com/OCA/website
 207|github.com/OCA/connector-woocommerce
 208|github.com/OCA/vertical-association
+209|github.com/OCA/connector-odoo2odoo
