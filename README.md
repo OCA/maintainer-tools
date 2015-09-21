@@ -95,7 +95,7 @@ More info of original autopep8 [here](https://pypi.python.org/pypi/autopep8/)
 You can rename snake_case to CamelCase with next command:
     $ oca-autopep8 -ri --select=CW0001 PATH
 
-** Clone all OCA repositories **
+**Clone all OCA repositories**
 
 The script `oca-clone-everything` can be used to clone all the OCA projects:
 create a fresh directory, use oca-github-login (or copy oca.cfg from a place
