@@ -112,9 +112,12 @@ def gen_addons_table():
     replace_in_readme(readme_path, header, rows_available, rows_unported)
 
 
-if __name__ == '__main__':
+def main():
     try:
         gen_addons_table()
     except UserError as e:
         print(e.msg)
         exit(1)
+
+if __name__ == '__main__':
+    main()
