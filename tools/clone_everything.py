@@ -13,7 +13,9 @@ def clone(organization_remotes=None):
         try:
             subprocess.check_call(cmd)
         except:
-            cmd = ['git', '--git-dir=' + os.path.join(project, '.git'), 'fetch', '--all']
+            cmd = ['git',
+                   '--git-dir=' + os.path.join(project, '.git'),
+                   'fetch', '--all']
             subprocess.call(cmd)
         if organization_remotes:
             for organization_remote in organization_remotes.split(','):
