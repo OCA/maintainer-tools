@@ -68,6 +68,7 @@ def replace_in_readme(readme_path, header, rows_available, rows_unported):
             render_markdown_table(header, rows_unported),
             '\n'
         ])
+    addons.append('\n')
     parts[2:5] = addons
     readme = ''.join(parts)
     open(readme_path, 'w').write(readme)

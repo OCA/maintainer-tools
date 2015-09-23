@@ -20,6 +20,7 @@ addon | version | summary
 --- | --- | ---
 [module3](__unported__/module3/) | 8.0.1.0.0 (unported) | Module 3 summary
 [module2](module2/) | 8.0.1.0.0 (unported) | Module 2 summary
+
 [//]: # (end addons)
 
 Translation Status
