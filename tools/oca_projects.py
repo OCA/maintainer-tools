@@ -27,7 +27,7 @@ OCA_PROJECTS = {
                    ],
     # 'backport': ['OCB',
     #              ],
-    'banking': ['banking',
+    'banking': ['bank-payment',
                 'bank-statement-reconcile',
                 'bank-statement-import',
                 'account-payment',
