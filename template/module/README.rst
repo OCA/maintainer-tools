@@ -37,10 +37,6 @@ To use this module, you need to:
 .. repo_id is available in https://github.com/OCA/maintainer-tools/blob/master/tools/repos_with_ids.txt
 .. branch is "8.0" for example
 
-For further information, please visit:
-
-* https://www.odoo.com/forum/help-1
-
 Known issues / Roadmap
 ======================
 
