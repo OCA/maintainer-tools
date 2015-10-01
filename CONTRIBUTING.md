@@ -466,6 +466,7 @@ class...
     * Action method: an object action method is prefix with `action_`.
       Its decorator is `@api.multi`, but since it use only one record, add
       `self.ensure_one()` at the beginning of the method.
+    * `@api.one` method: For v8 is recommended use `@api.multi` and avoid use `@api.one`, for compatibility with v9 where is deprecated `@api.one`.
 
 * Default functions should be declared with a lambda call on self. The reason
   for this is so a default function can be inherited. Assigning a function
@@ -728,7 +729,7 @@ The differences include:
 * [Python](#python)
     Use Python standards
     * Fuller PEP8 compliance
-    * use ``# coding: utf-8`` or ``# -*- coding: utf-8 -*-`` in first line
+    * Use ``# coding: utf-8`` or ``# -*- coding: utf-8 -*-`` in first line
     * Using relative import for local files
     * More python idioms
     * A way to deal with long comma-separated lines
