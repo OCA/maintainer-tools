@@ -136,12 +136,15 @@ OCA_PROJECTS = {
 
 
 def get_repositories():
-    ignored = set([
+    ignored = {
         'odoo-community.org',
-        'community-data-files',
         'contribute-md-template',
-        'website',
-        ])
+        'maintainer-tools',
+        'maintainer-quality-tools',
+        'odoo-sphinx-autodoc',
+        'openupgradelib',
+        'connector-magento-php-extension',
+    }
     gh = login()
     all_repos = [repo.name for repo in gh.iter_user_repos('OCA')
                  if repo not in ignored]
