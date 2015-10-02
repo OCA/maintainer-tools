@@ -10,9 +10,11 @@ OCA_REPOSITORY_NAMES: list of OCA repository names
 
 """
 
-from github_login import login
+from .github_login import login
+from operator import add
 
-ALL = ['OCA_PROJECTS', 'OCA_REPOSITORY_NAMES', 'url']
+__all__ = ['OCA_PROJECTS', 'OCA_REPOSITORY_NAMES', 'url',
+           'update_repositories']
 
 OCA_PROJECTS = {
     'accounting': ['account-analytic',
@@ -136,6 +138,7 @@ OCA_PROJECTS = {
 
 
 def get_repositories():
+    """ download OCA repositories from github """
     ignored = set([
         'odoo-community.org',
         'community-data-files',
@@ -147,15 +150,8 @@ def get_repositories():
                  if repo not in ignored]
     return all_repos
 
-try:
-    OCA_REPOSITORY_NAMES = get_repositories()
-except Exception as exc:
-    print exc
-    OCA_REPOSITORY_NAMES = []
-    for repos in OCA_PROJECTS.itervalues():
-        OCA_REPOSITORY_NAMES += repos
-
-OCA_REPOSITORY_NAMES.sort()
+OCA_REPOSITORY_NAMES = reduce(add, OCA_PROJECTS.itervalues())
+del add
 
 _OCA_REPOSITORY_NAMES = set(OCA_REPOSITORY_NAMES)
 
@@ -164,8 +160,26 @@ _URL_MAPPINGS = {'git': 'git@github.com:%s/%s.git',
                  }
 
 
-def url(project_name, protocol='git', org_name='OCA'):
-    """get the URL for an OCA project repository"""
+def update_repositories():
+    """ update OCA_REPOSTIORY_NAMES global module variables from github OCA account """
+    global OCA_REPOSITORY_NAMES
+    global _OCA_REPOSITORY_NAMES
+    try:
+        updated = get_repositories()
+    except Exception as exc:
+        print exc
+    else:
+        OCA_REPOSITORY_NAMES = updated
+        _OCA_REPOSITORY_NAMES = set(OCA_REPOSITORY_NAMES)
+
+
+def url(project_name, protocol='git', org_name='OCA', online=None):
+    """get the URL for an OCA project repository """
+    import os
+    if online is None:
+        online = not os.environ.get('OFFLINE')
+    if online:
+        update_repositories()
     if project_name not in _OCA_REPOSITORY_NAMES:
         raise ValueError('Unknown project', project_name)
     return _URL_MAPPINGS[protocol] % (org_name, project_name)
