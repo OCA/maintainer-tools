@@ -57,7 +57,9 @@ This script will perform the following operations for each project:
 Known issues / Roadmap
 ======================
 
-* Modules without installable key in the manifest are not disabled.
+* Modules without installable key in the manifest are filled with this key,
+  but the indentation for this added line is assumed to be 4 spaces, and the
+  closing brace indentation is 0.
 * Issue enumerating the module list contains a list to a Wiki page that should
   be formatted this way:
   https://github.com/OCA/maintainer-tools/wiki/Migration-to-version-{branch}
@@ -113,9 +115,10 @@ class BranchMigrator(object):
         self.gh_target_branch = target
         self.gh_org = target_org or 'OCA'
 
-    def _replace_content(self, repo, path, replace_list):
-        # Re-read path for retrieving content
-        gh_file = repo.contents(path, self.gh_target_branch)
+    def _replace_content(self, repo, path, replace_list, gh_file=None):
+        if not gh_file:
+            # Re-read path for retrieving content
+            gh_file = repo.contents(path, self.gh_target_branch)
         content = gh_file.decoded
         for replace in replace_list:
             content = re.sub(replace[0], replace[1], content, flags=re.DOTALL)
@@ -151,10 +154,16 @@ class BranchMigrator(object):
             if manifest:
                 modules.append(root_content.path)
                 # Re-read path for retrieving content
+                gh_file = repo.contents(manifest.path, self.gh_target_branch)
+                manifest_dict = eval(gh_file.decoded)
+                if not manifest_dict.get('installable'):
+                    src = " *\n}"
+                    dest = "\n    'installable': False,\n}"
+                else:
+                    src = '["\']installable["\']: *True'
+                    dest = "'installable': False"
                 tree_data.append(self._replace_content(
-                    repo, manifest.path,
-                    [('["\"]installable["\"]:[ ]*True',
-                      "'installable': False")]))
+                    repo, manifest.path, [(src, dest)], gh_file=gh_file))
         self._create_commit(
             repo, tree_data, "[MIG] Make modules uninstallable")
         return modules
