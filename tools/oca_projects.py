@@ -144,6 +144,9 @@ def get_repositories():
         'odoo-sphinx-autodoc',
         'openupgradelib',
         'connector-magento-php-extension',
+        'OCB',
+        'OpenUpgrade',
+        'pylint-odoo',
     }
     gh = login()
     all_repos = [repo.name for repo in gh.iter_user_repos('OCA')
