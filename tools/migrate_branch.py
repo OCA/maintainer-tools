@@ -48,6 +48,7 @@ This script will perform the following operations for each project:
 * Mark all modules as installable = False.
 * Replace in README.md all references to source branch by the target branch.
 * Replace in .travis.yml all references to source branch by the target branch.
+* Remove __unported__ dir.
 * Make target branch the default branch in the repository.
 * Create a milestone (if not exist) for new version.
 * Create an issue enumerating the modules to migrate, with the milestone
@@ -130,16 +131,24 @@ class BranchMigrator(object):
             'sha': new_file_blob
         }
 
-    def _create_commit(self, repo, tree_data, message):
-        if tree_data:
-            branch = repo.branch(self.gh_target_branch)
-            tree_sha = branch.commit.commit.tree.sha
-            tree = repo.create_tree(tree_data, tree_sha)
-            commit = repo.create_commit(
-                message=message, tree=tree.sha, parents=[branch.commit.sha],
-                author=self.gh_credentials, committer=self.gh_credentials)
-            repo.ref('heads/{}'.format(branch.name)).update(commit.sha)
-            return commit
+    def _create_commit(self, repo, tree_data, message, use_sha=True):
+        """Create a GitHub commit.
+        :param repo: github3 repo reference
+        :param tree_data: list with dictionary for the entries of the commit
+        :param message: message to use in the commit
+        :param use_sha: if False, the tree_data structure will be considered
+        the full one, deleting the rest of the entries not listed in this one.
+        """
+        if not tree_data:
+            return
+        branch = repo.branch(self.gh_target_branch)
+        tree_sha = branch.commit.commit.tree.sha if use_sha else None
+        tree = repo.create_tree(tree_data, tree_sha)
+        commit = repo.create_commit(
+            message=message, tree=tree.sha, parents=[branch.commit.sha],
+            author=self.gh_credentials, committer=self.gh_credentials)
+        repo.ref('heads/{}'.format(branch.name)).update(commit.sha)
+        return commit
 
     def _mark_modules_uninstallable(self, repo, root_contents):
         """Make uninstallable the existing modules in the repo."""
@@ -167,6 +176,24 @@ class BranchMigrator(object):
         self._create_commit(
             repo, tree_data, "[MIG] Make modules uninstallable")
         return modules
+
+    def _delete_unported_dir(self, repo, root_contents):
+        if '__unported__' not in root_contents.keys():
+            return
+        branch = repo.branch(self.gh_target_branch)
+        tree = repo.tree(branch.commit.sha).tree
+        tree_data = []
+        # Reconstruct tree without __unported__ entry
+        for entry in tree:
+            if '__unported__' not in entry.path:
+                tree_data.append({
+                    'path': entry.path,
+                    'sha': entry.sha,
+                    'type': entry.type,
+                    'mode': entry.mode,
+                })
+        self._create_commit(
+            repo, tree_data, "[MIG] Remove __unported__ dir", use_sha=False)
 
     def _update_metafiles(self, repo, root_contents):
         """Update metafiles (README.md, .travis.yml...) for pointing to
@@ -229,6 +256,7 @@ class BranchMigrator(object):
             source_branch.commit.sha)
         root_contents = repo.contents('/', self.gh_target_branch)
         modules = self._mark_modules_uninstallable(repo, root_contents)
+        self._delete_unported_dir(repo, root_contents)
         self._update_metafiles(repo, root_contents)
         self._make_default_branch(repo)
         milestone = self._create_branch_milestone(repo)
