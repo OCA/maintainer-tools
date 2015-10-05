@@ -37,9 +37,8 @@ optional arguments:
                         Provides an email address used to commit on GitHub if
                         the one associated to the GitHub account is not public
   -t TARGET_ORG, --target-org TARGET_ORG
-                        By default, translation are committed in GitHub on
-                        OCA. This arg lets you provide an alternative
-                        organization
+                        By default, the GitHub organization used is OCA. This
+                        arg lets you provide an alternative organization
 
 This script will perform the following operations for each project:
 
@@ -285,8 +284,8 @@ def get_parser():
               'associated to the GitHub account is not public'))
     parser.add_argument(
         '-t', '--target-org', dest='target_org',
-        help=('By default, translation are committed in GitHub on OCA. This '
-              'arg lets you provide an alternative organization'))
+        help=('By default, the GitHub organization used is OCA. This arg lets '
+              'you provide an alternative organization'))
     return parser
 
 
