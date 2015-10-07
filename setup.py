@@ -1,11 +1,8 @@
 import setuptools
 
-PACKAGES = ['oca']
+requires = open('requirements.txt', 'r').read().split('/n')
 
-setuptools.setup(name='oca',
-                 description="OCA maintainer tools",
-                 namespace_packages=['oca'],
-                 setup_requires=['pbr'],
+setuptools.setup(setup_requires=['pbr'] + requires,
                  pbr=True,
                  test_suite="tests",
                  package_data={'': ['*.yaml']})

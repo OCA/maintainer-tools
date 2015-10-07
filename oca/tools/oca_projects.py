@@ -161,7 +161,8 @@ _URL_MAPPINGS = {'git': 'git@github.com:%s/%s.git',
 
 
 def update_repositories():
-    """ update OCA_REPOSTIORY_NAMES global module variables from github OCA account """
+    """ update OCA_REPOSTIORY_NAMES global module variables from github OCA
+      account """
     global OCA_REPOSITORY_NAMES
     global _OCA_REPOSITORY_NAMES
     try:
