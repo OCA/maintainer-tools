@@ -225,6 +225,9 @@ class TransifexPuller(object):
             tx_resource_api = tx_project_api.resource(resource['slug'])
             resource = tx_resource_api.get(details=True)
             for lang in resource['available_languages']:
+                # Discard english (native language in Odoo)
+                if lang['code'] == 'en':
+                    continue
                 cont = 0
                 tx_lang = False
                 while cont < self.tx_num_retries and not tx_lang:
