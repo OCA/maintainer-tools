@@ -278,8 +278,8 @@ class TransifexPuller(object):
             # TODO: Request the API to get the date for the next request
             # http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/\
             # content/Determining_Limits_Programmatically-d1e1039.html
-            print "Sleeping a minute..."
-            time.sleep(60)
+            print "Sleeping 70 seconds..."
+            time.sleep(70)
         if tree_data:
             tree_sha = gh_branch.commit.commit.tree.sha
             tree = gh_repo.create_tree(tree_data, tree_sha)
