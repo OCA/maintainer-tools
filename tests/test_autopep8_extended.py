@@ -2,7 +2,7 @@
 import os
 import tempfile
 import unittest
-from tools import autopep8_extended
+from oca.tools import autopep8_extended
 
 
 class TestAutopep8Extended(unittest.TestCase):

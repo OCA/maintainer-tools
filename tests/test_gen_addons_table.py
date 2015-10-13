@@ -8,7 +8,8 @@ class TestGenAddonsTable(unittest.TestCase):
     def test_1(self):
         dirname = os.path.dirname(__file__)
         cwd = os.path.join(dirname, 'test_repo')
-        gen_addons_table = os.path.join(dirname, '..', 'tools',
+        gen_addons_table = os.path.join(dirname, '..', 
+                                        'oca', 'tools',
                                         'gen_addons_table.py')
         readme_filename = os.path.join(dirname, 'test_repo',
                                        'README.md')
