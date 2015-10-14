@@ -229,6 +229,10 @@ class BranchMigrator(object):
 
     def _create_migration_issue(self, repo, modules, milestone):
         title = "Migration to version %s" % self.gh_target_branch
+        # Check first if it already exists
+        for issue in repo.iter_issues(milestone=milestone.number):
+            if issue.title == title:
+                return issue
         body = ("# Todo\n\nhttps://github.com/OCA/maintainer-tools/wiki/"
                 "Migration-to-version-%s\n\n# Modules to migrate\n\n" %
                 self.gh_target_branch)
@@ -238,7 +242,7 @@ class BranchMigrator(object):
         for label in repo.iter_labels():
             if label.name in ['help wanted', 'work in progress']:
                 labels.append(label.name)
-        repo.create_issue(
+        return repo.create_issue(
             title=title, body=body, milestone=milestone.number, labels=labels)
 
     def _migrate_project(self, project):
