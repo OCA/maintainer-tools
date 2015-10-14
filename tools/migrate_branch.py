@@ -246,6 +246,9 @@ class BranchMigrator(object):
         # Create new branch
         repo = self.github.repository(self.gh_org, project)
         source_branch = repo.branch(self.gh_source_branch)
+        if not source_branch:
+            print "Source branch non existing. Skipping..."
+            return
         branch = repo.branch(self.gh_target_branch)
         if branch:
             print "Branch already exists. Skipping..."
