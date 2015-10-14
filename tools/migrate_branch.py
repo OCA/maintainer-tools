@@ -164,7 +164,7 @@ class BranchMigrator(object):
                 # Re-read path for retrieving content
                 gh_file = repo.contents(manifest.path, self.gh_target_branch)
                 manifest_dict = eval(gh_file.decoded)
-                if not manifest_dict.get('installable'):
+                if manifest_dict.get('installable') is None:
                     src = " *\n}"
                     dest = "\n    'installable': False,\n}"
                 else:
