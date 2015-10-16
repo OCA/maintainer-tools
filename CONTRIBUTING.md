@@ -575,6 +575,24 @@ increased or decreased. If it has decreased, this is usually a sign that a test
 should be added. The coveralls web interface can also show which lines need
 test cases.
 
+### Unitest
+
+If you use unitest class use a sequential name in your method test.
+E.g.
+```python
+from openerp.tests.common import TransactionCase
+
+class TestUom(TransactionCase):
+    def test_10_caseA(self):
+      pass
+
+    def test_20_caseB(self):
+      pass
+
+    def test_30_caseC(self):
+      pass
+```
+
 ## Git
 
 ### Commit message
