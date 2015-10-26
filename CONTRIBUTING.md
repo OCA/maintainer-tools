@@ -644,8 +644,9 @@ Please respect a few basic rules:
 * 5 calendar days must be given to be able to merge it
 * A MP can be merged in less that 5 calendar days if and only if it is approved
   by 3 reviewers. If you are in a hurry just send a mail at
-  openerp-community-reviewer@lists.launchpad.net or ask by IRC (FreeNode
-  server, openobject channel).
+  contributors@odoo-community.org or ask by IRC (FreeNode
+  oca, openobject channel).
+* At least one of the review above must be from a member of the PSC
 * Is the module generic enough to be part of community addons?
 * Is the module duplicating features with other community addons?
 * Does the documentation allow to understand what it does and how to use it?
