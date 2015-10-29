@@ -748,3 +748,50 @@ The differences include:
     * Use of present imperative
 * [Github Section](#github)
 * [Review Section](#review)
+
+
+# Roadmaps: collaborating on new features
+
+Collaboration around features is done using a project Roadmap.
+
+The Roadmap is a list of Issues or Pull Requests,
+marked with a roadmap milestone, usually `8.0-roadmap`.
+
+This distinguishes them from the maintenance Issues and Pull Requests,
+marked with the Odoo version milestone. For example, `8.0`.
+
+If the project does not yet have the roadmap milestones, please open an Issue
+asking for an admin to create it.
+
+The Issue/Pull Request description should contain the functional description and design,
+and can include links to other public documents, such as a Gist, Etherpad, or Google Doc.
+
+This is the template to use for Roadmap items:
+
+    Purpose
+    =======
+
+    Summary with the functional benefit expected for the users.
+
+    Supporters
+    ----------
+
+    List of people supporting the feature implementation.
+    This might be for work on functional specification, code development,
+    tests and validation, documentation, coordination, or just moral support.
+    The point is that features is no supporters should be removed from the raadmap.
+
+
+    Functional Specification
+    ========================
+
+    Functional description of the features to implement.
+    May be adapted to user documentation once implemented.
+    Include links to relevant resources.
+
+    Technical Specification
+    =======================
+
+    Technical breakdown of the components and tasks to implement.
+    Include links to relevant resources.
+
