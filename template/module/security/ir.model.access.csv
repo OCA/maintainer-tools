@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+read,Permission to read some model,model_module_some_model,user_group,1,0,0,0
+write,Permission to write some model,model_module_some_model,manager_group,1,1,1,1
