@@ -646,7 +646,7 @@ Please respect a few basic rules:
   by 3 reviewers. If you are in a hurry just send a mail at
   contributors@odoo-community.org or ask by IRC (FreeNode
   oca, openobject channel).
-* At least one of the review above must be from a member of the PSC
+* At least one of the review above must be from a member of the PSC or having write access on the repository (here one of the OCA core maintainers can do the job: https://github.com/orgs/OCA/teams/core-maintainers)
 * Is the module generic enough to be part of community addons?
 * Is the module duplicating features with other community addons?
 * Does the documentation allow to understand what it does and how to use it?
