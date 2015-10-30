@@ -120,6 +120,7 @@ OCA_PROJECTS = {
               'webkit-tools',
               'server-tools',
               'community-data-files',
+              'webhook',
               ],
     'vertical association': ['vertical-association'],
     'vertical hotel': ['vertical-hotel'],
