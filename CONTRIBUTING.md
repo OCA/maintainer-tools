@@ -622,7 +622,7 @@ Instead of using global ...
 
 Peer review is the only way to ensure good quality of the code and to be able
 to rely on the others devs. The peer review in this project will be made by
-making Merge Proposal. It will serve the following main purposes:
+making Pull Request. It will serve the following main purposes:
 
 * Having a second look on his work to avoid unintended problems / bugs
 * Avoid technical or business design flaws
@@ -642,7 +642,7 @@ Please respect a few basic rules:
 
 * Two reviewers must approve a merge proposal in order to be able to merge it
 * 5 calendar days must be given to be able to merge it
-* A MP can be merged in less that 5 calendar days if and only if it is approved
+* A PR can be merged in less that 5 calendar days if and only if it is approved
   by 3 reviewers. If you are in a hurry just send a mail at
   contributors@odoo-community.org or ask by IRC (FreeNode
   oca, openobject channel).
@@ -662,8 +662,8 @@ Most reference can be found here:
 There are the following important part in a review:
 
 * Start by thanking the contributor / developer for his work. No matter the
-  issue of the MP, someone make work for you here, so be thankful for that.
-* Be cordial and polite. Nothing is obvious in a MP.
+  issue of the PR, someone make work for you here, so be thankful for that.
+* Be cordial and polite. Nothing is obvious in a PR.
 * The description of the changes should be clear enough for you to understand
   his purpose and if apply, contain the reference feature instance in order to
   allow people to run and test the review
