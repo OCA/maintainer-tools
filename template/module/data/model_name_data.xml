@@ -5,8 +5,8 @@
 <openerp>
 <data>
 
-<record id="my_demo_partner" model="res.partner">
-    <!-- My demo record data -->
+<record id="my_data_record" model="model.name">
+    <!-- My record data -->
 </record>
 
 </data>

@@ -7,8 +7,8 @@
 
 <record id="my_view" model="ir.ui.view">
     <field name="name">My view description</field>
-    <field name="model">res.partner</field>
-    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="model">model.name</field>
+    <field name="inherit_id" ref="othermodule.form_view"/>
     <field name="arch" type="xml">
         <!-- My view modifications -->
     </field>
