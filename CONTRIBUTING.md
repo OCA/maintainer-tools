@@ -638,7 +638,7 @@ Meaning "If there are enough reviewers, all problems are easy to solve". Eric
 S. Raymond has written influentially about peer review in software development:
  http://en.wikipedia.org/wiki/Software_peer_review.
 
-Please respect a few basic rules:
+#### Please respect a few basic rules:
 
 * Two reviewers must approve a merge proposal in order to be able to merge it
 * 5 calendar days must be given to be able to merge it
@@ -659,7 +659,7 @@ Please respect a few basic rules:
 Most reference can be found here:
 * http://insidecoding.com/2013/01/07/code-review-guidelines/
 
-There are the following important part in a review:
+#### There are the following important part in a review:
 
 * Start by thanking the contributor / developer for his work. No matter the
   issue of the PR, someone make work for you here, so be thankful for that.
@@ -676,7 +676,7 @@ While making the merge, please respect the author using the `--author` option
 when committing. The author is found using the bzr log command. Use the commit
 message provided by the contributor if any.
 
-It makes sense to be picky in the following cases:
+#### It makes sense to be picky in the following cases:
 
 * The origin/reason for the patch/dev is not documented very well
 * No adapted / convenient description written in the `__openerp__.py` file for
