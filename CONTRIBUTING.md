@@ -748,3 +748,17 @@ The differences include:
     * Use of present imperative
 * [Github Section](#github)
 * [Review Section](#review)
+
+# Backporting Odoo Modules
+
+Suggesting a backport of a module among an OCA repository is possible, but you must respect a few rules:
+ 
+ * You need to keep the license of the module coded by Odoo SA
+ * You need to add the OCA as author (and Odoo SA of course)
+ * You need to make the module "OCA compatible" : PEP8, OCA convention and so on so it won't break our CI like runbot, Travis and so.
+ * You need to add a disclaimer in the Readme with the following text:
+```
+TODO
+```
+
+
