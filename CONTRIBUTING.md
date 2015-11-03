@@ -758,7 +758,7 @@ Suggesting a backport of a module among an OCA repository is possible, but you m
  * You need to make the module "OCA compatible" : PEP8, OCA convention and so on so it won't break our CI like runbot, Travis and so.
  * You need to add a disclaimer in the Readme with the following text:
 ```
-TODO
+**This module is a backport from Odoo SA and as such, it is not included in the OCA CLA. That means we do not have a copy of the copyright on it like all other OCA modules.**
 ```
 
 
