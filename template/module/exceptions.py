@@ -12,7 +12,6 @@ class ModuleNameValidationError(exceptions.ValidationError):
         value = self._message()
         super(ModuleNameValidationError, self).__init__(value)
 
-    @staticmethod
     def _message(self):
         """Format the message."""
         return self.__doc__.format(*self._args, **self._kwargs)
