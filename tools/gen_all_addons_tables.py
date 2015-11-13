@@ -68,7 +68,8 @@ def main():
                          raise_on_error=False)
                 if r != 0:
                     call(['git', 'commit',
-                          '-m', '[UPD] addons table in README.md', 'README.md'],
+                          '-m', '[UPD] addons table in README.md',
+                          'README.md'],
                          cwd=d)
                     call(['git', 'push', 'origin'], cwd=d)
             except NonFatalError:
