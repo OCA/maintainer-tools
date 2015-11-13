@@ -49,7 +49,7 @@ def call(cmd, cwd, raise_on_error=True, raise_fatal_error=True, shell=False):
 
 
 def main():
-    # call(['oca-clone-everything', '--remove-old-repos'], cwd='.')
+    call(['oca-clone-everything', '--remove-old-repos'], cwd='.')
     for d in sorted(os.listdir('.')):
         if not os.path.isdir(os.path.join(d, '.git')):
             continue
