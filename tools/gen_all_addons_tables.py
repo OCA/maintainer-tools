@@ -21,6 +21,7 @@ EXCLUDE = {
     'pylint-odoo',
     'OCB',
     'OpenUpgrade',
+    'dotnet',
 }
 
 
