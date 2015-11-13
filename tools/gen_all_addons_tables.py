@@ -15,14 +15,6 @@ import sys
 
 
 BRANCHES = ['8.0', '9.0']
-EXCLUDE = {
-    'maintainer-tools',
-    'maintainer-quality-tools',
-    'pylint-odoo',
-    'OCB',
-    'OpenUpgrade',
-    'dotnet',
-}
 
 
 class FatalError(RuntimeError):
@@ -52,8 +44,6 @@ def main():
     call(['oca-clone-everything', '--remove-old-repos'], cwd='.')
     for d in sorted(os.listdir('.')):
         if not os.path.isdir(os.path.join(d, '.git')):
-            continue
-        if d in EXCLUDE:
             continue
         sys.stderr.write("============> updating addons table in %s\n" % d)
         for branch in BRANCHES:
