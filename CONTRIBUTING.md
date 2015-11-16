@@ -717,19 +717,24 @@ This is the template to use for Roadmap items:
     List of people supporting the feature implementation.
     This might be for work on functional specification, code development,
     tests and validation, documentation, coordination, or just moral support.
-    The point is that features is no supporters should be removed from the raadmap.
+    The point is that features without supporters should be removed from the roadmap.
 
 
     Functional Specification
     ========================
 
     Functional description of the features to implement.
-    May be adapted to user documentation once implemented.
+    It should provide the README content for the description, configuration and usage sections,
+    to be incorporated in the module once implemented.
+    As a rough guideline, “description” should explain the why, “configuration” should guide
+    the consultant on the setup options required or available, and “usage” should guide a
+    user evaluating the features on an running instance.
     Include links to relevant resources.
 
     Technical Specification
     =======================
 
     Technical breakdown of the components and tasks to implement.
+    If external components are needed, it should also provice the content for the “Installation”
+    section of the README file.
     Include links to relevant resources.
-
