@@ -19,7 +19,17 @@
         "base",
     ],
     "data": [
+        "security/some_model_security.xml",
+        "security/ir.model.access.csv",
+        "views/assets.xml",
+        "views/report_name.xml",
+        "views/res_partner_view.xml",
+        "wizard/wizard_model_view.xml",
     ],
     "demo": [
+        "demo/res_partner_demo.xml",
     ],
+    "qweb": [
+        "static/src/xml/module_name.xml",
+    ]
 }
