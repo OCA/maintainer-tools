@@ -45,12 +45,12 @@ or scripts to perform migration on current installations.
 
 ### Directories
 
-A module is organised in a few directory:
+A module is organized in a few directories:
 
 * `controllers/`: contains controllers (http routes)
 * `data/`: data xml
 * `demo/`: demo xml
-* `models/`: models definition
+* `models/`: model definitions
 * `report/`: reporting models (BI/analysis), Webkit/RML print report templates
 * `static/`: contains the web assets, separated into `css/`, `js/`, `img/`,
   `lib/`, ...
@@ -62,8 +62,8 @@ A module is organised in a few directory:
 For `models`, `views` and `data` declarations, split files by the model
 involved, either created or inherited. These files should be named after the
 model. For example, demo data for res.partner should go in a file named
-demo/res_partner.xml and a view for partner should go in a file named
-views/res_partner.xml.
+`demo/res_partner.xml` and a view for partner should go in a file named
+`views/res_partner.xml`.
 
 For model named `<main_model>` the following files may be created:
 
@@ -80,7 +80,7 @@ For `static files`, the name pattern is `<module_name>.ext` (i.e.
 ...). Don't link data (image, libraries) outside Odoo: don't use an url to an
 image but copy it in our codebase instead.
 
-The complete tree should looks like
+The complete tree should look like this:
 
 ```
 addons/<my_module_name>/
@@ -135,26 +135,27 @@ addons/<my_module_name>/
     `-- <wizard_model>.xml
 ```
 
-Filename should only use only `[a-z0-9_]`
+Filenames should use only `[a-z0-9_]`
 
-Use correct file permissions: folder 755 and file 644.
+Use correct file permissions: folders 755 and files 644.
 
 ## XML files
 
 ### Format
 
-When declaring a record in XML,
+When declaring a record in XML:
 
 * Place `id` attribute before `model`
-* For field declaration, `name` attribute is first. Then place the `value`
+* For field declarations, the `name` attribute is first. Then place the `value`
   either in the `field` tag, either in the `eval` attribute, and finally other
   attributes (widget, options, ...) ordered by importance.
 
-* Try to group the record by model. In case of dependencies between
+* Try to group the records by model. In case of dependencies between
   action/menu/views, the convention may not be applicable.
 * Use naming convention defined at the next point
 * The tag `<data>` is only used to set not-updatable data with `noupdate=1`
-* Do not prefix the xmlid by the current module's name (`<record id="view_id"...`, not `<record id="current_module.view_id"...`)
+* Do not prefix the xmlid by the current module's name
+  (`<record id="view_id"...`, not `<record id="current_module.view_id"...`)
 
 
 ```xml
@@ -195,11 +196,11 @@ Use the following pattern:
 * For a view: `<model_name>_view_<view_type>`, where `view_type` is kanban,
   form, tree, search, ...
 * For an action: the main action respects `<model_name>_action`. Others are
-  suffixed with `_<detail>`, where `detail` is a underscore lowercase string
-  explaining a little bit the action (Should not be long). This is used only if
-  multiple action are declared for the model.
+  suffixed with `_<detail>`, where `detail` is an underscore lowercase string
+  explaining the action (should not be long). This is used only if
+  multiple actions are declared for the model.
 * For a group: `<model_name>_group_<group_name>` where `group_name` is the
-  name of the group, genrally 'user', 'manager', ...
+  name of the group, generally 'user', 'manager', ...
 * For a rule: `<model_name>_rule_<concerned_group>` where `concerned_group` is
   the short name of the concerned group ('user' for the
   'model_name_group_user', 'public' for public user, 'company' for
@@ -247,11 +248,11 @@ Use the following pattern:
 A module can extend a view only one time.
 
 The naming rules should be followed even when a view is inherited, the module
-name prevents xid conflicts. In the case where a view inherited has a name which
-does not follow the guidelines set above, prefer naming the inherited view
-after the original over using a name which follows the guidelines. This eases
-looking up the original view and other inheritance if they all have the same
-name.
+name prevents xid conflicts. In the case where an inherited view has a name
+which does not follow the guidelines set above, prefer naming the inherited
+view after the original over using a name which follows the guidelines. This
+eases looking up the original view and other inheritance if they all have the
+same name.
 
 
 ```xml
@@ -264,7 +265,8 @@ name.
 ### External dependencies
 
 #### `__openerp__.py`
-If your module use extras dependencies of python or binaries you should add to `__openerp__py` file the section `external_dependencies`.
+If your module uses extra dependencies of python or binaries you should add
+the `external_dependencies` section to `__openerp__.py`.
 
 ```python
 {
@@ -289,29 +291,33 @@ If your module use extras dependencies of python or binaries you should add to `
 }
 ```
 
-An entry in `bin` needs to be in `PATH` identify with `which external_dependency_binary_N` command.
+An entry in `bin` needs to be in `PATH`, check by running
+`which external_dependency_binary_N`.
 
-An entry in `python` needs to be in `PYTHONPATH` identify with `python -c "import external_dependency_python_N"` command.
+An entry in `python` needs to be in `PYTHONPATH`, check by running
+`python -c "import external_dependency_python_N"`.
 
 #### ImportError
-In python files where you use a `import external_dependency_python_N` you will need to add a `try-except` with a debug log.
+In python files where you use `import external_dependency_python_N` you will
+need to add `try-except` with a debug log.
 
 ```python
 try:
   import external_dependency_python_N
 except ImportError:
-  _logger.debug('Can not `import external_dependency_python_N`.')
+  _logger.debug('Cannot `import external_dependency_python_N`.')
 ```
 
 #### README
-If your module use extras dependencies of python or binaries, please explain how to install them in the `README.rst` file in the section `Installation`.
+If your module uses extra dependencies of python or binaries, please explain
+how to install them in the `README.rst` file in the section `Installation`.
 
 
 ## Python
 
 ### PEP8 options
 
-Using the linter flake8 can help to see syntax and semantic warning or error.
+Using the linter flake8 can help to see syntax and semantic warnings or errors.
 Project Source Code should adhere to PEP8 and PyFlakes standards with
 a few exceptions:
 
@@ -323,11 +329,11 @@ a few exceptions:
 The imports are ordered as
 
 1. Standard library imports
-2. Known third party imports (One per line sorted and splitted in python stdlib)
+2. Known third party imports (One per line sorted and split in python stdlib)
 3. Odoo imports (`openerp`)
 4. Imports from Odoo modules (rarely, and only if necessary)
 5. Local imports in the relative form
-6. Unknown third party imports (One per line sorted and splitted in python stdlib)
+6. Unknown third party imports (One per line sorted and split in python stdlib)
 
 Inside these 6 groups, the imported lines are alphabetically sorted.
 
@@ -359,16 +365,18 @@ _logger = logging.getLogger(__name__)
 try:
   import external_dependency_python_N
 except ImportError:
-  _logger.debug('Can not `import external_dependency_python_N`.')
+  _logger.debug('Cannot `import external_dependency_python_N`.')
 ```
 
  * Note:
-   * You can use [isort](https://pypi.python.org/pypi/isort/) to auto sort import's.
+   * You can use [isort](https://pypi.python.org/pypi/isort/) to automatically
+     sort imports.
    * Install with `pip install isort` and use with `isort myfile.py`.
 
 ### Idioms
 
-* Each python file should have ``# coding: utf-8`` or ``# -*- coding: utf-8 -*-`` as first line
+* Each python file should have
+  ``# coding: utf-8`` or ``# -*- coding: utf-8 -*-`` as first line
 * Prefer `%` over `.format()`, prefer `%(varname)` instead of positional.
   This is better for translation and clarity.
 * Always favor **Readability** over **conciseness** or using the language
@@ -386,8 +394,8 @@ except ImportError:
       not a summary of the code
     * Simple comments for parts of code which do things which are not
       immediately obvious
-    * Too many comments are usually a sign that the code is unreadable needs to
-      be refactored
+    * Too many comments are usually a sign that the code is unreadable and
+      needs to be refactored
 * Use meaningful variable/class/method names
 * If a function is too long or too indented due to loops, this is a sign
   that it needs to be refactored into smaller functions
@@ -408,15 +416,16 @@ except ImportError:
   element to simply add a comma.
 * If an argument to a function call is not immediately obvious, prefer using
   named parameter.
-* Use English variable names and write comments in english. Strings which need
+* Use English variable names and write comments in English. Strings which need
   to be displayed in other languages should be translated using the translation
   system
 
 ### Symbols
 
-#### Odoo Python Class
+#### Odoo Python Classes
 
-Use camelcase for code in api v8, underscore lowercase notation for old api.
+Use UpperCamelCase for code in api v8, underscore lowercase notation for old
+api.
 
 ```python
 class AccountInvoice(models.Model):
@@ -426,11 +435,11 @@ class account_invoice(orm.Model):
     ...
 ```
 
-#### Variable name :
-* use underscore lowercase notation for common variable (snake_case)
-* since new API works with record or recordset instead of id list, don't suffix
-  variable name with `_id` or `_ids` if they do not contain an id or a list of
-  ids.
+#### Variable names
+* Use underscore lowercase notation for common variables (snake_case)
+* Since new API works with records or recordsets instead of id lists, don't
+  suffix variable names with `_id` or `_ids` if they do not contain an ids or
+  lists of ids.
 
 ```python
     ...
@@ -453,7 +462,11 @@ class...
   (example: sale_order_line_ids)
 * `Many2One` fields should have `_id` as suffix
   (example: partner_id, user_id, ...)
-* If the technical name of the field (the variable name) is the same to the string of the label, don't put `string` parameter for new API fields, because it's automatically taken. If your variable name contains "_" in the name, they are converted to spaces when creating the automatic string and each word is capitalized.
+* If the technical name of the field (the variable name) is the same to the
+  string of the label, don't put `string` parameter for new API fields, because
+  it's automatically taken. If your variable name contains "_" in the name,
+  they are converted to spaces when creating the automatic string and each word
+  is capitalized.
   (example: old api `'name': fields.char('Name', ...)`
             new api `'name': fields.Char(...)`)
 * Method conventions
@@ -466,7 +479,8 @@ class...
     * Action method: an object action method is prefix with `action_`.
       Its decorator is `@api.multi`, but since it use only one record, add
       `self.ensure_one()` at the beginning of the method.
-    * `@api.one` method: For v8 is recommended use `@api.multi` and avoid use `@api.one`, for compatibility with v9 where is deprecated `@api.one`.
+    * `@api.one` method: For v8 is recommended use `@api.multi` and avoid use
+      `@api.one`, for compatibility with v9 where is deprecated `@api.one`.
 
 * Default functions should be declared with a lambda call on self. The reason
   for this is so a default function can be inherited. Assigning a function
@@ -549,19 +563,19 @@ class Event(models.Model):
 
 * `use strict;` is recommended for all javascript files
 * Use a linter (jshint, ...)
-* Never add minified Javascript Libraries
-* Use camelcase for class declaration
+* Never add minified Javascript libraries
+* Use UpperCamelCase for class declarations
 
 ## CSS
 
-* Prefix all your class with `o_<module_name>` where `module_name` is the
+* Prefix all your classes with `o_<module_name>` where `module_name` is the
   technical name of the module (`sale`, `im_chat`, ...) or the main route
   reserved by the module (for website module mainly,
   i.e. `o_forum` for website_forum module). The only exception for this rule is
   the webclient: it simply use `o_` prefix.
-* Avoid using id
-* Use bootstrap native class
-* Use underscore lowercase notation to name class
+* Avoid using ids
+* Use bootstrap native classes
+* Use underscore lowercase notation to name classes
 
 ## Tests
 
@@ -590,18 +604,17 @@ changes. This part should be multiple lines no longer than 80 characters.
 * Merge proposals should follow the same rules as the title of the propsal is
   the first line of the merge commit and the description corresponds to commit
   description.
-* Always put meaning full commit message: commit message should be
+* Always put meaningful commit messages: commit messages should be
   self explanatory (long enough) including the name of the module that
   has been changed and the reason behind that change. Do not use
   single words like "bugfix" or "improvements".
-* Avoid commits which simultaneously impacts lots of modules. Try to
-  splits into different commits where impacted modules are different
-  (It will be helpful when we are going to revert that module
-  separately).
+* Avoid commits which simultaneously impact lots of modules. Try to
+  split into different commits where impacted modules are different.
+  This is helpful if we need to revert changes on a module separately.
 * Only make a single commit per logical change set. Do not add commits such as
   "Fix pep8", "Code review" or "Add unittest" if they fix commits which are
    being proposed
-* Use present imperative (Fix formating, Remove unused field) avoid appending
+* Use present imperative (Fix formatting, Remove unused field) avoid appending
   's' to verbs: Fixes, Removes
 
 ```
@@ -621,16 +634,16 @@ Instead of using global ...
 ### Review
 
 Peer review is the only way to ensure good quality of the code and to be able
-to rely on the others devs. The peer review in this project will be made by
-making Pull Request. It will serve the following main purposes:
+to rely on the other developers. The peer review in this project will be
+managed through Pull Requests. It will serve the following main purposes:
 
-* Having a second look on his work to avoid unintended problems / bugs
+* Having a second look on a code snippet to avoid unintended problems / bugs
 * Avoid technical or business design flaws
-* Allow the coordination and convergence of the devs by informing community of
-  what has been done
+* Allow the coordination and convergence of the developers by informing the
+  community of what has been done
 * Allow the responsibles to look at every devs and keep the interested people
   informed of what has been done
-* Prevent addons incompatibilities when/if possible
+* Prevent addon incompatibilities when/if possible
 * The rationale for peer review has its equivalent in Linus's law, often
   phrased: "Given enough eyeballs, all bugs are shallow"
 
@@ -642,11 +655,14 @@ S. Raymond has written influentially about peer review in software development:
 
 * Two reviewers must approve a merge proposal in order to be able to merge it
 * 5 calendar days must be given to be able to merge it
-* A PR can be merged in less that 5 calendar days if and only if it is approved
+* A PR can be merged in less than 5 calendar days if and only if it is approved
   by 3 reviewers. If you are in a hurry just send a mail at
   contributors@odoo-community.org or ask by IRC (FreeNode
   oca, openobject channel).
-* At least one of the review above must be from a member of the PSC or having write access on the repository (here one of the [OCA Core Maintainers](https://odoo-community.org/project/core-maintainers-55) can do the job. You can notify them on Github using '@OCA/core-maintainers')
+* At least one of the review above must be from a member of the PSC or having
+  write access on the repository (here one of the
+  [OCA Core Maintainers](https://odoo-community.org/project/core-maintainers-55)
+  can do the job. You can notify them on Github using '@OCA/core-maintainers')
 * Is the module generic enough to be part of community addons?
 * Is the module duplicating features with other community addons?
 * Does the documentation allow to understand what it does and how to use it?
@@ -656,17 +672,17 @@ S. Raymond has written influentially about peer review in software development:
 * Is there any setup in code? Should not!
 * Are there demo data?
 
-Most reference can be found here:
+Further reading:
 * http://insidecoding.com/2013/01/07/code-review-guidelines/
 
-#### There are the following important part in a review:
+#### There are the following important parts in a review:
 
-* Start by thanking the contributor / developer for his work. No matter the
-  issue of the PR, someone make work for you here, so be thankful for that.
+* Start by thanking the contributor / developer for their work. No matter the
+  issue of the PR, someone has done work for you, so be thankful for that.
 * Be cordial and polite. Nothing is obvious in a PR.
 * The description of the changes should be clear enough for you to understand
-  his purpose and if apply, contain the reference feature instance in order to
-  allow people to run and test the review
+  their purpose and, if applicable, contain a demo in order to
+  allow people to run and test the code
 * Choose the review tag (comment, approve, rejected, needs information,...)
   and don't forget to add a type of review to let people know:
   * Code review: means you look at the code
@@ -735,7 +751,7 @@ The differences include:
     * More python idioms
     * A way to deal with long comma-separated lines
     * Hints on documentation
-    * Don't use CamelCase for model variable
+    * Don't use CamelCase for model variables
     * Use underscore uppercase notation for global variables or constants
 * [Field](#field)
     * A hint for function defaults
@@ -751,11 +767,13 @@ The differences include:
 
 # Backporting Odoo Modules
 
-Suggesting a backport of a module among an OCA repository is possible, but you must respect a few rules:
+Suggesting a backport of a module among an OCA repository is possible, but you
+must respect a few rules:
  
  * You need to keep the license of the module coded by Odoo SA
  * You need to add the OCA as author (and Odoo SA of course)
- * You need to make the module "OCA compatible" : PEP8, OCA convention and so on so it won't break our CI like runbot, Travis and so.
+ * You need to make the module "OCA compatible" : PEP8, OCA convention and so
+   on so it won't break our CI like runbot, Travis and so.
  * You need to add a disclaimer in the Readme with the following text:
 ```
 **This module is a backport from Odoo SA and as such, it is not included in the OCA CLA. That means we do not have a copy of the copyright on it like all other OCA modules.**
