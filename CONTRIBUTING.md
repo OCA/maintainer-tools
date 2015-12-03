@@ -96,7 +96,8 @@ following
 }
 ```
 
-Remember to add into the **`__init__.py`** the following imports as needed
+Remember to add into the **`__init__.py`** the following imports as
+needed. For example:
 ```python
 ...
 from .hooks import pre_init_hook
