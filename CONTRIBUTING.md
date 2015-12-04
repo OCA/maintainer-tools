@@ -80,12 +80,39 @@ For `static files`, the name pattern is `<module_name>.ext` (i.e.
 ...). Don't link data (image, libraries) outside Odoo: don't use an url to an
 image but copy it in our codebase instead.
 
+### Installation hooks
+When **`pre_init_hook`**, **`post_init_hook`** and **`uninstall_hook`** are
+used, they should be placed in **`hooks.py`** located at the root of module
+directory structure and keys in the manifest file keeps the same as the
+following
+
+```python
+{
+    ...
+    'pre_init_hook': 'pre_init_hook',
+    'post_init_hook': 'post_init_hook',
+    'uninstall_hook': 'uninstall_hook',
+    ...
+}
+```
+
+Remember to add into the **`__init__.py`** the following imports as
+needed. For example:
+```python
+...
+from .hooks import pre_init_hook
+from .hooks import post_init_hook
+from .hooks import uninstall_hook
+...
+```
+
 The complete tree should look like this:
 
 ```
 addons/<my_module_name>/
 |-- __init__.py
 |-- __openerp__.py
+|-- hooks.py
 |-- controllers/
 |   |-- __init__.py
 |   `-- main.py
@@ -740,6 +767,7 @@ The differences include:
     * Separating data and demo data xml folders
     * Not changing xml_ids while inheriting
     * Add guideline to use external dependencies
+    * Define a separated file for installation hooks
 * [XML](#xml-files)
     * Avoid use current module in xml_id
     * Use explicit `user_id` field for records of model `ir.filters`
@@ -769,7 +797,7 @@ The differences include:
 
 Suggesting a backport of a module among an OCA repository is possible, but you
 must respect a few rules:
- 
+
  * You need to keep the license of the module coded by Odoo SA
  * You need to add the OCA as author (and Odoo SA of course)
  * You need to make the module "OCA compatible" : PEP8, OCA convention and so
