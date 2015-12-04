@@ -24,6 +24,7 @@ OCA_PROJECTS = {
                    'account-invoice-reporting',
                    'account-invoicing',
                    'account-fiscal-rule',
+                   'operating-unit',
                    ],
     # 'backport': ['OCB',
     #              ],
