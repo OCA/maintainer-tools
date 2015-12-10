@@ -113,3 +113,4 @@
 211|github.com/OCA/l10n-peru
 212|github.com/OCA/l10n-ecuador
 213|github.com/OCA/operating-unit
+215|github.com/OCA/l10n-morocco
