@@ -84,6 +84,7 @@ OCA_PROJECTS = {
     'l10n-italy': ['l10n-italy'],
     'l10n-luxemburg': ['l10n-luxemburg'],
     'l10n-mexico': ['l10n-mexico'],
+    'l10n-morocco': ['l10n-morocco'],
     'l10n-netherlands': ['l10n-netherlands'],
     'l10n-norway': ['l10n-norway'],
     'l10n-peru': ['l10n-peru'],
