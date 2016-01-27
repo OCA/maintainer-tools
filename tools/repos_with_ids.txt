@@ -114,3 +114,5 @@
 212|github.com/OCA/l10n-ecuador
 213|github.com/OCA/operating-unit
 215|github.com/OCA/l10n-morocco
+216|github.com/OCA/connector-salesforce
+217|github.com/OCA/vertical-education

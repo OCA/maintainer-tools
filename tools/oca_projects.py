@@ -47,6 +47,7 @@ OCA_PROJECTS = {
     'connector Prestashop': ['connector-prestashop'],
     'connector Redmine': ['connector-redmine'],
     'connector Sage': ['connector-sage'],
+    'connector Salesforce': ['connector-salesforce'],
     'connector WooCommerce': ['connector-woocommerce'],
     'crm sales marketing': ['sale-workflow',
                             'crm',
@@ -131,6 +132,7 @@ OCA_PROJECTS = {
     'vertical hotel': ['vertical-hotel'],
     'vertical ISP': ['vertical-isp'],
     'vertical edition': ['vertical-edition'],
+    'vertical education': ['vertical-education'],
     'vertical medical': ['vertical-medical'],
     'vertical NGO': ['vertical-ngo',
                      # XXX
