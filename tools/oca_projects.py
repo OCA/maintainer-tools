@@ -47,6 +47,7 @@ OCA_PROJECTS = {
     'connector Prestashop': ['connector-prestashop'],
     'connector Redmine': ['connector-redmine'],
     'connector Sage': ['connector-sage'],
+    'connector Salesforce': ['connector-salesforce'],
     'connector WooCommerce': ['connector-woocommerce'],
     'crm sales marketing': ['sale-workflow',
                             'crm',
@@ -90,6 +91,7 @@ OCA_PROJECTS = {
     'l10n-peru': ['l10n-peru'],
     'l10n-portugal': ['l10n-portugal'],
     'l10n-romania': ['l10n-romania'],
+    'l10n-slovenia': ['l10n-slovenia'],
     'l10n-spain': ['l10n-spain'],
     'l10n-switzerland': ['l10n-switzerland'],
     'l10n-taiwan': ['l10n-taiwan'],
@@ -131,6 +133,7 @@ OCA_PROJECTS = {
     'vertical hotel': ['vertical-hotel'],
     'vertical ISP': ['vertical-isp'],
     'vertical edition': ['vertical-edition'],
+    'vertical education': ['vertical-education'],
     'vertical medical': ['vertical-medical'],
     'vertical NGO': ['vertical-ngo',
                      # XXX
