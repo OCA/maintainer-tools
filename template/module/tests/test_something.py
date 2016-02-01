@@ -7,12 +7,10 @@ from openerp.tests.common import TransactionCase
 
 class SomethingCase(TransactionCase):
     def setUp(self, *args, **kwargs):
-        result = super(SomethingCase, self).setUp(*args, **kwargs)
+        super(SomethingCase, self).setUp(*args, **kwargs)
 
         # TODO Replace this for something useful or delete this method
         self.do_something_before_all_tests()
-
-        return result
 
     def tearDown(self, *args, **kwargs):
         # TODO Replace this for something useful or delete this method
