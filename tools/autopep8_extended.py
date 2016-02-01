@@ -135,8 +135,8 @@ class Pep8Extended(object):
         for check in self.msgs:
             # Validate if error is enabled.
             if check not in self.pep8_options['ignore'] \
-               and (not self.pep8_options['select']
-               or check in self.pep8_options['select']):
+               and (not self.pep8_options['select'] or
+               check in self.pep8_options['select']):
                 check_methodname = 'check_' + check.lower()
                 if hasattr(self, check_methodname):
                     check_method = getattr(self, check_methodname)
