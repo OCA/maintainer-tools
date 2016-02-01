@@ -122,6 +122,7 @@ OCA_PROJECTS = {
                            'contract',
                            'program',
                            ],
+    'social': ['social'],
     'tools': ['reporting-engine',
               'report-print-send',
               'webkit-tools',
