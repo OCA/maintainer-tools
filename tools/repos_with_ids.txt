@@ -117,3 +117,4 @@
 216|github.com/OCA/connector-salesforce
 217|github.com/OCA/vertical-education
 218|github.com/OCA/l10n-slovenia
+219|github.com/OCA/l10n-indonesia
