@@ -14,11 +14,20 @@ section.
 
 * Use of the singular form in module name (or use "multi"),
   except when compound of module name or object Odoo
-  that is already in the plural (i.e. mrp_operations_....).
+  that is already in the plural (i.e. `mrp_operations_...`).
+* If your module's purpose is to serve as a base for other modules, prefix its
+  name with `base_`. I.e. `base_location_nuts`.
+* When creating a localization module, prefix its name with `l10n_CC_`, where
+  `CC` is its country code. I.e. `l10n_es_pos`.
+* When extending an Odoo module, prefix yours with that module's name. I.e.
+  `mail_forward`.
+* When combining an Odoo module with another from OCA, Odoo's name goes before.
+  I.e., if you want to combine Odoo's `crm` with OCA's `partner_firstname`, the
+  name should be `crm_partner_firstname`.
 * Use the [description template](https://github.com/OCA/maintainer-tools/tree/master/template/module) but remove sections with no meaningful content.
 * In the `__openerp__.py`  manifest file:
   * Avoid empty keys
-  * Make sure it has the `license` key
+  * Make sure it has the `license` and `images` keys.
   * Make sure the text `,Odoo Community Association (OCA)` is appended
     to the `author` text.
 
@@ -806,5 +815,3 @@ must respect a few rules:
 ```
 **This module is a backport from Odoo SA and as such, it is not included in the OCA CLA. That means we do not have a copy of the copyright on it like all other OCA modules.**
 ```
-
-
