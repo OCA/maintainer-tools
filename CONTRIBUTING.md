@@ -30,6 +30,7 @@ section.
   * Make sure it has the `license` and `images` keys.
   * Make sure the text `,Odoo Community Association (OCA)` is appended
     to the `author` text.
+* Don't use your company logo or your corporate branding. Using the website, the author and the list of contributors is enough for people to know about your employer/company and contact you.
 
 ### Version numbers
 
