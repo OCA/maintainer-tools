@@ -5,6 +5,7 @@ guidelines aim to improve the quality of the code: better readability of
 source, better maintainability, better stability and fewer regressions.
 
 These are loosely based on the [Odoo Guidelines](https://www.odoo.com/documentation/8.0/reference/guidelines.html)
+and [Old Odoo Guidelines](https://doc.odoo.com/contribute/15_guidelines/coding_guidelines_framework.html)
 with adaptations to improve their guidelines and make them more suitable for
 this project's own needs. Readers used to the Odoo Guidelines can skip to the
 [Differences With Odoo Guidelines](#differences-with-odoo-guidelines)
@@ -494,6 +495,41 @@ class...
 ...
 ```
 
+### SQL
+
+#### No SQL Injection
+Care must be taken not to introduce SQL injections vulnerabilities when using manual SQL queries. The vulnerability is present when user input is either incorrectly filtered or badly quoted, allowing an attacker to introduce undesirable clauses to a SQL query (such as circumventing filters or executing **UPDATE** or **DELETE** commands).
+
+The best way to be safe is to never, NEVER use Python string concatenation (+) or string parameters interpolation (%) to pass variables to a SQL query string.
+
+The second reason, which is almost as important, is that it is the job of the database abstraction layer (psycopg2) to decide how to format query parameters, not your job! For example psycopg2 knows that when you pass a list of values it needs to format them as a comma-separated list, enclosed in parentheses!
+
+```python
+# the following is very bad:
+#   - it's a SQL injection vulnerability
+#   - it's unreadable
+#   - it's not your job to format the list of ids
+cr.execute('select distinct child_id from account_account_consol_rel ' +
+           'where parent_id in ('+','.join(map(str, ids))+')')
+
+# better
+cr.execute('SELECT DISTINCT child_id '\
+           'FROM account_account_consol_rel '\
+           'WHERE parent_id IN %s',
+           (tuple(ids),))
+```
+
+This is very important, so please be careful also when refactoring, and most importantly do not copy these patterns!
+
+Here is a [memorable example](http://www.bobby-tables.com) to help you remember what the issue is about (but do not copy the code there).
+
+Before continuing, please be sure to read the online documentation of pyscopg2 to learn of to use it properly:
+
+  - [The problem with query parameters](http://initd.org/psycopg/docs/usage.html#the-problem-with-the-query-parameters)
+  - [How to pass parameters with psycopg2](http://initd.org/psycopg/docs/usage.html#passing-parameters-to-sql-queries)
+  - [Advanced parameter types](http://initd.org/psycopg/docs/usage.html#adaptation-of-python-values-to-sql-types)
+
+
 ### Field
 * `One2Many` and `Many2Many` fields should always have `_ids` as suffix
   (example: sale_order_line_ids)
@@ -782,7 +818,7 @@ The differences include:
     * Avoid use current module in xml_id
     * Use explicit `user_id` field for records of model `ir.filters`
 * [Python](#python)
-    Use Python standards
+    * Use Python standards
     * Fuller PEP8 compliance
     * Use ``# coding: utf-8`` or ``# -*- coding: utf-8 -*-`` in first line
     * Using relative import for local files
@@ -791,6 +827,8 @@ The differences include:
     * Hints on documentation
     * Don't use CamelCase for model variables
     * Use underscore uppercase notation for global variables or constants
+* [SQL](#sql)
+    * Add section for No SQL Injection
 * [Field](#field)
     * A hint for function defaults
     * Use default label string if is posible.
