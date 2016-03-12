@@ -530,6 +530,33 @@ Before continuing, please be sure to read the online documentation of pyscopg2 t
   - [Advanced parameter types](http://initd.org/psycopg/docs/usage.html#adaptation-of-python-values-to-sql-types)
 
 
+### Do not bypass the ORM
+
+You should never use the database cursor directly when the ORM can do the same thing! By doing so you are bypassing all the ORM features, possibly the transactions, access rights and so on.
+
+And chances are that you are also making the code harder to read and probably less secure (see also next guideline):
+
+```python
+# very very wrong
+cr.execute('select id from auction_lots where auction_id in (' +
+           ','.join(map(str, ids)) + ') and state=%s and obj_price>0',
+           ('draft',))
+auction_lots_ids = [x[0] for x in cr.fetchall()]
+
+# no injection, but still wrong
+cr.execute('select id from auction_lots where auction_id in %s '
+           'and state=%s and obj_price>0',
+           (tuple(ids), 'draft',))
+auction_lots_ids = [x[0] for x in cr.fetchall()]
+
+# better
+auction_lots_ids = self.search(cr, uid, [
+    ('auction_id', 'in', ids),
+    ('state', '=', 'draft'),
+    ('obj_price', '>', 0),
+])
+```
+
 ### Field
 * `One2Many` and `Many2Many` fields should always have `_ids` as suffix
   (example: sale_order_line_ids)
@@ -829,6 +856,7 @@ The differences include:
     * Use underscore uppercase notation for global variables or constants
 * [SQL](#sql)
     * Add section for No SQL Injection
+    * Add section for don't bypass the ORM
 * [Field](#field)
     * A hint for function defaults
     * Use default label string if is posible.
