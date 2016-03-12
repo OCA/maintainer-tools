@@ -529,6 +529,57 @@ Before continuing, please be sure to read the online documentation of pyscopg2 t
   - [How to pass parameters with psycopg2](http://initd.org/psycopg/docs/usage.html#passing-parameters-to-sql-queries)
   - [Advanced parameter types](http://initd.org/psycopg/docs/usage.html#adaptation-of-python-values-to-sql-types)
 
+#### Never commit the transaction
+
+The OpenERP/OpenObject framework is in charge of providing the transactional context for all RPC calls. The principle is that a new database cursor is opened at the beginning of each RPC call, and committed when the call has returned, just before transmitting the answer to the RPC client, approximately like this:
+
+```python
+def execute(self, db_name, uid, obj, method, *args, **kw):
+    db, pool = pooler.get_db_and_pool(db_name)
+    # create transaction cursor
+    cr = db.cursor()
+    try:
+        res = pool.execute_cr(cr, uid, obj, method, *args, **kw)
+        cr.commit() # all good, we commit
+    except Exception:
+        cr.rollback() # error, rollback everything atomically
+        raise
+    finally:
+        cr.close() # always close cursor opened manually
+    return res
+```
+
+If any error occurs during the execution of the RPC call, the transaction is rolled back atomically, preserving the state of the system.
+
+Similarly, the system also provides a dedicated transaction during the execution of tests suites, so it can be rolled back or not depending on the server startup options.
+
+The consequence is that if you manually call `cr.commit()` anywhere there is a very high chance that you will break the system in various ways, because you will cause partial commits, and thus partial and unclean rollbacks, causing among others:
+
+ - inconsistent business data, usually data loss ;
+ - workflow desynchronization, documents stuck permanently ;
+ - tests that can't be rolled back cleanly, and will start polluting the database, and triggering error (this is true even if no error occurs during the transaction);
+
+Here is the very simple rule:
+
+Warning
+
+You should NEVER call cr.commit() yourself, UNLESS you have created your own database cursor explicitly! And the situations where you need to do that are exceptional!
+
+And by the way if you did create your own cursor, then you need to handle error cases and proper rollback, as well as properly close the cursor when you're done with it.
+
+And contrary to popular belief, you do not even need to call `cr.commit()` in the following situations:
+
+ - in the `_auto_init()` method of an osv.osv object: this is taken care of by the addons initialization method, or by the ORM transaction when creating custom models
+ - in reports: the `commit()` is handled by the framework too, so you can update the database even from within a report
+ - within `osv.osv_memory` methods: these methods are called exactly like regular `osv.osv` ones, within a transaction and with the corresponding `cr.commit()`/`rollback()` at the end ;
+ - etc. (see general rule above if you have in doubt!)
+
+And another very simple rule:
+
+Warning
+
+All `cr.commit()` calls outside of the server framework from now on must have an explicit comment explaining why they are absolutely necessary, why they are indeed correct, and why they do not break the transactions. Otherwise they can and will be removed!
+
 
 ### Do not bypass the ORM
 
@@ -857,6 +908,7 @@ The differences include:
 * [SQL](#sql)
     * Add section for No SQL Injection
     * Add section for don't bypass the ORM
+    * Add section for never commit the transaction
 * [Field](#field)
     * A hint for function defaults
     * Use default label string if is posible.
