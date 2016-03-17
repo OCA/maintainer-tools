@@ -119,3 +119,4 @@
 218|github.com/OCA/l10n-slovenia
 219|github.com/OCA/l10n-indonesia
 220|github.com/OCA/l10n-turkey
+221|github.com/OCA/l10n-ethiopia
