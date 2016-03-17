@@ -76,6 +76,7 @@ OCA_PROJECTS = {
     'l10n-colombia': ['l10n-colombia'],
     'l10n-costa-rica': ['l10n-costa-rica'],
     'l10n-ecuador': ['l10n-ecuador'],
+    'l10n-ethiopia': ['l10n-ethiopia'],
     'l10n-finland': ['l10n-finland'],
     'l10n-france': ['l10n-france'],
     'l10n-germany': ['l10n-germany'],
