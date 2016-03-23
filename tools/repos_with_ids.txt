@@ -1,5 +1,5 @@
 109|github.com/OCA/connector-sage-50
-140|github.com/OCA/project-service
+140|github.com/OCA/project
 141|github.com/OCA/purchase-reporting
 144|github.com/OCA/report-print-send
 107|github.com/OCA/connector-magento
