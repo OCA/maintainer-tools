@@ -559,39 +559,34 @@ The consequence is that if you manually call `cr.commit()` anywhere there is a v
  - workflow desynchronization, documents stuck permanently ;
  - tests that can't be rolled back cleanly, and will start polluting the database, and triggering error (this is true even if no error occurs during the transaction);
 
-Here is the very simple rule:
+Unless:
 
-You should NEVER call cr.commit() yourself, UNLESS you have created your own database cursor explicitly! And the situations where you need to do that are exceptional!
+ - You have created your own database cursor explicitly! And the situations where you need to do that are exceptional!
+   And by the way if you did create your own cursor, then you need to handle error cases and proper rollback, as well as properly close the cursor when you're done with it.
 
-And by the way if you did create your own cursor, then you need to handle error cases and proper rollback, as well as properly close the cursor when you're done with it.
+   And contrary to popular belief, you do not even need to call `cr.commit()` in the following situations:
 
-And contrary to popular belief, you do not even need to call `cr.commit()` in the following situations:
+   - in the `_auto_init()` method of an osv.osv object: this is taken care of by the addons initialization method, or by the ORM transaction when creating custom models
+   - in reports: the `commit()` is handled by the framework too, so you can update the database even from within a report
+   - within `osv.osv_memory` methods: these methods are called exactly like regular `osv.osv` ones, within a transaction and with the corresponding `cr.commit()`/`rollback()` at the end ;
+   - etc. (see general rule above if you have in doubt!)
 
- - in the `_auto_init()` method of an osv.osv object: this is taken care of by the addons initialization method, or by the ORM transaction when creating custom models
- - in reports: the `commit()` is handled by the framework too, so you can update the database even from within a report
- - within `osv.osv_memory` methods: these methods are called exactly like regular `osv.osv` ones, within a transaction and with the corresponding `cr.commit()`/`rollback()` at the end ;
- - etc. (see general rule above if you have in doubt!)
+ - All `cr.commit()` calls outside of the server framework from now on must have an explicit comment explaining why they are absolutely necessary, why they are indeed correct, and why they do not break the transactions. Otherwise they can and will be removed!
 
-And another very simple rule:
+ - With new api you can avoid the `cr.commit` using `cr.savepoint` method.
 
-All `cr.commit()` calls outside of the server framework from now on must have an explicit comment explaining why they are absolutely necessary, why they are indeed correct, and why they do not break the transactions. Otherwise they can and will be removed!
+  ```python
+    try:
+        with cr.savepoint():
+            # Create a savepoint and rollback this section if raise a exception.
+            method1()
+            method2()
+    #We catch all kind of exception to be sure that the operation doesn't fail.
+    except (except_class1, except_class2):
+        # Add here the logic if fail. NOTE: Don't need rollback sentence.
+        pass
 
-And another rule with new api:
-
-You can avoid the `cr.commit` with new api using
-
-```python
-  try:
-      with cr.savepoint():
-          # Create a savepoint and rollback this section.
-          method1()
-          method2()
-  #We catch all kind of exception to be sure that the operation doesn't fail.
-  except (except_class1, except_class2):
-      # Add here the logic if fail. NOTE: Don't need rollback sentence.
-      pass
-
-```
+  ```
 
 
 ### Do not bypass the ORM
