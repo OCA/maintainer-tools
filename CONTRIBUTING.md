@@ -561,8 +561,6 @@ The consequence is that if you manually call `cr.commit()` anywhere there is a v
 
 Here is the very simple rule:
 
-Warning
-
 You should NEVER call cr.commit() yourself, UNLESS you have created your own database cursor explicitly! And the situations where you need to do that are exceptional!
 
 And by the way if you did create your own cursor, then you need to handle error cases and proper rollback, as well as properly close the cursor when you're done with it.
@@ -576,9 +574,24 @@ And contrary to popular belief, you do not even need to call `cr.commit()` in th
 
 And another very simple rule:
 
-Warning
-
 All `cr.commit()` calls outside of the server framework from now on must have an explicit comment explaining why they are absolutely necessary, why they are indeed correct, and why they do not break the transactions. Otherwise they can and will be removed!
+
+And another rule with new api:
+
+You can avoid the `cr.commit` with new api using
+
+```python
+  try:
+      with cr.savepoint():
+          # Create a savepoint and rollback this section.
+          method1()
+          method2()
+  #We catch all kind of exception to be sure that the operation doesn't fail.
+  except (except_class1, except_class2):
+      # Add here the logic if fail. NOTE: Don't need rollback sentence.
+      pass
+
+```
 
 
 ### Do not bypass the ORM
