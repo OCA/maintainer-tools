@@ -566,9 +566,9 @@ Unless:
 
    And contrary to popular belief, you do not even need to call `cr.commit()` in the following situations:
 
-   - in the `_auto_init()` method of an osv.osv object: this is taken care of by the addons initialization method, or by the ORM transaction when creating custom models
+   - in the `_auto_init()` method of an `models.Model` object: this is taken care of by the addons initialization method, or by the ORM transaction when creating custom models
    - in reports: the `commit()` is handled by the framework too, so you can update the database even from within a report
-   - within `osv.osv_memory` methods: these methods are called exactly like regular `osv.osv` ones, within a transaction and with the corresponding `cr.commit()`/`rollback()` at the end ;
+   - within `models.TransientModel` methods: these methods are called exactly like regular `models.Model` ones, within a transaction and with the corresponding `cr.commit()`/`rollback()` at the end ;
    - etc. (see general rule above if you have in doubt!)
 
  - All `cr.commit()` calls outside of the server framework from now on must have an explicit comment explaining why they are absolutely necessary, why they are indeed correct, and why they do not break the transactions. Otherwise they can and will be removed!
@@ -578,12 +578,12 @@ Unless:
   ```python
     try:
         with cr.savepoint():
-            # Create a savepoint and rollback this section if raise a exception.
+            # Create a savepoint and rollback this section if any exception is raised.
             method1()
             method2()
-    #We catch all kind of exception to be sure that the operation doesn't fail.
+    # Catch here any exceptions if you need to.
     except (except_class1, except_class2):
-        # Add here the logic if fail. NOTE: Don't need rollback sentence.
+        # Add here the logic if anything fails. NOTE: Don't need rollback sentence.
         pass
 
   ```
