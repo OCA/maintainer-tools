@@ -72,8 +72,12 @@ def main():
     parser = argparse.ArgumentParser(description="Make python wheel packages "
                                                  "for all Odoo addons in "
                                                  "subdirectories")
-    parser.add_argument('--branch', required=True)
-    parser.add_argument('--dist-dir', required=True)
+    parser.add_argument('--branch', required=True,
+                        help='git branch to checkout and work on')
+    parser.add_argument('--dist-dir', required=True,
+                        help='target directory for generated wheels')
+    parser.add_argument('--push', action='store_true',
+                        help='git push changes made to the setup directory')
     args = parser.parse_args()
     dist_dir = os.path.abspath(args.dist_dir)
     for repo in get_repositories():
@@ -85,11 +89,21 @@ def main():
         except KeyboardInterrupt:
             raise
         except:
+            # branch does not exist, move on to next repo
             continue
         subprocess.check_call(['git', 'clean', '-f', '-d'], cwd=repo)
         subprocess.check_call(['setuptools-odoo-make-default',
                                '-d', '.'], cwd=repo)
-        # TODO: git commit setup dir
+        # git commit and push setup dir
+        if args.push:
+            subprocess.check_call(['git', 'add', 'setup'], cwd=repo)
+            if 0 != subprocess.call(['git', 'diff', '--quiet', '--cached',
+                                     '--exit-code', 'setup'], cwd=repo):
+                subprocess.check_call(['git', 'commit', '-m' '[ADD] setup.py'],
+                                      cwd=repo)
+                subprocess.check_call(['git', 'push', 'origin', args.branch],
+                                      cwd=repo)
+        # make wheel for each installable addon
         metapackage_reqs = []
         for addon_name in os.listdir(os.path.join(repo, 'setup')):
             addon_setup_path = os.path.join(repo, 'setup', addon_name)
