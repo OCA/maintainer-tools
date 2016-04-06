@@ -89,7 +89,7 @@ import argparse
 import os.path
 import re
 import time
-
+import math
 import polib
 from slumber import API, exceptions
 
@@ -207,9 +207,18 @@ class TransifexPuller(object):
                 tx_projects += temp_projects
         for tx_project in tx_projects:
             if self.tx_org + '-' in tx_project['slug']:
-                self._process_project(tx_project)
+                tx_project_api = self.tx_api.project(tx_project['slug'])
+                resources = tx_project_api.resources().get()
+                print 'resources', len(resources)
+                if len(resources) > 20:
+                    # resources_batchs = ......
+                    # for resource_batch in resources_batchs:
+                    for i in range(int(math.ceil(len(resources) / 20.0))):
+                        self._process_project(tx_project, resources[i * 20 :(i + 1) * 20])
+                else:
+                    self._process_project(tx_project)
 
-    def _process_project(self, tx_project):
+    def _process_project(self, tx_project, resources=False):
         print "Processing project '%s'..." % tx_project['name']
         oca_project, oca_branch = self._get_oca_project_info(tx_project)
         # get a reference to the github repo and branch where to push the
@@ -219,7 +228,8 @@ class TransifexPuller(object):
         tree_data = []
 
         tx_project_api = self.tx_api.project(tx_project['slug'])
-        resources = tx_project_api.resources().get()
+        if not resources:
+            resources = tx_project_api.resources().get()
         for resource in resources:
             print "Checking resource %s..." % resource['name']
             tx_resource_api = tx_project_api.resource(resource['slug'])
@@ -230,6 +240,8 @@ class TransifexPuller(object):
                     continue
                 cont = 0
                 tx_lang = False
+                # forzamos retry 10
+                self.tx_num_retries = 10
                 while cont < self.tx_num_retries and not tx_lang:
                     # for some weird reason, sometimes Transifex fails to
                     # some requests, so this retry mechanism handles this
@@ -240,6 +252,7 @@ class TransifexPuller(object):
                     except exceptions.HttpClientError:
                         tx_lang = False
                         cont += 1
+                        print 'retry %s' % cont
                 if tx_lang:
                     try:
                         tx_po_file = polib.pofile(tx_lang['content'])
@@ -281,8 +294,8 @@ class TransifexPuller(object):
             # TODO: Request the API to get the date for the next request
             # http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/\
             # content/Determining_Limits_Programmatically-d1e1039.html
-            print "Sleeping 70 seconds..."
-            time.sleep(70)
+            # print "Sleeping 70 seconds..."
+            # time.sleep(70)
         if tree_data:
             tree_sha = gh_branch.commit.commit.tree.sha
             tree = gh_repo.create_tree(tree_data, tree_sha)
