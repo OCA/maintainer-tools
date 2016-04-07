@@ -832,7 +832,7 @@ S. Raymond has written influentially about peer review in software development:
 * Are there demo data?
 
 Further reading:
-* http://insidecoding.com/2013/01/07/code-review-guidelines/
+* https://insidecoding.wordpress.com/2013/01/07/code-review-guidelines/
 
 #### There are the following important parts in a review:
 
