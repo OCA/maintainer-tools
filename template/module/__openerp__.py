@@ -25,12 +25,14 @@
         "security/some_model_security.xml",
         "security/ir.model.access.csv",
         "views/assets.xml",
+        "views/model_name.xml",
         "views/report_name.xml",
         "views/res_partner_view.xml",
-        "wizard/wizard_model_view.xml",
+        "data/model_name.xml",
+        "wizard/wizard_model.xml",
     ],
     "demo": [
-        "demo/res_partner_demo.xml",
+        "demo/model_name.xml",
     ],
     "qweb": [
         "static/src/xml/module_name.xml",
