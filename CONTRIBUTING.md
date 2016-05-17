@@ -588,6 +588,20 @@ Unless:
 
   ```
 
+ - With new api you can isolate a transaction for a valid `cr.commit` using `Environment`:
+
+  ```python
+    with openerp.api.Environment.manage():
+        with openerp.registry(self.env.cr.dbname).cursor() as new_cr:
+            # Create a new environment with new cursor database
+            new_env = api.Environment(new_cr, self.env.uid, self.env.context)
+            # with_env replace original env for this method
+            self.with_env(new_env).write({'name': 'hello'})  # isolated transaction to commit
+            new_env.cr.commit()  # Don't show a invalid-commit in this case
+        # You don't need close your cr because is closed when finish "with"
+    # You don't need clear caches because is cleared when finish "with"
+  ```
+
 
 ### Do not bypass the ORM
 
