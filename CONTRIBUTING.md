@@ -742,7 +742,7 @@ As a general rule, a bug fix should come with a unittest which would fail
 without the fix itself. This is to assure that regression will not happen in
 the future. It also is a good way to show that the fix works in all cases.
 
-New modules or addtions should ideally test all the functions defined. The
+New modules or additions should ideally test all the functions defined. The
 coveralls utility will comment on pull requests indicating if coverage
 increased or decreased. If it has decreased, this is usually a sign that a test
 should be added. The coveralls web interface can also show which lines need
