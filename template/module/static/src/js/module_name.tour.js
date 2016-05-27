@@ -4,6 +4,7 @@
 "use strict";
 odoo.define("module_name.tour", function (require) {
 
+// Dependencies here by alphabetic order. Template only for Odoo 9+.
 var Core = require("web.core");
 var Tour = require("web.Tour");
 var _t = Core._t;
