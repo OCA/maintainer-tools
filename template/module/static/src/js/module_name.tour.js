@@ -20,6 +20,7 @@ Tour.register({
             title: _t("The title of this step, appears in logs"),
             element: "div.jquery-selector-of-element-to-click-or-use",
             sampleText: "Value to enter if it is an input",
+            wait: 3000, // Milliseconds to wait
             waitFor: ".start-when-this-jquery-selector-matches-something",
             waitNot: ".start-when-this-jquery-selector-matches-nothing",
             onend: function() {
