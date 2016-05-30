@@ -91,7 +91,7 @@ def main():
         except:
             # branch does not exist, move on to next repo
             continue
-        subprocess.check_call(['git', 'clean', '-f', '-d'], cwd=repo)
+        subprocess.check_call(['git', 'clean', '-f', '-d', '-x'], cwd=repo)
         subprocess.check_call(['setuptools-odoo-make-default',
                                '-d', '.'], cwd=repo)
         # git commit and push setup dir
@@ -107,6 +107,8 @@ def main():
         metapackage_reqs = []
         for addon_name in os.listdir(os.path.join(repo, 'setup')):
             addon_setup_path = os.path.join(repo, 'setup', addon_name)
+            if not os.path.isdir(addon_setup_path):
+                continue
             try:
                 # bdist_wheel for each addon
                 subprocess.check_call(['python', 'setup.py', 'bdist_wheel',
