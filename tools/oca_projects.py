@@ -124,6 +124,7 @@ OCA_PROJECTS = {
                            'project-service',
                            'contract',
                            'program',
+                           'business-requirement',
                            ],
     'social': ['social'],
     'tools': ['reporting-engine',
