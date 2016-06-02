@@ -51,5 +51,9 @@ def post_load():
 
     This is ok as the post-load hook is for server-wide
     (instead of registry-specific) functionalities.
+
+    This is very useful to create monkey patches for odoo.
+
+    Note: You do not have access to database cursor here.
     """
     raise NotImplementedError
