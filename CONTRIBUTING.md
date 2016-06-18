@@ -630,6 +630,7 @@ auction_lots_ids = self.search(cr, uid, [
             new api `'name': fields.Char(...)`)
 * Method conventions
     * Compute Field: the compute method pattern is `_compute_<field_name>`
+    * Inverse method: the inverse method pattern is `_inverse_<field_name>`
     * Search method: the search method pattern is `_search_<field_name>`
     * Default method: the default method pattern is `_default_<field_name>`
     * Onchange method: the onchange method pattern is `_onchange_<field_name>`
@@ -919,7 +920,8 @@ The differences include:
     * Add section for never commit the transaction
 * [Field](#field)
     * A hint for function defaults
-    * Use default label string if is posible.
+    * Use default label string if is possible
+    * Add the inverse method pattern
 * [Tests Section Added](#tests)
 * [Git](#git)
     * No prefixing of commits
