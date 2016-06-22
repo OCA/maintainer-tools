@@ -573,7 +573,7 @@ Unless:
 
  - All `cr.commit()` calls outside of the server framework from now on must have an explicit comment explaining why they are absolutely necessary, why they are indeed correct, and why they do not break the transactions. Otherwise they can and will be removed!
 
- - With new api you can avoid the `cr.commit` using `cr.savepoint` method.
+ - You can avoid the `cr.commit` using `cr.savepoint` method.
 
   ```python
     try:
@@ -588,7 +588,7 @@ Unless:
 
   ```
 
- - With new api you can isolate a transaction for a valid `cr.commit` using `Environment`:
+ - You can isolate a transaction for a valid `cr.commit` using `Environment`:
 
   ```python
     with openerp.api.Environment.manage():
