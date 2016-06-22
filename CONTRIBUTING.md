@@ -652,8 +652,8 @@ auction_lots_ids = self.search(cr, uid, [
 
 * In a Model attribute order should be
     1. Private attributes (`_name`, `_description`, `_inherit`, ...)
-    2. Fields declarations
-    3. Default method and `_default_get`
+    2. Default method and `_default_get`
+    3. Fields declarations
     4. Compute and search methods in the same order than field declaration
     5. Constrains methods (`@api.constrains`) and onchange methods
        (`@api.onchange`)
@@ -666,6 +666,10 @@ class Event(models.Model):
     # Private attributes
     _name = 'event.event'
     _description = 'Event'
+
+    # Default methods
+    def _default_name(self):
+            ...
 
     # Fields declaration
     name = fields.Char(string='Name', default=_default_name)
@@ -684,10 +688,6 @@ class Event(models.Model):
         compute='_compute_seats',
     )
     price = fields.Integer(string='Price')
-
-    # Default methods
-    def _default_name(self):
-            ...
 
     # compute and search fields, in the same order that fields declaration
     @api.multi
