@@ -573,7 +573,7 @@ Unless:
 
  - All `cr.commit()` calls outside of the server framework from now on must have an explicit comment explaining why they are absolutely necessary, why they are indeed correct, and why they do not break the transactions. Otherwise they can and will be removed!
 
- - With new api you can avoid the `cr.commit` using `cr.savepoint` method.
+ - You can avoid the `cr.commit` using `cr.savepoint` method.
 
   ```python
     try:
@@ -586,6 +586,20 @@ Unless:
         # Add here the logic if anything fails. NOTE: Don't need rollback sentence.
         pass
 
+  ```
+
+ - You can isolate a transaction for a valid `cr.commit` using `Environment`:
+
+  ```python
+    with openerp.api.Environment.manage():
+        with openerp.registry(self.env.cr.dbname).cursor() as new_cr:
+            # Create a new environment with new cursor database
+            new_env = api.Environment(new_cr, self.env.uid, self.env.context)
+            # with_env replace original env for this method
+            self.with_env(new_env).write({'name': 'hello'})  # isolated transaction to commit
+            new_env.cr.commit()  # Don't show a invalid-commit in this case
+        # You don't need close your cr because is closed when finish "with"
+    # You don't need clear caches because is cleared when finish "with"
   ```
 
 
