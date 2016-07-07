@@ -160,6 +160,11 @@ addons/<my_module_name>/
 |       |   `-- <my_module_name>.less
 |       `-- xml/
 |           `-- <my_module_name>.xml
+|-- test/
+|   |-- <test_file>.yml
+|-- tests/
+|   |-- __init__.py
+|   |-- <test_file>.py
 |-- views/
 |   |-- <main_model>.xml
 |   `-- <inherited_main_model>_views.xml
