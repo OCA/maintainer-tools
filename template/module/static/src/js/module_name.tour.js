@@ -1,8 +1,8 @@
 /* Copyright <YEAR(S)> <AUTHOR(S)>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). */
 
-"use strict";
 odoo.define("module_name.tour", function (require) {
+"use strict";
 
 // Dependencies here by alphabetic order. Template only for Odoo 9+.
 var Core = require("web.core");
