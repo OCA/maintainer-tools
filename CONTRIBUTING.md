@@ -325,6 +325,8 @@ high value of priority to avoid the error.
 </record>
 ```
 
+Also, we can hide an element from the view using `invisible="1"`.
+
 
 ### External dependencies
 
