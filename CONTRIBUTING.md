@@ -306,20 +306,20 @@ same name.
 
 Use of `<... position="replace">` is not recommended because
 could show the error `Element ... cannot be located in parent view`
-from other views inheriting with this field.
+from other inherited views with this field.
 
-if you need to use this option, must have an explicit comment
-explaining why they are absolutely necessary and use a
-high value of priority to avoid the error.
+If you need to use this option, it must have an explicit comment
+explaining why it is absolutely necessary and also use a
+high value in its `priority` (greater than 100 is recommended) to avoid the error.
 
 
 ```xml
 <record id="view_id" model="ir.ui.view">
     <field name="name">view.name</field>
     <field name="model">object_name</field>
-    <field name="priority">110</field> <!--Priority greather than 100-->
+    <field name="priority">110</field> <!--Priority greater than 100-->
     <field name="arch" type="xml">
-        <!--Necessary because...-->
+        <!-- It is necessary because...-->
         <xpath expr="//field[@name='my_field_1']" position="replace"/>
     </field>
 </record>
