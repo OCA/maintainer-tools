@@ -308,7 +308,7 @@ Use of `<... position="replace">` is not recommended because
 could show the error `Element ... cannot be located in parent view`
 from other views inheriting with this field.
 
-if you need use this option, must have an explicit comment
+if you need to use this option, must have an explicit comment
 explaining why they are absolutely necessary and use a
 high value of priority to avoid the error.
 
