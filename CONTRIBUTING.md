@@ -191,7 +191,6 @@ When declaring a record in XML:
 * For field declarations, the `name` attribute is first. Then place the `value`
   either in the `field` tag, either in the `eval` attribute, and finally other
   attributes (widget, options, ...) ordered by importance.
-
 * Try to group the records by model. In case of dependencies between
   action/menu/views, the convention may not be applicable.
 * Use naming convention defined at the next point
@@ -303,6 +302,31 @@ same name.
     ...
 </record>
 ```
+
+
+Use of `<... position="replace">` is not recommended because
+could show the error `Element ... cannot be located in parent view`
+from other inherited views with this field.
+
+If you need to use this option, it must have an explicit comment
+explaining why it is absolutely necessary and also use a
+high value in its `priority` (greater than 100 is recommended) to avoid the error.
+
+
+```xml
+<record id="view_id" model="ir.ui.view">
+    <field name="name">view.name</field>
+    <field name="model">object_name</field>
+    <field name="priority">110</field> <!--Priority greater than 100-->
+    <field name="arch" type="xml">
+        <!-- It is necessary because...-->
+        <xpath expr="//field[@name='my_field_1']" position="replace"/>
+    </field>
+</record>
+```
+
+Also, we can hide an element from the view using `invisible="1"`.
+
 
 ### External dependencies
 
