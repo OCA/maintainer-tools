@@ -11,6 +11,52 @@ this project's own needs. Readers used to the Odoo Guidelines can skip to the
 [Differences With Odoo Guidelines](#differences-with-odoo-guidelines)
 section.
 
+##### Table of Contents
+
+  * [OCA Guidelines](#oca-guidelines)
+    * [Modules](#modules)
+      * [Version numbers](#version-numbers)
+      * [Directories](#directories)
+      * [File naming](#file-naming)
+      * [Installation hooks](#installation-hooks)
+    * [XML files](#xml-files)
+      * [Format](#format)
+      * [Records](#records)
+      * [Naming xml_id](#naming-xml_id)
+        * [Security, View and Action](#security-view-and-action)
+        * [Inherited XML](#inherited-xml)
+      * [External dependencies](#external-dependencies)
+        * [`__openerp__.py`](#__openerp__py)
+        * [ImportError](#importerror)
+        * [README](#user-content-readme)
+    * [Python](#python)
+      * [PEP8 options](#pep8-options)
+      * [Imports](#imports)
+      * [Idioms](#idioms)
+      * [Symbols](#symbols)
+        * [Odoo Python Classes](#odoo-python-classes)
+        * [Variable names](#variable-names)
+      * [SQL](#sql)
+        * [No SQL Injection](#no-sql-injection)
+        * [Never commit the transaction](#never-commit-the-transaction)
+      * [Do not bypass the ORM](#do-not-bypass-the-orm)
+      * [Field](#field)
+    * [Javascript](#javascript)
+    * [CSS](#css)
+    * [Tests](#tests)
+    * [Git](#git)
+      * [Commit message](#commit-message)
+      * [Review](#review)
+        * [Please respect a few basic rules:](#please-respect-a-few-basic-rules)
+        * [There are the following important parts in a review:](#there-are-the-following-important-parts-in-a-review)
+        * [It makes sense to be picky in the following cases:](#it-makes-sense-to-be-picky-in-the-following-cases)
+    * [Github](#github)
+      * [Teams](#teams)
+      * [Repositories](#repositories)
+      * [Issues](#issues)
+    * [Differences With Odoo Guidelines](#differences-with-odoo-guidelines)
+  * [Backporting Odoo Modules](#backporting-odoo-modules)
+
 ## Modules
 
 * Use of the singular form in module name (or use "multi"),
@@ -925,7 +971,7 @@ Pull requests can be closed if:
 * Project name for localization is "l10n_belgium" for Belgium
 * Project name for connectors is "connector-magento" for Magento connector
 
-### Issue
+### Issues
 
 * Issues are used for blueprints and bugs.
 
