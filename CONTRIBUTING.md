@@ -485,6 +485,8 @@ except ImportError:
 * Use English variable names and write comments in English. Strings which need
   to be displayed in other languages should be translated using the translation
   system
+* Avoid use of ``api.v7`` decorator in new code, unless there is already an API
+  fragmentation in parent methods.
 
 ### Symbols
 
