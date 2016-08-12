@@ -23,9 +23,13 @@ Tour.register({
             wait: 3000, // Milliseconds to wait
             waitFor: ".start-when-this-jquery-selector-matches-something",
             waitNot: ".start-when-this-jquery-selector-matches-nothing",
-            onend: function() {
-                // Custom code that should return true for step to success
-                return true;
+
+            // Triggers that could return a step title to jump to it
+            onload: function () {
+                return "step title";
+            },
+            onend: function () {
+                return "step title";
             },
 
             // Only for "tutorial" mode.
