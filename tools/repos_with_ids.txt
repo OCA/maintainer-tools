@@ -121,3 +121,4 @@
 220|github.com/OCA/l10n-turkey
 221|github.com/OCA/l10n-ethiopia
 222|github.com/OCA/business-requirement
+223|github.com/OCA/l10n-cambodia
