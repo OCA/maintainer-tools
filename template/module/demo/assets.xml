@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright <YEAR(S)> <AUTHOR(S)>
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+
+<openerp>
+<data>
+
+<template id="assets_frontend_demo" inherit_id="website.assets_frontend">
+    <xpath expr=".">
+        <script type="text/javascript"
+                src="/module/static/src/js/module_name.tour.js"/>
+    </xpath>
+</template>
+
+</data>
+</openerp>
