@@ -31,7 +31,7 @@ class SomethingCase(TransactionCase):
 class UICase(HttpCase):
     def test_ui_web(self):
         """Test backend tests."""
-        self.phantom_js("/web/tests?mod=module_name", "", login="admin")
+        self.phantom_js("/web/tests?module=module_name", "", login="admin")
 
     def test_ui_website(self):
         """Test frontend tour."""
