@@ -113,6 +113,8 @@ A module is organized in a few directories:
   `lib/`, ...
 * `views/`: contains the views and templates, and QWeb report print templates
 * `wizards/`: wizard model and views
+* `examples/`: external files
+
 
 ### File naming
 
@@ -221,6 +223,8 @@ addons/<my_module_name>/
     |-- __init__.py
     |-- <wizard_model>.py
     `-- <wizard_model>.xml
+|-- examples/
+|   |-- my_example.csv
 ```
 
 Filenames should use only `[a-z0-9_]`
