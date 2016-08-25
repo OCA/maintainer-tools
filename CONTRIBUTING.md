@@ -120,7 +120,11 @@ For `models`, `views` and `data` declarations, split files by the model
 involved, either created or inherited. These files should be named after the
 model. For example, demo data for res.partner should go in a file named
 `demo/res_partner.xml` and a view for partner should go in a file named
-`views/res_partner.xml`.
+`views/res_partner.xml`. An exception can be made when the model is a 
+model intended to be used only as a one2many model nested on the main 
+model. In this case, you can include the model definition inside it.
+Example `sale.order.line` model can be together with `sale.order` in
+the file `models/sale_order.py`.
 
 For model named `<main_model>` the following files may be created:
 
