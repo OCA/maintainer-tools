@@ -88,6 +88,7 @@ To contribute to this module, please visit http://odoo-community.org.
 import argparse
 import os.path
 import re
+import time
 
 import polib
 from slumber import API, exceptions
@@ -224,6 +225,9 @@ class TransifexPuller(object):
             tx_resource_api = tx_project_api.resource(resource['slug'])
             resource = tx_resource_api.get(details=True)
             for lang in resource['available_languages']:
+                # Discard english (native language in Odoo)
+                if lang['code'] == 'en':
+                    continue
                 cont = 0
                 tx_lang = False
                 while cont < self.tx_num_retries and not tx_lang:
@@ -272,6 +276,13 @@ class TransifexPuller(object):
                         print "ERROR: processing lang '%s'" % lang['code']
                 else:
                     print "ERROR: fetching lang '%s'" % lang['code']
+            # Wait a minute before the next file to avoid reaching Transifex
+            # API limitations
+            # TODO: Request the API to get the date for the next request
+            # http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/\
+            # content/Determining_Limits_Programmatically-d1e1039.html
+            print "Sleeping 70 seconds..."
+            time.sleep(70)
         if tree_data:
             tree_sha = gh_branch.commit.commit.tree.sha
             tree = gh_repo.create_tree(tree_data, tree_sha)
@@ -282,6 +293,13 @@ class TransifexPuller(object):
                 author=self.gh_credentials, committer=self.gh_credentials)
             print "git pushing"
             gh_repo.ref('heads/{}'.format(gh_branch.name)).update(commit.sha)
+        # Wait 5 minutes before the next project to avoid reaching Transifex
+        # API limitations
+        # TODO: Request the API to get the date for the next request
+        # http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/\
+        # content/Determining_Limits_Programmatically-d1e1039.html
+        print "Sleeping 5 minutes..."
+        time.sleep(300)
 
 
 def main():

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright <YEAR(S)> <AUTHOR(S)>
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+
+<openerp>
+<data>
+
+<template id="assets_common" inherit_id="web.assets_common">
+    <xpath expr=".">
+        <link rel="stylesheet"
+              href="/module/static/src/css/module_name.css"/>
+        <script type="text/javascript"
+                src="/module/static/src/js/module_name.js"/>
+    </xpath>
+</template>
+
+<template id="assets_backend" inherit_id="web.assets_backend">
+    <xpath expr=".">
+        <link rel="stylesheet"
+              href="/module/static/src/css/module_name.css"/>
+        <script type="text/javascript"
+                src="/module/static/src/js/module_name.js"/>
+    </xpath>
+</template>
+
+<template id="assets_frontend" inherit_id="website.assets_frontend">
+    <xpath expr=".">
+        <link rel="stylesheet"
+              href="/module/static/src/css/module_name.css"/>
+        <script type="text/javascript"
+                src="/module/static/src/js/module_name.js"/>
+    </xpath>
+</template>
+
+<template id="assets_editor" inherit_id="website.assets_editor">
+    <xpath expr=".">
+        <script type="text/javascript"
+                src="/module/static/src/js/module_name.tour.js"/>
+    </xpath>
+</template>
+
+</data>
+</openerp>

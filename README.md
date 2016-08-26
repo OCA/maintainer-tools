@@ -89,17 +89,45 @@ to support custom code refactoring.
 * List of errors added:
 
     - `CW0001` Class name with snake_case style found, should use CamelCase.
+    - `CW0002` Delete vim comment.
 
 More info of original autopep8 [here](https://pypi.python.org/pypi/autopep8/)
 
 You can rename snake_case to CamelCase with next command:
     $ oca-autopep8 -ri --select=CW0001 PATH
 
+You can delete vim comment
+    $ oca-autopep8 -ri --select=CW0002,W391 PATH
+
+
+**Clone all OCA repositories**
+
+The script `oca-clone-everything` can be used to clone all the OCA projects:
+create a fresh directory, use oca-github-login (or copy oca.cfg from a place
+where you've already logged in) and run oca-clone-everything.
+
+The script will create a clone for all the OCA projects registered on
+github. For projects already cloned, it run `git fetch --all` to get the
+lastest versions.
+
+If you pass the `--organization-remotes
+<comma-separated-list>` option, the script will also add remotes for the listed
+accounts, and run `git fetch` to get the source code from these forks. For instance:
+
+    $ oca-clone-everything --organization-remotes yourlogin,otherlogin
+
+will create two remotes, in addition to the default `origin`, called
+`yourlogin` and `otherlogin`, respectively referencing
+`git@github.com:yourlogin/projectname` and
+`git@github.com:otherlogin/projectname` and fetch these remotes, for all the
+OCA projects. It does not matter whether the forks exist on github or not, and
+you can create them later.
+
 
 ## Developers
 
 As a developer, you want to launch the scripts without installing the
-egg. 
+egg.
 
     $ git clone git@github.com:OCA/maintainers-tools.git
     $ cd maintainers-tools

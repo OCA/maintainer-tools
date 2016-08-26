@@ -1,5 +1,5 @@
 109|github.com/OCA/connector-sage-50
-140|github.com/OCA/project-service
+140|github.com/OCA/project
 141|github.com/OCA/purchase-reporting
 144|github.com/OCA/report-print-send
 107|github.com/OCA/connector-magento
@@ -109,3 +109,16 @@
 207|github.com/OCA/connector-woocommerce
 208|github.com/OCA/vertical-association
 209|github.com/OCA/connector-odoo2odoo
+210|github.com/OCA/webhook
+211|github.com/OCA/l10n-peru
+212|github.com/OCA/l10n-ecuador
+213|github.com/OCA/operating-unit
+215|github.com/OCA/l10n-morocco
+216|github.com/OCA/connector-salesforce
+217|github.com/OCA/vertical-education
+218|github.com/OCA/l10n-slovenia
+219|github.com/OCA/l10n-indonesia
+220|github.com/OCA/l10n-turkey
+221|github.com/OCA/l10n-ethiopia
+222|github.com/OCA/business-requirement
+223|github.com/OCA/l10n-cambodia
