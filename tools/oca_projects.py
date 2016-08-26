@@ -61,6 +61,7 @@ OCA_PROJECTS = {
     'document': ['knowledge'],
     'ecommerce': ['e-commerce'],
     'financial control': ['margin-analysis'],
+    'Infrastructure': ['infrastructure-dns'],
     'geospatial': ['geospatial'],
     'hr': ['hr-timesheet',
            'hr',
