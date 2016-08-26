@@ -122,3 +122,4 @@
 221|github.com/OCA/l10n-ethiopia
 222|github.com/OCA/business-requirement
 223|github.com/OCA/l10n-cambodia
+224|github.com/OCA/infrastructure-dns
