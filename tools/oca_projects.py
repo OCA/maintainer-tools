@@ -4,7 +4,7 @@ Data about OCA Projects, with a few helper functions.
 
 OCA_PROJECTS: dictionary of OCA Projects mapped to the list of related
 repository names, based on
-https://community.odoo.com/page/website.projects_index
+https://odoo-community.org/page/List
 
 OCA_REPOSITORY_NAMES: list of OCA repository names
 
