@@ -10,4 +10,4 @@ autopep8==1.2
 slumber
 polib
 wheel
-setuptools-odoo
+setuptools-odoo>1.0.0b6
