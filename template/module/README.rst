@@ -14,16 +14,16 @@ Installation
 
 To install this module, you need to:
 
-#  Do this ...
+#. Do this ...
 
 Configuration
 =============
 
 To configure this module, you need to:
 
-#  Go to ...
+#. Go to ...
 
-.. figure:: ../module_name/path/to/local/image.png
+.. figure:: ../module/path/to/local/image.png
    :alt: alternative description
    :width: 600 px
 
@@ -32,7 +32,7 @@ Usage
 
 To use this module, you need to:
 
-#  Go to ...
+#. Go to ...
 
 .. image:: https://odoo-community.org/website/image/ir.attachment/5784_f2813bd/datas
    :alt: Try me on Runbot
