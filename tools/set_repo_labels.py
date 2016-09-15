@@ -37,7 +37,7 @@ def main():
             continue
         labels = repo.iter_labels()
 
-        existing_labels = dict((l.name, l.color) for l in labels)
+        existing_labels = dict((l.name.lower(), l.color) for l in labels)
 
         to_create = []
         to_change_color = []
