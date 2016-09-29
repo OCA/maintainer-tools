@@ -113,8 +113,6 @@ A module is organized in a few directories:
   `lib/`, ...
 * `views/`: contains the views and templates, and QWeb report print templates
 * `wizards/`: wizard model and views
-* `examples/`: external files
-
 
 ### File naming
 
@@ -223,8 +221,6 @@ addons/<my_module_name>/
     |-- __init__.py
     |-- <wizard_model>.py
     `-- <wizard_model>.xml
-|-- examples/
-|   |-- my_example.csv
 ```
 
 Filenames should use only `[a-z0-9_]`
@@ -1032,8 +1028,11 @@ must respect a few rules:
 
  * You need to keep the license of the module coded by Odoo SA
  * You need to add the OCA as author (and Odoo SA of course)
- * You need to make the module "OCA compatible" : PEP8, OCA convention and so
-   on so it won't break our CI like runbot, Travis and so.
+ * If the code does not fit with our linters, you have to disable them, so
+   further backport updates become easier, and we can stick the code as close
+   as possible to upstream's.
+   * Add on top of Python files: `# flake8: noqa`
+   * Add on top of ECMAScript files: `// jshint ignore: start`
  * You need to add a disclaimer in the Readme with the following text:
 ```
 **This module is a backport from Odoo SA and as such, it is not included in the OCA CLA. That means we do not have a copy of the copyright on it like all other OCA modules.**
