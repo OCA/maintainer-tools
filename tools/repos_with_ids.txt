@@ -123,3 +123,6 @@
 222|github.com/OCA/business-requirement
 223|github.com/OCA/l10n-cambodia
 224|github.com/OCA/infrastructure-dns
+225|github.com/OCA/website-cms
+226|github.com/OCA/edi
+227|github.com/OCA/intrastat

@@ -25,6 +25,7 @@ OCA_PROJECTS = {
                    'account-invoicing',
                    'account-fiscal-rule',
                    'operating-unit',
+                   'intrastat',
                    ],
     # 'backport': ['OCB',
     #              ],
@@ -60,6 +61,7 @@ OCA_PROJECTS = {
                             ],
     'document': ['knowledge'],
     'ecommerce': ['e-commerce'],
+    'edi': ['edi'],
     'financial control': ['margin-analysis'],
     'Infrastructure': ['infrastructure-dns'],
     'geospatial': ['geospatial'],
@@ -148,7 +150,10 @@ OCA_PROJECTS = {
     'vertical construction': ['vertical-construction'],
     'vertical travel': ['vertical-travel'],
     'web': ['web'],
-    }
+    'website': ['website',
+                'website-cms',
+                ],
+}
 
 
 def get_repositories():
