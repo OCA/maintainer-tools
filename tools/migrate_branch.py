@@ -95,6 +95,8 @@ from . import github_login
 from . import oca_projects
 from .config import read_config
 
+MANIFESTS = ('__openerp__.py', '__manifest__.py')
+
 
 class BranchMigrator(object):
     def __init__(self, source, target, target_org=None, email=None):
@@ -158,15 +160,18 @@ class BranchMigrator(object):
                 continue
             module_contents = repo.contents(
                 root_content.path, self.gh_target_branch)
-            manifest = module_contents.get('__openerp__.py')
+            for manifest_file in MANIFESTS:
+                manifest = module_contents.get(manifest_file)
+                if manifest:
+                    break
             if manifest:
                 modules.append(root_content.path)
                 # Re-read path for retrieving content
                 gh_file = repo.contents(manifest.path, self.gh_target_branch)
                 manifest_dict = eval(gh_file.decoded)
                 if manifest_dict.get('installable') is None:
-                    src = " *\n}"
-                    dest = "\n    'installable': False,\n}"
+                    src = ",?\s*}"
+                    dest = ",\n    'installable': False,\n}"
                 else:
                     src = '["\']installable["\']: *True'
                     dest = "'installable': False"
@@ -260,13 +265,13 @@ class BranchMigrator(object):
         repo.create_ref(
             'refs/heads/%s' % self.gh_target_branch,
             source_branch.commit.sha)
-        root_contents = repo.contents('/', self.gh_target_branch)
+        root_contents = repo.contents('', self.gh_target_branch)
         modules = self._mark_modules_uninstallable(repo, root_contents)
         self._delete_unported_dir(repo, root_contents)
         self._update_metafiles(repo, root_contents)
         self._make_default_branch(repo)
         milestone = self._create_branch_milestone(repo)
-        self._create_migration_issue(repo, modules, milestone)
+        self._create_migration_issue(repo, sorted(modules), milestone)
 
     def do_migration(self, projects=None):
         if not projects:
