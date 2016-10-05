@@ -132,8 +132,9 @@ For model named `<main_model>` the following files may be created:
 * `templates/<main_model>.xml`
 * `views/<main_model>.xml`
 
-For `controller`, if there is only file should be named `main.py`. If there
-are several controller methods you can split them in several files.
+For `controller`, if there is only one file it should be named `main.py`.
+If there are several controller classes or functions you can split them into
+several files.
 
 For `static files`, the name pattern is `<module_name>.ext` (i.e.
 `static/js/im_chat.js`, `static/css/im_chat.css`, `static/xml/im_chat.xml`,
