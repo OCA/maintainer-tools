@@ -181,6 +181,50 @@ class BranchMigrator(object):
             repo, tree_data, "[MIG] Make modules uninstallable")
         return modules
 
+    def _rename_manifests(self, repo, root_contents):
+        """ Rename __openerp__.py to __manifest__.py as per Odoo 10.0 API """
+        branch = repo.branch(self.gh_target_branch)
+        tree = repo.tree(branch.commit.sha).recurse().tree
+        tree_data = []
+        for entry in tree:
+            if entry.type == 'tree':
+                continue
+            path = entry.path
+            if path.endswith('__openerp__.py'):
+                path = path.replace('__openerp__.py', '__manifest__.py')
+            tree_data.append({
+                'path': path,
+                'sha': entry.sha,
+                'type': entry.type,
+                'mode': entry.mode,
+            })
+        self._create_commit(
+            repo, tree_data, "[MIG] Rename manifest files", use_sha=False)
+
+    def _delete_setup_dirs(self, repo, root_contents, modules):
+        if 'setup' not in root_contents:
+            return
+        exclude_paths = ['setup/%s' % module for module in modules]
+        branch = repo.branch(self.gh_target_branch)
+        tree = repo.tree(branch.commit.sha).recurse().tree
+        tree_data = []
+        for entry in tree:
+            if entry.type == 'tree':
+                continue
+            for path in exclude_paths:
+                if entry.path == path or entry.path.startswith(path + '/'):
+                    break
+            else:
+                tree_data.append({
+                    'path': entry.path,
+                    'sha': entry.sha,
+                    'type': entry.type,
+                    'mode': entry.mode,
+                })
+        self._create_commit(
+            repo, tree_data, "[MIG] Remove setup module directories",
+            use_sha=False)
+
     def _delete_unported_dir(self, repo, root_contents):
         if '__unported__' not in root_contents.keys():
             return
@@ -267,7 +311,10 @@ class BranchMigrator(object):
             source_branch.commit.sha)
         root_contents = repo.contents('', self.gh_target_branch)
         modules = self._mark_modules_uninstallable(repo, root_contents)
+        if self.gh_target_branch == '10.0':
+            self._rename_manifests(repo, root_contents)
         self._delete_unported_dir(repo, root_contents)
+        self._delete_setup_dirs(repo, root_contents, modules)
         self._update_metafiles(repo, root_contents)
         self._make_default_branch(repo)
         milestone = self._create_branch_milestone(repo)
