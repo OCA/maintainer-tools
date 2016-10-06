@@ -95,6 +95,8 @@ from . import github_login
 from . import oca_projects
 from .config import read_config
 
+MANIFESTS = ('__openerp__.py', '__manifest__.py')
+
 
 class BranchMigrator(object):
     def __init__(self, source, target, target_org=None, email=None):
@@ -158,15 +160,18 @@ class BranchMigrator(object):
                 continue
             module_contents = repo.contents(
                 root_content.path, self.gh_target_branch)
-            manifest = module_contents.get('__openerp__.py')
+            for manifest_file in MANIFESTS:
+                manifest = module_contents.get(manifest_file)
+                if manifest:
+                    break
             if manifest:
                 modules.append(root_content.path)
                 # Re-read path for retrieving content
                 gh_file = repo.contents(manifest.path, self.gh_target_branch)
                 manifest_dict = eval(gh_file.decoded)
                 if manifest_dict.get('installable') is None:
-                    src = " *\n}"
-                    dest = "\n    'installable': False,\n}"
+                    src = ",?\s*}"
+                    dest = ",\n    'installable': False,\n}"
                 else:
                     src = '["\']installable["\']: *True'
                     dest = "'installable': False"
@@ -175,6 +180,50 @@ class BranchMigrator(object):
         self._create_commit(
             repo, tree_data, "[MIG] Make modules uninstallable")
         return modules
+
+    def _rename_manifests(self, repo, root_contents):
+        """ Rename __openerp__.py to __manifest__.py as per Odoo 10.0 API """
+        branch = repo.branch(self.gh_target_branch)
+        tree = repo.tree(branch.commit.sha).recurse().tree
+        tree_data = []
+        for entry in tree:
+            if entry.type == 'tree':
+                continue
+            path = entry.path
+            if path.endswith('__openerp__.py'):
+                path = path.replace('__openerp__.py', '__manifest__.py')
+            tree_data.append({
+                'path': path,
+                'sha': entry.sha,
+                'type': entry.type,
+                'mode': entry.mode,
+            })
+        self._create_commit(
+            repo, tree_data, "[MIG] Rename manifest files", use_sha=False)
+
+    def _delete_setup_dirs(self, repo, root_contents, modules):
+        if 'setup' not in root_contents:
+            return
+        exclude_paths = ['setup/%s' % module for module in modules]
+        branch = repo.branch(self.gh_target_branch)
+        tree = repo.tree(branch.commit.sha).recurse().tree
+        tree_data = []
+        for entry in tree:
+            if entry.type == 'tree':
+                continue
+            for path in exclude_paths:
+                if entry.path == path or entry.path.startswith(path + '/'):
+                    break
+            else:
+                tree_data.append({
+                    'path': entry.path,
+                    'sha': entry.sha,
+                    'type': entry.type,
+                    'mode': entry.mode,
+                })
+        self._create_commit(
+            repo, tree_data, "[MIG] Remove setup module directories",
+            use_sha=False)
 
     def _delete_unported_dir(self, repo, root_contents):
         if '__unported__' not in root_contents.keys():
@@ -260,13 +309,16 @@ class BranchMigrator(object):
         repo.create_ref(
             'refs/heads/%s' % self.gh_target_branch,
             source_branch.commit.sha)
-        root_contents = repo.contents('/', self.gh_target_branch)
+        root_contents = repo.contents('', self.gh_target_branch)
         modules = self._mark_modules_uninstallable(repo, root_contents)
+        if self.gh_target_branch == '10.0':
+            self._rename_manifests(repo, root_contents)
         self._delete_unported_dir(repo, root_contents)
+        self._delete_setup_dirs(repo, root_contents, modules)
         self._update_metafiles(repo, root_contents)
         self._make_default_branch(repo)
         milestone = self._create_branch_milestone(repo)
-        self._create_migration_issue(repo, modules, milestone)
+        self._create_migration_issue(repo, sorted(modules), milestone)
 
     def do_migration(self, projects=None):
         if not projects:
