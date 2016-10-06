@@ -126,3 +126,5 @@
 225|github.com/OCA/website-cms
 226|github.com/OCA/edi
 227|github.com/OCA/intrastat
+229|github.com/OCA/interface-github
+

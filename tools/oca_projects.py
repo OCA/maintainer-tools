@@ -137,6 +137,7 @@ OCA_PROJECTS = {
               'server-tools',
               'community-data-files',
               'webhook',
+              'interface-github',
               ],
     'vertical association': ['vertical-association'],
     'vertical hotel': ['vertical-hotel'],
