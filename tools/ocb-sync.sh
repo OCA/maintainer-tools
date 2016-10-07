@@ -8,7 +8,7 @@
 
 ODOO="git@github.com:/odoo/odoo.git"
 OCB="git@github.com:/OCA/OCB.git"
-BRANCHES="9.0 8.0 7.0"
+BRANCHES="10.0 9.0 8.0 7.0"
 GITDIR="/var/tmp/git"
 
 if [ -f $(dirname $0)/$(basename $0).conf ]; then
