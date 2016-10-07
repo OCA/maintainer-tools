@@ -46,6 +46,8 @@ def branch_to_series(branch):
         return '8'
     elif branch.startswith('9.0'):
         return '9'
+    elif branch.startswith('10.0'):
+        return '10'
     else:
         raise RuntimeError("Can't determine Odoo series from %s" % branch)
 
