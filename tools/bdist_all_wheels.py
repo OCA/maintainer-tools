@@ -78,6 +78,22 @@ def remove_duplicate_oca_meta_packages(wheeldir):
         os.remove(full_filename)
 
 
+def make_wheel_if_not_exists(addon_setup_path, dist_dir):
+    tmpdir = tempfile.mkdtemp()
+    try:
+        subprocess.check_call(['python', 'setup.py', 'bdist_wheel',
+                               '--dist-dir', tmpdir],
+                              cwd=addon_setup_path)
+        wheels = [w for w in os.listdir(tmpdir) if w.endswith('.whl')]
+        if len(wheels) != 1:
+            raise RuntimeError("Wheelfile not found for %s" % addon_setup_path)
+        wheel = wheels[0]
+        if not os.path.exists(os.path.join(dist_dir, wheel)):
+            shutil.move(os.path.join(tmpdir, wheel), dist_dir)
+    finally:
+        shutil.rmtree(tmpdir)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Make python wheel packages "
                                                  "for all Odoo addons in "
@@ -121,9 +137,7 @@ def main():
                 continue
             try:
                 # bdist_wheel for each addon
-                subprocess.check_call(['python', 'setup.py', 'bdist_wheel',
-                                       '--dist-dir', dist_dir],
-                                      cwd=addon_setup_path)
+                make_wheel_if_not_exists(addon_setup_path, dist_dir)
                 addon_dir = os.path.join(repo, addon_name)
                 req = setuptools_odoo.make_pkg_requirement(addon_dir)
                 metapackage_reqs.append(req)
