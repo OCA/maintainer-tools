@@ -427,6 +427,8 @@ try:
 except ImportError:
   _logger.debug('Cannot `import external_dependency_python_N`.')
 ```
+This rule doesn't apply to the test files since these files are loaded only when
+running tests and in such a case your module and their external dependencies are installed.
 
 #### README
 If your module uses extra dependencies of python or binaries, please explain
