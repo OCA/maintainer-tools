@@ -193,6 +193,8 @@ class TransifexPuller(object):
                 try:
                     tx_project = self.tx_api.project(project_slug).get()
                     tx_projects.append(tx_project)
+                except (KeyboardInterrupt, SystemExit):
+                    raise
                 except:
                     print "ERROR: Transifex project slug %s is invalid" % (
                         project_slug)
@@ -217,16 +219,18 @@ class TransifexPuller(object):
         gh_repo = self.github.repository(self.gh_org, oca_project)
         gh_branch = gh_repo.branch(oca_branch)
         tree_data = []
-
+        # Check resources on Transifex
         tx_project_api = self.tx_api.project(tx_project['slug'])
         resources = tx_project_api.resources().get()
         for resource in resources:
             print "Checking resource %s..." % resource['name']
+            if resource['slug'] != 'date_range':
+                continue
             tx_resource_api = tx_project_api.resource(resource['slug'])
-            resource = tx_resource_api.get(details=True)
-            for lang in resource['available_languages']:
-                # Discard english (native language in Odoo)
-                if lang['code'] == 'en':
+            stats = tx_resource_api.stats().get()
+            for lang in stats.keys():
+                # Discard english (native language in Odoo) or empty langs
+                if lang == 'en' or not stats[lang]['translated_words']:
                     continue
                 cont = 0
                 tx_lang = False
@@ -235,22 +239,18 @@ class TransifexPuller(object):
                     # some requests, so this retry mechanism handles this
                     # problem
                     try:
-                        tx_lang = tx_resource_api.translation(
-                            lang['code']).get()
+                        tx_lang = tx_resource_api.translation(lang).get()
+                    except (KeyboardInterrupt, SystemExit):
+                        raise
                     except exceptions.HttpClientError:
                         tx_lang = False
                         cont += 1
                 if tx_lang:
+                    gh_i18n_path = os.path.join('/', resource['slug'], "i18n")
+                    gh_file_path = os.path.join(gh_i18n_path, lang + '.po')
                     try:
                         tx_po_file = polib.pofile(tx_lang['content'])
                         tx_po_dict = self._load_po_dict(tx_po_file)
-                        # Discard empty languages
-                        if not tx_po_dict:
-                            continue
-                        gh_i18n_path = os.path.join(
-                            '/', resource['slug'], "i18n")
-                        gh_file_path = os.path.join(
-                            gh_i18n_path, lang['code'] + '.po')
                         gh_file = gh_repo.contents(
                             gh_file_path, gh_branch.name)
                         if gh_file:
@@ -273,9 +273,9 @@ class TransifexPuller(object):
                     except (KeyboardInterrupt, SystemExit):
                         raise
                     except:
-                        print "ERROR: processing lang '%s'" % lang['code']
+                        print "ERROR: processing lang '%s'" % lang
                 else:
-                    print "ERROR: fetching lang '%s'" % lang['code']
+                    print "ERROR: fetching lang '%s'" % lang
             # Wait a minute before the next file to avoid reaching Transifex
             # API limitations
             # TODO: Request the API to get the date for the next request
