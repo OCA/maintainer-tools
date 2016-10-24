@@ -72,7 +72,7 @@ section.
   I.e., if you want to combine Odoo's `crm` with OCA's `partner_firstname`, the
   name should be `crm_partner_firstname`.
 * Use the [description template](https://github.com/OCA/maintainer-tools/tree/master/template/module) but remove sections with no meaningful content.
-* In the `__openerp__.py`  manifest file:
+* In the `__openerp__.py`/`__manifest__.py`  manifest file:
   * Avoid empty keys
   * Make sure it has the `license` and `images` keys.
   * Make sure the text `,Odoo Community Association (OCA)` is appended
