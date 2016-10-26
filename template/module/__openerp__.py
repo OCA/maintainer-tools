@@ -28,7 +28,7 @@
         "templates/assets.xml",
         "views/report_name.xml",
         "views/res_partner_view.xml",
-        "wizard/wizard_model_view.xml",
+        "wizards/wizard_model_view.xml",
     ],
     "demo": [
         "demo/res_partner_demo.xml",
