@@ -951,7 +951,7 @@ Further reading:
   * Test: means you tested it functionally speaking
 
 While making the merge, please respect the author using the `--author` option
-when committing. The author is found using the bzr log command. Use the commit
+when committing. The author is found using the git log command. Use the commit
 message provided by the contributor if any.
 
 #### It makes sense to be picky in the following cases:
