@@ -420,14 +420,17 @@ An entry in `python` needs to be in `PYTHONPATH`, check by running
 `python -c "import external_dependency_python_N"`.
 
 #### ImportError
-In python files where you use `import external_dependency_python_N` you will
+In python files where you use external dependencies you will
 need to add `try-except` with a debug log.
 
 ```python
 try:
-  import external_dependency_python_N
-except ImportError:
-  _logger.debug('Cannot `import external_dependency_python_N`.')
+    import external_dependency_python_N
+    import external_dependency_python_M
+    EXTERNAL_DEPENDENCY_BINARY_N_PATH = tools.find_in_path('external_dependency_binary_N')
+    EXTERNAL_DEPENDENCY_BINARY_M_PATH = tools.find_in_path('external_dependency_binary_M')
+except (ImportError, IOError) as err:
+    _logger.debug(err)
 ```
 This rule doesn't apply to the test files since these files are loaded only when
 running tests and in such a case your module and their external dependencies are installed.
