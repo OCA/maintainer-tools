@@ -14,7 +14,7 @@ import subprocess
 import sys
 
 
-BRANCHES = ['8.0', '9.0']
+BRANCHES = ['8.0', '9.0', '10.0']
 
 
 class FatalError(RuntimeError):
