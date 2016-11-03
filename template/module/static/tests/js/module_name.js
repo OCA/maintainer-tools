@@ -4,11 +4,11 @@
 odoo.define_section('module_name', ['module_name.ExportedObject'], function(test) {
     "use strict";
 
-    test('It should demonstrate a PhantomJS test',
+    test('It should demonstrate a PhantomJS test for web (backend)',
         function(assert, ExportedObject) {
             var expect = 'Expected Return',
                 result = new ExportedObject();
-            assertStrictEqual(
+            assert.assertStrictEqual(
                 result,
                 expect,
                 "Result !== Expect and the test failed with this message"
