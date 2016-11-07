@@ -40,6 +40,7 @@ OCA_PROJECTS = {
                   ],
     'connector': ['connector',
                   'connector-ecommerce',
+                  'queue',
                   ],
     'connector AccountEdge': ['connector-accountedge'],
     'connector LIMS': ['connector-lims'],

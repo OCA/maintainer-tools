@@ -71,6 +71,7 @@ def replace_in_readme(readme_path, header, rows_available, rows_unported):
         ])
     addons.append('\n')
     parts[2:5] = addons
+    parts = [p.encode('utf-8') if isinstance(p, unicode) else p for p in parts]
     readme = ''.join(parts)
     open(readme_path, 'w').write(readme)
 
