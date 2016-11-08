@@ -40,8 +40,8 @@ section.
         * [No SQL Injection](#no-sql-injection)
         * [Never commit the transaction](#never-commit-the-transaction)
       * [Do not bypass the ORM](#do-not-bypass-the-orm)
-      * [Model](#model)
-      * [Field](#field)
+      * [Models](#models)
+      * [Fields](#fields)
     * [Javascript](#javascript)
     * [CSS](#css)
     * [Tests](#tests)
@@ -806,7 +806,7 @@ class Event(models.Model):
 ```
 
 
-### Field
+### Fields
 * `One2Many` and `Many2Many` fields should always have `_ids` as suffix
   (example: sale_order_line_ids)
 * `Many2One` fields should have `_id` as suffix
