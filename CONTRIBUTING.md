@@ -989,9 +989,15 @@ Pull requests can be closed if:
 
 ### Repositories
 
+#### Naming
+
 * Project name must not contain odoo or openerp
-* Project name for localization is "l10n_belgium" for Belgium
+* Project name for localization is "l10n-belgium" for Belgium
 * Project name for connectors is "connector-magento" for Magento connector
+
+#### Branch configuration
+Python packages to install, must be preferably, define in requirements.txt than travis.yml file. 
+Requirements.txt avoid to repeat packages in all travis.yml files of repositories in case of using with oca_dependencies.txt file.
 
 ### Issues
 
