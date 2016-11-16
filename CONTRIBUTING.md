@@ -992,7 +992,7 @@ Pull requests can be closed if:
 #### Naming
 
 * Project name must not contain odoo or openerp
-* Project name for localization is "l10n_belgium" for Belgium
+* Project name for localization is "l10n-belgium" for Belgium
 * Project name for connectors is "connector-magento" for Magento connector
 
 #### Branch configuration
