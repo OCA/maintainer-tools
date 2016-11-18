@@ -68,6 +68,14 @@ Contributors
 * Firstname Lastname <email.address@example.org>
 * Second Person <second.person@example.org>
 
+Funders
+-------
+
+The development of this module has been financially supported by:
+
+* Company 1 name
+* Company 2 name
+
 Maintainer
 ----------
 
