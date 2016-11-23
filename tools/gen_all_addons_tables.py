@@ -62,7 +62,7 @@ def main():
                           '-m', '[UPD] addons table in README.md',
                           'README.md'],
                          cwd=d)
-                    call(['git', 'push', 'origin'], cwd=d)
+                    call(['git', 'push', 'origin', branch], cwd=d)
             except NonFatalError:
                 logging.exception("Error in %s", d, exc_info=True)
 
