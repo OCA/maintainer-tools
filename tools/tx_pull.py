@@ -224,8 +224,6 @@ class TransifexPuller(object):
         resources = tx_project_api.resources().get()
         for resource in resources:
             print "Checking resource %s..." % resource['name']
-            if resource['slug'] != 'date_range':
-                continue
             tx_resource_api = tx_project_api.resource(resource['slug'])
             stats = tx_resource_api.stats().get()
             for lang in stats.keys():
