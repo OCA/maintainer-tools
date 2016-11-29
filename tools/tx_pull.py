@@ -246,8 +246,6 @@ class TransifexPuller(object):
                         self.tx_api.project(project_slug).get
                     )
                     tx_projects.append(tx_project)
-                except (KeyboardInterrupt, SystemExit):
-                    raise
                 except exceptions.HttpNotFoundError:
                     print "ERROR: Transifex project slug '%s' is invalid" % (
                         project_slug
@@ -297,8 +295,6 @@ class TransifexPuller(object):
                         tx_lang = wrap_tx_call(
                             tx_resource_api.translation(lang).get,
                         )
-                    except (KeyboardInterrupt, SystemExit):
-                        raise
                     except (exceptions.HttpClientError,
                             exceptions.HttpServerError):
                         tx_lang = False
@@ -306,39 +302,36 @@ class TransifexPuller(object):
                 if tx_lang:
                     gh_i18n_path = os.path.join('/', resource['slug'], "i18n")
                     gh_file_path = os.path.join(gh_i18n_path, lang + '.po')
-                    try:
-                        tx_po_file = polib.pofile(tx_lang['content'])
-                        tx_po_dict = self._load_po_dict(tx_po_file)
-                        gh_file = wrap_gh_call(
-                            gh_repo.contents, [gh_file_path, gh_branch.name],
-                        )
-                        if gh_file:
-                            try:
-                                gh_po_file = polib.pofile(
-                                    gh_file.decoded.decode('utf-8'))
-                            except IOError:
-                                print "...ERROR reading %s" % gh_file_path
-                                continue
-                            gh_po_dict = self._load_po_dict(gh_po_file)
-                            unmatched_items = (set(gh_po_dict.items()) ^
-                                               set(tx_po_dict.items()))
-                            if not unmatched_items:
-                                print "...no change in %s" % gh_file_path
-                                continue
-                        print '..replacing %s' % gh_file_path
-                        new_file_blob = wrap_gh_call(
-                            gh_repo.create_blob,
-                            args=[tx_lang['content']],
-                            kwargs={'encoding': 'utf-8'},
-                        )
-                        tree_data.append({
-                            'path': gh_file_path[1:],
-                            'mode': '100644',
-                            'type': 'blob',
-                            'sha': new_file_blob,
-                        })
-                    except (KeyboardInterrupt, SystemExit):
-                        raise
+                    tx_po_file = polib.pofile(tx_lang['content'])
+                    tx_po_dict = self._load_po_dict(tx_po_file)
+                    gh_file = wrap_gh_call(
+                        gh_repo.contents, [gh_file_path, gh_branch.name],
+                    )
+                    if gh_file:
+                        try:
+                            gh_po_file = polib.pofile(
+                                gh_file.decoded.decode('utf-8'))
+                        except IOError:
+                            print "...ERROR reading %s" % gh_file_path
+                            continue
+                        gh_po_dict = self._load_po_dict(gh_po_file)
+                        unmatched_items = (set(gh_po_dict.items()) ^
+                                           set(tx_po_dict.items()))
+                        if not unmatched_items:
+                            print "...no change in %s" % gh_file_path
+                            continue
+                    print '..replacing %s' % gh_file_path
+                    new_file_blob = wrap_gh_call(
+                        gh_repo.create_blob,
+                        args=[tx_lang['content']],
+                        kwargs={'encoding': 'utf-8'},
+                    )
+                    tree_data.append({
+                        'path': gh_file_path[1:],
+                        'mode': '100644',
+                        'type': 'blob',
+                        'sha': new_file_blob,
+                    })
                 else:
                     print "ERROR: fetching lang '%s'" % lang
         if tree_data:
