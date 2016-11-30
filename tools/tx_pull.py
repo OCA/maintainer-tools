@@ -91,6 +91,7 @@ import re
 import time
 
 import polib
+from github3.models import GitHubError
 from slumber import API, exceptions
 
 from . import github_login
@@ -107,12 +108,61 @@ def get_parser():
     parser.add_argument(
         '-e', '--email', dest='email',
         help=('Provides an email address used to commit on github if the one '
-              'associated to the github account is not pulbic'))
+              'associated to the GitHub account is not public'))
     parser.add_argument(
         '-t', '--target-org', dest='target',
-        help=('By default, translation are committed in github on OCA. This '
+        help=('By default, translation are committed in GitHub on OCA. This '
               'arg lets you provide an alternative org'))
     return parser
+
+
+def wrap_tx_call(func, args=None, kwargs=None):
+    """Intercept all TX calls to wait when the API rate limit is reached."""
+    while True:
+        try:
+            if args is None:
+                args = []
+            if kwargs is None:
+                kwargs = {}
+            return func(*args, **kwargs)
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except exceptions.HttpClientError:
+            print "WARNING: Transifex API rate limit. Sleeping 300 seconds."
+            time.sleep(300)
+
+
+def wrap_gh_call(func, args=None, kwargs=None):
+    """Intercept all GH calls to wait when the API rate limit is reached."""
+    retry = 0
+    while True:
+        try:
+            if args is None:
+                args = []
+            if kwargs is None:
+                kwargs = {}
+            return func(*args, **kwargs)
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except GitHubError as e:
+            if e.code == 403:
+                print "WARNING: %s. Sleeping 300 seconds" % e.message
+                time.sleep(300)
+            elif e.code == 405:
+                retry += 1
+                if retry < 4:
+                    print "WARNING: Temporary error: %s. Retrying..." % (
+                        e.message
+                    )
+                    time.sleep(5)
+                else:
+                    print "WARNING: GitHub error: %s. Aborting..." % (
+                        e.message
+                    )
+                    break
+            else:
+                raise
+
 
 TX_USERNAME_DEFAULT = 'transbot@odoo-community.org'
 TX_ORG_DEFAULT = "OCA"
@@ -141,16 +191,17 @@ class TransifexPuller(object):
         self.gh_org = target or self.tx_org
         # Connect to GitHub
         self.github = github_login.login()
-        gh_user = self.github.user()
-
+        gh_user = wrap_gh_call(self.github.user)
         if not gh_user.email and not email:
             raise Exception(
                 'Email required to commit to github. Please provide one on '
                 'the command line or make the one of your github profile '
-                'public.')
-        self.gh_credentials = {'name': gh_user.name or str(gh_user),
-                               'email': gh_user.email or email}
-
+                'public.'
+            )
+        self.gh_credentials = {
+            'name': gh_user.name or str(gh_user),
+            'email': gh_user.email or email,
+        }
         # Connect to Transifex
         self.tx_api = API(TX_URL, auth=(tx_username, tx_password))
 
@@ -191,20 +242,22 @@ class TransifexPuller(object):
             # Check that provided projects are correct
             for project_slug in projects:
                 try:
-                    tx_project = self.tx_api.project(project_slug).get()
+                    tx_project = wrap_tx_call(
+                        self.tx_api.project(project_slug).get
+                    )
                     tx_projects.append(tx_project)
-                except (KeyboardInterrupt, SystemExit):
-                    raise
-                except:
-                    print "ERROR: Transifex project slug %s is invalid" % (
-                        project_slug)
-                    return
+                except exceptions.HttpNotFoundError:
+                    print "ERROR: Transifex project slug '%s' is invalid" % (
+                        project_slug
+                    )
         else:
             start = 1
             temp_projects = []
             print "Getting Transifex projects..."
             while temp_projects or start == 1:
-                temp_projects = self.tx_api.projects().get(start=start)
+                temp_projects = wrap_tx_call(
+                    self.tx_api.projects().get, kwargs={'start': start},
+                )
                 start += len(temp_projects)
                 tx_projects += temp_projects
         for tx_project in tx_projects:
@@ -216,16 +269,18 @@ class TransifexPuller(object):
         oca_project, oca_branch = self._get_oca_project_info(tx_project)
         # get a reference to the github repo and branch where to push the
         # the translations
-        gh_repo = self.github.repository(self.gh_org, oca_project)
-        gh_branch = gh_repo.branch(oca_branch)
+        gh_repo = wrap_gh_call(
+            self.github.repository, [self.gh_org, oca_project],
+        )
+        gh_branch = wrap_gh_call(gh_repo.branch, [oca_branch])
         tree_data = []
         # Check resources on Transifex
         tx_project_api = self.tx_api.project(tx_project['slug'])
-        resources = tx_project_api.resources().get()
+        resources = wrap_tx_call(tx_project_api.resources().get)
         for resource in resources:
             print "Checking resource %s..." % resource['name']
             tx_resource_api = tx_project_api.resource(resource['slug'])
-            stats = tx_resource_api.stats().get()
+            stats = wrap_tx_call(tx_resource_api.stats().get)
             for lang in stats.keys():
                 # Discard english (native language in Odoo) or empty langs
                 if lang == 'en' or not stats[lang]['translated_words']:
@@ -237,67 +292,70 @@ class TransifexPuller(object):
                     # some requests, so this retry mechanism handles this
                     # problem
                     try:
-                        tx_lang = tx_resource_api.translation(lang).get()
-                    except (KeyboardInterrupt, SystemExit):
-                        raise
-                    except exceptions.HttpClientError:
+                        tx_lang = wrap_tx_call(
+                            tx_resource_api.translation(lang).get,
+                        )
+                    except (exceptions.HttpClientError,
+                            exceptions.HttpServerError):
                         tx_lang = False
                         cont += 1
                 if tx_lang:
                     gh_i18n_path = os.path.join('/', resource['slug'], "i18n")
                     gh_file_path = os.path.join(gh_i18n_path, lang + '.po')
-                    try:
-                        tx_po_file = polib.pofile(tx_lang['content'])
-                        tx_po_dict = self._load_po_dict(tx_po_file)
-                        gh_file = gh_repo.contents(
-                            gh_file_path, gh_branch.name)
-                        if gh_file:
+                    tx_po_file = polib.pofile(tx_lang['content'])
+                    tx_po_dict = self._load_po_dict(tx_po_file)
+                    gh_file = wrap_gh_call(
+                        gh_repo.contents, [gh_file_path, gh_branch.name],
+                    )
+                    if gh_file:
+                        try:
                             gh_po_file = polib.pofile(
                                 gh_file.decoded.decode('utf-8'))
-                            gh_po_dict = self._load_po_dict(gh_po_file)
-                            unmatched_items = (set(gh_po_dict.items()) ^
-                                               set(tx_po_dict.items()))
-                            if not unmatched_items:
-                                print "...no change in %s" % gh_file_path
-                                continue
-                        print '..replacing %s' % gh_file_path
-                        new_file_blob = gh_repo.create_blob(
-                            tx_lang['content'], encoding='utf-8')
-                        tree_data.append({
-                            'path': gh_file_path[1:],
-                            'mode': '100644',
-                            'type': 'blob',
-                            'sha': new_file_blob})
-                    except (KeyboardInterrupt, SystemExit):
-                        raise
-                    except:
-                        print "ERROR: processing lang '%s'" % lang
+                        except IOError:
+                            print "...ERROR reading %s" % gh_file_path
+                            continue
+                        gh_po_dict = self._load_po_dict(gh_po_file)
+                        unmatched_items = (set(gh_po_dict.items()) ^
+                                           set(tx_po_dict.items()))
+                        if not unmatched_items:
+                            print "...no change in %s" % gh_file_path
+                            continue
+                    print '..replacing %s' % gh_file_path
+                    new_file_blob = wrap_gh_call(
+                        gh_repo.create_blob,
+                        args=[tx_lang['content']],
+                        kwargs={'encoding': 'utf-8'},
+                    )
+                    tree_data.append({
+                        'path': gh_file_path[1:],
+                        'mode': '100644',
+                        'type': 'blob',
+                        'sha': new_file_blob,
+                    })
                 else:
                     print "ERROR: fetching lang '%s'" % lang
-            # Wait a minute before the next file to avoid reaching Transifex
-            # API limitations
-            # TODO: Request the API to get the date for the next request
-            # http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/\
-            # content/Determining_Limits_Programmatically-d1e1039.html
-            print "Sleeping 70 seconds..."
-            time.sleep(70)
         if tree_data:
             tree_sha = gh_branch.commit.commit.tree.sha
-            tree = gh_repo.create_tree(tree_data, tree_sha)
+            tree = wrap_gh_call(
+                gh_repo.create_tree, [tree_data, tree_sha],
+            )
             message = 'OCA Transbot updated translations from Transifex'
-            print "message", message
-            commit = gh_repo.create_commit(
-                message=message, tree=tree.sha, parents=[gh_branch.commit.sha],
-                author=self.gh_credentials, committer=self.gh_credentials)
-            print "git pushing"
-            gh_repo.ref('heads/{}'.format(gh_branch.name)).update(commit.sha)
-        # Wait 5 minutes before the next project to avoid reaching Transifex
-        # API limitations
-        # TODO: Request the API to get the date for the next request
-        # http://docs.rackspace.com/loadbalancers/api/v1.0/clb-devguide/\
-        # content/Determining_Limits_Programmatically-d1e1039.html
-        print "Sleeping 5 minutes..."
-        time.sleep(300)
+            if tree:
+                commit = wrap_gh_call(
+                    gh_repo.create_commit,
+                    kwargs={
+                        'message': message,
+                        'tree': tree.sha,
+                        'parents': [gh_branch.commit.sha],
+                        'author': self.gh_credentials,
+                        'committer': self.gh_credentials,
+                    },
+                )
+                print "Pushing to GitHub"
+                wrap_gh_call(
+                    gh_repo.ref('heads/{}'.format(gh_branch.name)).update,
+                    args=[commit.sha],
+                )
 
 
 def main():
