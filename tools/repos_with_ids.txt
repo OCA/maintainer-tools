@@ -34,7 +34,7 @@
  91|github.com/OCA/account-financial-reporting
 117|github.com/OCA/hr-timesheet
 96|github.com/OCA/account-payment
-99|github.com/OCA/carrier-delivery
+99|github.com/OCA/delivery-carrier
 115|github.com/OCA/geospatial
 131|github.com/OCA/manufacture-reporting
 183|github.com/OCA/vertical-community
