@@ -688,7 +688,7 @@ Unless:
             # Create a new environment with new cursor database
             new_env = api.Environment(new_cr, self.env.uid, self.env.context)
             # with_env replace original env for this method
-            # A good comment here of because is required this transaction isolated.
+            # A good comment here of why is required this transaction isolated.
             self.with_env(new_env).write({'name': 'hello'})  # isolated transaction to commit
         # You don't need close your cr because is closed when finish "with"
         # You don't need commit your cr because is commited when finish "with"
