@@ -690,8 +690,7 @@ Unless:
             # with_env replace original env for this method
             # A good comment here of why this isolated transaction is required.
             self.with_env(new_env).write({'name': 'hello'})  # isolated transaction to commit
-        # You don't need close your cr because is closed when finish "with"
-        # You don't need commit your cr because is commited when finish "with"
+        # You don't need to close nor to commit your cursor as they are done when exiting "with" block
     # You don't need clear caches because is cleared when finish "with"
   ```
 
