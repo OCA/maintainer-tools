@@ -17,6 +17,41 @@ from . import odoo_login
 from . import colors
 
 
+class FakeProject(object):
+    """mock project to represent the 'CLA' team"""
+
+    def __init__(self, name, members):
+        self.name = name
+        self._members = members
+
+    @property
+    def user_id(self):
+        return self._members[0] if self._members else False
+
+    @property
+    def members(self):
+        return self._members[1:]
+
+
+def get_cla_project(odoo):
+    Partner = odoo.model('res.partner')
+    domain = [('x_github_login', '!=', False),
+              '|',
+              ('category_id.name', '=', 'ICLA'),
+              ('parent_id.category_id.name', '=', 'ECLA')]
+    members = Partner.browse(domain)
+    return FakeProject('OCA Contributors', members)
+
+
+def get_members_project(odoo):
+    Partner = odoo.model('res.partner')
+    domain = [('x_github_login', '!=', False),
+              ('membership_state', 'in', ('paid', 'free'))]
+    members = Partner.browse(domain)
+    print(members)
+    return FakeProject('OCA Members', members)
+
+
 def copy_users(odoo, team=None, dry_run=False):
     gh = github_login.login()
 
@@ -24,14 +59,19 @@ def copy_users(odoo, team=None, dry_run=False):
     Project = odoo.model('project.project')
     base_domain = [('privacy_visibility = public'),
                    ('state != template')]
-    if team:
+    if team == 'OCA Contributors':
+        projects = [get_cla_project(odoo)]
+    elif team == 'OCA Members':
+        projects = [get_members_project(odoo)]
+    elif team:
         domain = [('name', '=', team)] + base_domain
         projects = Project.browse(domain)
         if not projects:
             sys.exit('Project %s not found.' % team)
     else:
-        projects = Project.browse(base_domain)
-
+        projects = list(Project.browse(base_domain))
+        projects.append(get_cla_project(odoo))
+        projects.append(get_members_project(odoo))
     print('Fetching teams...')
     org = gh.organization('oca')
     github_teams = list(org.iter_teams())
@@ -69,9 +109,15 @@ def copy_users(odoo, team=None, dry_run=False):
         print("Remove", colors.FAIL + ', '.join(remove_logins) + colors.ENDC)
         if not dry_run:
             for login in add_logins:
-                github_team.invite(login)
+                try:
+                    github_team.invite(login)
+                except Exception as exc:
+                    print('Failed to invite %s: %s' % (login, exc))
             for login in remove_logins:
-                github_team.remove_member(login)
+                try:
+                    github_team.remove_member(login)
+                except Exception as exc:
+                    print('Failed to remove %s: %s' % (login, exc))
 
     if no_github_login:
         print()
