@@ -42,6 +42,7 @@ section.
       * [Do not bypass the ORM](#do-not-bypass-the-orm)
       * [Models](#models)
       * [Fields](#fields)
+      * [Exceptions](#exceptions)
     * [Javascript](#javascript)
     * [CSS](#css)
     * [Tests](#tests)
@@ -828,6 +829,22 @@ class Event(models.Model):
   ```python
   a_field(..., default=lambda self: self._default_get())
   ```
+
+### Exceptions
+  The `pass` into block except is not a good practice!
+
+  By including the `pass` we assume that our algorithm can continue to function after the exception occurred
+
+  If you really need to use the `pass` consider logging that exception
+
+  ```python
+      try:
+          sentences
+      except:
+          pass
+          _logger.debug('Pass')
+  ```
+
 
 ## Javascript
 
