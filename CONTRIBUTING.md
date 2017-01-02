@@ -841,7 +841,6 @@ class Event(models.Model):
       try:
           sentences
       except:
-          pass
           _logger.debug('Pass')
   ```
 
