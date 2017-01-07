@@ -2,52 +2,51 @@
 <!-- Copyright <YEAR(S)> <AUTHOR(S)>
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 
-<openerp>
-<data>
+<!-- Note that ``<odoo noupdate="1">`` will also work here. -->
+<odoo>
 
-<!-- Templates -->
-<template id="name_report">
-    <t t-call="report.html_container">
-        <t t-foreach="doc_ids" t-as="doc_id">
-            <t t-raw="translate_doc(doc_id, doc_model, 'partner_id.lang',
-                                    'module.name_report_translatable')"/>
+    <!-- Templates -->
+    <template id="name_report">
+        <t t-call="report.html_container">
+            <t t-foreach="doc_ids" t-as="doc_id">
+                <t t-raw="translate_doc(doc_id, doc_model, 'partner_id.lang',
+                                        'module.name_report_translatable')"/>
+            </t>
         </t>
-    </t>
-</template>
+    </template>
 
-<template id="name_report_styles" inherit_id="report.style">
-    <xpath expr=".">
-        <t>
-            /* Additional CSS rules for my report if needed */
-            .something p {
-                font-size: 42pt;
-            }
+    <template id="name_report_styles" inherit_id="report.style">
+        <xpath expr=".">
+            <t>
+                /* Additional CSS rules for my report if needed */
+                .something p {
+                    font-size: 42pt;
+                }
+            </t>
+        </xpath>
+    </template>
+
+    <template id="name_report_translatable">
+        <t t-call="report.external_layout">
+            <div class="page something">
+                <p>Here goes something.</p>
+            </div>
         </t>
-    </xpath>
-</template>
+    </template>
 
-<template id="name_report_translatable">
-    <t t-call="report.external_layout">
-        <div class="page something">
-            <p>Here goes something.</p>
-        </div>
-    </t>
-</template>
+    <!-- Report action -->
+    <report
+        id="name_action"
+        model="module.some_model"
+        name="module.name_report"
+        string="Do something"
+        report_type="qweb-pdf"
+        groups="user_group"
+        attachment="object.state == 'done' and 'something.pdf'"
+        multi="False"/>
 
-<!-- Report action -->
-<report
-    id="name_action"
-    model="module.some_model"
-    name="module.name_report"
-    string="Do something"
-    report_type="qweb-pdf"
-    groups="user_group"
-    attachment="object.state == 'done' and 'something.pdf'"
-    multi="False"/>
+    <record id="name_action" model="ir.actions.report.xml">
+        <field name="paperformat_id" ref="name_paperformat"/>
+    </record>
 
-<record id="name_action" model="ir.actions.report.xml">
-    <field name="paperformat_id" ref="name_paperformat"/>
-</record>
-
-</data>
-</openerp>
+</odoo>

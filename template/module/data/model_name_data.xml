@@ -2,12 +2,11 @@
 <!-- Copyright <YEAR(S)> <AUTHOR(S)>
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 
-<openerp>
-<data>
+<!-- Note that ``<odoo noupdate="1">`` will also work here. -->
+<odoo>
 
-<record id="my_data_record" model="model.name">
-    <!-- My record data -->
-</record>
+    <record id="my_data_record" model="model.name">
+        <!-- My record data -->
+    </record>
 
-</data>
-</openerp>
+</odoo>
