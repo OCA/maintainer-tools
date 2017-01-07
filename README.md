@@ -108,7 +108,7 @@ where you've already logged in) and run oca-clone-everything.
 
 The script will create a clone for all the OCA projects registered on
 github. For projects already cloned, it run `git fetch --all` to get the
-lastest versions.
+latest versions.
 
 If you pass the `--organization-remotes
 <comma-separated-list>` option, the script will also add remotes for the listed
