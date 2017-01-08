@@ -251,7 +251,9 @@ When declaring a record in XML:
 * Try to group the records by model. In case of dependencies between
   action/menu/views, the convention may not be applicable.
 * Use naming convention defined at the next point
-* The tag `<data>` is only used to set not-updatable data with `noupdate=1`
+* The tag `<data>` is only used to set not-updatable data with `noupdate=1` when your data file contains a mix of "noupdate" data, otherwise, you should use one of this:
+  - `<odoo>`: for `noupdate=0`
+  - `<odoo noupdate='1'>`
 * Do not prefix the xmlid by the current module's name
   (`<record id="view_id"...`, not `<record id="current_module.view_id"...`)
 
