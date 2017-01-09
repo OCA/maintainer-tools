@@ -838,10 +838,10 @@ class Event(models.Model):
   If you really need to use the `pass` consider logging that exception
 
   ```python
-      try:
-          sentences
-      except:
-          _logger.debug('Pass')
+    try:
+        sentences
+    except:
+        _logger.debug('Pass')
   ```
 
 
