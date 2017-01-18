@@ -841,7 +841,7 @@ class Event(models.Model):
     try:
         sentences
     except:
-        _logger.debug('Pass')
+        _logger.debug('Why the exception is safe....', exc_info=1))
   ```
 
 
