@@ -1,7 +1,7 @@
 ERPpeek==1.6.1
 PyYAML==3.11
 argparse==1.2.1
-bzr==2.6.0
+bzr==2.7.0
 github3.py==0.9.4
 requests==2.3.0
 uritemplate.py==0.3.0
