@@ -128,3 +128,4 @@
 227|github.com/OCA/intrastat
 229|github.com/OCA/interface-github
 230|github.com/OCA/queue
+236|github.com/OCA/l10n-chile
