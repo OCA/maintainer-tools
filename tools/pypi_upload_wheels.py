@@ -15,13 +15,14 @@ class OcaPypi(object):
     """A wrapper around twine, with caching
     to avoid multiple useless upload attempts for the same file."""
 
-    def __init__(self, pypirc, repository, cache):
+    def __init__(self, pypirc, repository, cache, dryrun):
         parser = RawConfigParser()
         parser.read(pypirc)
         self.pypirc = pypirc
         self.repository = repository
         self.repository_url = parser.get(repository, 'repository')
         self.cache = cache
+        self.dryrun = dryrun
 
     def _registered(self, wheelfilename):
         wheelfile = WheelFile(wheelfilename)
@@ -34,12 +35,18 @@ class OcaPypi(object):
     def _register(self, wheelfilename):
         cmd = ['twine', 'register', '--config-file', self.pypirc,
                '-r', self.repository, wheelfilename]
-        subprocess.check_call(cmd)
+        if not self.dryrun:
+            subprocess.check_call(cmd)
+        else:
+            _logger.info("dryrun: %s", cmd)
 
     def _upload(self, wheelfilename):
         cmd = ['twine', 'upload', '--config-file', self.pypirc,
                '-r', self.repository, '--skip-existing', wheelfilename]
-        subprocess.check_call(cmd)
+        if not self.dryrun:
+            subprocess.check_call(cmd)
+        else:
+            _logger.info("dryrun: %s", cmd)
 
     def upload_wheel(self, wheelfilename):
         key = self.repository_url + '#' + os.path.basename(wheelfilename)
@@ -48,11 +55,14 @@ class OcaPypi(object):
                 _logger.debug("skipped %s: found in cache", wheelfilename)
                 return
             if not self._registered(wheelfilename):
-                _logger.info("registering %s", wheelfilename)
+                _logger.info("registering %s to %s",
+                             wheelfilename, self.repository_url)
                 self._register(wheelfilename)
-            _logger.info("uploading %s", wheelfilename)
+            _logger.info("uploading %s to %s",
+                         wheelfilename, self.repository_url)
             self._upload(wheelfilename)
-            dbm[key] = '1'
+            if not self.dryrun:
+                dbm[key] = '1'
 
     def upload_files(self, wheelfilenames):
         for wheelfilename in wheelfilenames:
@@ -71,9 +81,10 @@ def main():
     parser.add_argument('--pypirc', required=True)
     parser.add_argument('--repository', required=True)
     parser.add_argument('--cache', required=True)
+    parser.add_argument('--dryrun', action='store_true')
     parser.add_argument('wheels', nargs='+')
     args = parser.parse_args()
-    pypi = OcaPypi(args.pypirc, args.repository, args.cache)
+    pypi = OcaPypi(args.pypirc, args.repository, args.cache, args.dryrun)
     pypi.upload_files(args.wheels)
 
 
