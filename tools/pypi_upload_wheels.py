@@ -7,8 +7,18 @@ import requests
 import subprocess
 from wheel.install import WheelFile
 from ConfigParser import RawConfigParser
+from pkg_resources import parse_version
 
 _logger = logging.getLogger(__name__)
+
+
+def _split_wheelfilename(wheelfilename):
+    wheelfile = WheelFile(wheelfilename)
+    package_name = wheelfile.parsed_filename.group('name')
+    package_name = package_name.replace('_', '-')
+    package_ver = wheelfile.parsed_filename.group('ver')
+    package_ver = parse_version(package_ver)
+    return package_name, package_ver
 
 
 class OcaPypi(object):
@@ -25,9 +35,7 @@ class OcaPypi(object):
         self.dryrun = dryrun
 
     def _registered(self, wheelfilename):
-        wheelfile = WheelFile(wheelfilename)
-        package_name = wheelfile.parsed_filename.group('name')
-        package_name = package_name.replace('_', '-')
+        package_name, package_ver = _split_wheelfilename(wheelfilename)
         package_url = self.repository_url + '/' + package_name
         r = requests.head(package_url)
         return r.status_code == 200
@@ -64,13 +72,16 @@ class OcaPypi(object):
             if not self.dryrun:
                 dbm[key] = '1'
 
-    def upload_files(self, wheelfilenames):
+    def upload_wheels(self, wheelfilenames):
+        to_upload = []
         for wheelfilename in wheelfilenames:
             if os.path.isfile(wheelfilename) and \
                     wheelfilename.lower().endswith('.whl'):
-                self.upload_wheel(wheelfilename)
+                to_upload.append(wheelfilename)
             else:
                 _logger.debug("skipped %s: not a wheel file", wheelfilename)
+        for wheelfilename in sorted(to_upload, key=_split_wheelfilename):
+            self.upload_wheel(wheelfilename)
 
 
 def main():
@@ -85,7 +96,7 @@ def main():
     parser.add_argument('wheels', nargs='+')
     args = parser.parse_args()
     pypi = OcaPypi(args.pypirc, args.repository, args.cache, args.dryrun)
-    pypi.upload_files(args.wheels)
+    pypi.upload_wheels(args.wheels)
 
 
 if __name__ == '__main__':
