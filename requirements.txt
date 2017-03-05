@@ -11,3 +11,5 @@ slumber
 polib
 wheel
 setuptools-odoo
+# https://github.com/odoo/odoo/pull/15718
+setuptools<31
