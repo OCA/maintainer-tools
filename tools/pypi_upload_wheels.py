@@ -35,6 +35,15 @@ class OcaPypi(object):
         self.cache = cache
         self.dryrun = dryrun
 
+    def _make_key(self, wheelfilename):
+        return str(self.repository_url + '#' + os.path.basename(wheelfilename))
+
+    def _key_match(self, key):
+        return key.startswith(self.repository_url + '#')
+
+    def _key_to_wheel(self, key):
+        return key[len(self.repository_url) + 1:]
+
     def _registered(self, wheelfilename):
         package_name, package_ver = _split_wheelfilename(wheelfilename)
         package_url = self.repository_url + '/' + package_name
@@ -68,8 +77,7 @@ class OcaPypi(object):
             _logger.info("dryrun: %s", cmd)
 
     def upload_wheel(self, wheelfilename):
-        key = self.repository_url + '#' + os.path.basename(wheelfilename)
-        key = str(key)
+        key = self._make_key(wheelfilename)
         with contextlib.closing(anydbm.open(self.cache, 'c')) as dbm:
             if key in dbm:
                 _logger.debug("skipped %s: found in cache", wheelfilename)
@@ -106,6 +114,23 @@ class OcaPypi(object):
         for wheelfilename in sorted(to_upload, key=_split_wheelfilename):
             self.upload_wheel(wheelfilename)
 
+    def cache_print_errors(self):
+        with contextlib.closing(anydbm.open(self.cache, 'r')) as dbm:
+            for key, value in dbm.items():
+                if not self._key_match(key):
+                    continue
+                if value:
+                    wheel = self._key_to_wheel(key)
+                    click.echo(u"{}: {}".format(wheel, value))
+
+    def cache_rm_wheels(self, wheelfilenames):
+        with contextlib.closing(anydbm.open(self.cache, 'w')) as dbm:
+            for wheelfilename in wheelfilenames:
+                wheelfilename = os.path.basename(wheelfilename)
+                key = self._make_key(wheelfilename)
+                if key in dbm:
+                    del dbm[key]
+
 
 @click.group()
 @click.option('--pypirc', required=True)
@@ -132,7 +157,22 @@ def upload(ctx, wheels):
     ctx.obj.upload_wheels(wheels)
 
 
+@click.command()
+@click.pass_context
+def cache_print_errors(ctx):
+    ctx.obj.cache_print_errors()
+
+
+@click.command()
+@click.argument('wheels', nargs=-1)
+@click.pass_context
+def cache_rm_wheels(ctx, wheels):
+    ctx.obj.cache_rm_wheels(wheels)
+
+
 cli.add_command(upload)
+cli.add_command(cache_print_errors)
+cli.add_command(cache_rm_wheels)
 
 
 if __name__ == '__main__':
