@@ -1,5 +1,4 @@
 import anydbm
-import argparse
 import contextlib
 import logging
 import os
@@ -8,6 +7,8 @@ import subprocess
 from wheel.install import WheelFile
 from ConfigParser import RawConfigParser
 from pkg_resources import parse_version
+
+import click
 
 _logger = logging.getLogger(__name__)
 
@@ -68,6 +69,7 @@ class OcaPypi(object):
 
     def upload_wheel(self, wheelfilename):
         key = self.repository_url + '#' + os.path.basename(wheelfilename)
+        key = str(key)
         with contextlib.closing(anydbm.open(self.cache, 'c')) as dbm:
             if key in dbm:
                 _logger.debug("skipped %s: found in cache", wheelfilename)
@@ -100,25 +102,38 @@ class OcaPypi(object):
                     wheelfilename.lower().endswith('.whl'):
                 to_upload.append(wheelfilename)
             else:
-                _logger.debug("skipped %s: not a wheel file", wheelfilename)
+                _logger.warn("skipped %s: not a wheel file", wheelfilename)
         for wheelfilename in sorted(to_upload, key=_split_wheelfilename):
             self.upload_wheel(wheelfilename)
 
 
-def main():
+@click.group()
+@click.option('--pypirc', required=True)
+@click.option('--repository', required=True)
+@click.option('--cache', required=True)
+@click.option('--dryrun/--no-dryrun', default=False)
+@click.option('--debug/--no-debug', default=False)
+@click.pass_context
+def cli(ctx, pypirc, repository, cache, dryrun, debug):
+    if debug:
+        level = logging.DEBUG
+    else:
+        level = logging.INFO
     logging.basicConfig(
         format='%(asctime)s:%(levelname)s:%(message)s',
-        level=logging.DEBUG)
-    parser = argparse.ArgumentParser(description="OCA Twine Wrapper")
-    parser.add_argument('--pypirc', required=True)
-    parser.add_argument('--repository', required=True)
-    parser.add_argument('--cache', required=True)
-    parser.add_argument('--dryrun', action='store_true')
-    parser.add_argument('wheels', nargs='+')
-    args = parser.parse_args()
-    pypi = OcaPypi(args.pypirc, args.repository, args.cache, args.dryrun)
-    pypi.upload_wheels(args.wheels)
+        level=level)
+    ctx.obj = OcaPypi(pypirc, repository, cache, dryrun)
+
+
+@click.command()
+@click.argument('wheels', nargs=-1)
+@click.pass_context
+def upload(ctx, wheels):
+    ctx.obj.upload_wheels(wheels)
+
+
+cli.add_command(upload)
 
 
 if __name__ == '__main__':
-    main()
+    cli()
