@@ -80,7 +80,10 @@ class OcaPypi(object):
         key = self._make_key(wheelfilename)
         with contextlib.closing(anydbm.open(self.cache, 'c')) as dbm:
             if key in dbm:
-                _logger.debug("skipped %s: found in cache", wheelfilename)
+                value = dbm[key]
+                detail = '' if not value else ' (with error)'
+                _logger.debug("skipped %s: found in cache%s",
+                              wheelfilename, detail)
                 return
             if not self._registered(wheelfilename):
                 _logger.info("registering %s to %s",
