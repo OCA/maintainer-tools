@@ -44,7 +44,12 @@ class OcaPypi(object):
         cmd = ['twine', 'register', '--config-file', self.pypirc,
                '-r', self.repository, wheelfilename]
         if not self.dryrun:
-            subprocess.check_call(cmd)
+            try:
+                subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+            except subprocess.CalledProcessError as e:
+                if "HTTPError: 400 Client Error" in e.output:
+                    return e.output
+                raise
         else:
             _logger.info("dryrun: %s", cmd)
 
@@ -52,7 +57,12 @@ class OcaPypi(object):
         cmd = ['twine', 'upload', '--config-file', self.pypirc,
                '-r', self.repository, '--skip-existing', wheelfilename]
         if not self.dryrun:
-            subprocess.check_call(cmd)
+            try:
+                subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+            except subprocess.CalledProcessError as e:
+                if "HTTPError: 400 Client Error" in e.output:
+                    return e.output
+                raise
         else:
             _logger.info("dryrun: %s", cmd)
 
@@ -65,12 +75,23 @@ class OcaPypi(object):
             if not self._registered(wheelfilename):
                 _logger.info("registering %s to %s",
                              wheelfilename, self.repository_url)
-                self._register(wheelfilename)
+                r = self._register(wheelfilename)
+                if r:
+                    # registration failed, store the error in cache
+                    # so we don't try again, and do not try to upload
+                    _logger.error("registering %s to %s failed: %s",
+                                  wheelfilename, self.repository_url, r)
+                    if not self.dryrun:
+                        dbm[key] = r or ''
+                    return
             _logger.info("uploading %s to %s",
                          wheelfilename, self.repository_url)
-            self._upload(wheelfilename)
+            r = self._upload(wheelfilename)
+            if r:
+                _logger.error("uploading %s to %s failed: %s",
+                              wheelfilename, self.repository_url, r)
             if not self.dryrun:
-                dbm[key] = '1'
+                dbm[key] = r or ''
 
     def upload_wheels(self, wheelfilenames):
         to_upload = []
