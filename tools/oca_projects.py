@@ -47,7 +47,6 @@ OCA_PROJECTS = {
     'connector CMIS': ['connector-cmis'],
     'connector Magento': ['connector-magento'],
     'connector Prestashop': ['connector-prestashop'],
-    'connector Redmine': ['connector-redmine'],
     'connector Sage': ['connector-sage'],
     'connector Salesforce': ['connector-salesforce'],
     'connector WooCommerce': ['connector-woocommerce'],
@@ -131,6 +130,7 @@ OCA_PROJECTS = {
                            'contract',
                            'program',
                            'business-requirement',
+                           'connector-redmine'
                            ],
     'social': ['social'],
     'tools': ['reporting-engine',
