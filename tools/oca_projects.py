@@ -130,7 +130,8 @@ OCA_PROJECTS = {
                            'contract',
                            'program',
                            'business-requirement',
-                           'connector-redmine'
+                           'connector-redmine',
+                           'connector-jira',
                            ],
     'social': ['social'],
     'tools': ['reporting-engine',
