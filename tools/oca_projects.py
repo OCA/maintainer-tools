@@ -50,6 +50,7 @@ OCA_PROJECTS = {
     'connector Sage': ['connector-sage'],
     'connector Salesforce': ['connector-salesforce'],
     'connector WooCommerce': ['connector-woocommerce'],
+    'connector Lengow': ['connector-lengow'],
     'crm sales marketing': ['sale-workflow',
                             'crm',
                             'partner-contact',

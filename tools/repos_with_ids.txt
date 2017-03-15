@@ -130,3 +130,4 @@
 230|github.com/OCA/queue
 236|github.com/OCA/l10n-chile
 233|github.com/OCA/connector-jira
+234|github.com/OCA/connector-lengow
