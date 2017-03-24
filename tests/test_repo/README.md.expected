@@ -8,11 +8,13 @@
 ${REPO_DESCRIPTION}
 
 [//]: # (addons)
+
 Available addons
 ----------------
 addon | version | summary
 --- | --- | ---
 [module1](module1/) | 8.0.1.0.0 | Module 1 summary
+
 
 Unported addons
 ---------------

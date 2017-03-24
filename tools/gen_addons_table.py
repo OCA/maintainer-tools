@@ -56,6 +56,7 @@ def replace_in_readme(readme_path, header, rows_available, rows_unported):
     if rows_available:
         addons.extend([
             '\n',
+            '\n',
             'Available addons\n',
             '----------------\n',
             render_markdown_table(header, rows_available),
@@ -63,6 +64,7 @@ def replace_in_readme(readme_path, header, rows_available, rows_unported):
         ])
     if rows_unported:
         addons.extend([
+            '\n',
             '\n',
             'Unported addons\n',
             '---------------\n',
