@@ -31,12 +31,12 @@ class SomethingCase(TransactionCase):
 class UICase(HttpCase):
     def test_ui_web(self):
         """Test backend tests."""
-        self.phantom_js("/web/tests?module=module_name", "", login="admin")
+        self.phantom_js("/web/tests?debug=assets&module=module_name", "", login="admin")
 
     def test_ui_website(self):
         """Test frontend tour."""
         self.phantom_js(
-            url_path="/",
+            url_path="/?debug=assets",
             code="odoo.__DEBUG__.services['web.Tour']"
                  ".run('test_module_name', 'test')",
             ready="odoo.__DEBUG__.services['web.Tour'].tours.test_module_name",
