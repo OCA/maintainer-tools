@@ -107,6 +107,7 @@ OCA_PROJECTS = {
     'l10n-usa': ['l10n-usa'],
     'l10n-united-kingdom': ['l10n-united-kingdom'],
     'l10n-venezuela': ['l10n-venezuela'],
+    'l10n-vietnam': ['l10n-vietnam'],
     'logistics': ['carrier-delivery',
                   'stock-logistics-barcode',
                   'stock-logistics-workflow',

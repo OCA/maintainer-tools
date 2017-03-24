@@ -131,3 +131,4 @@
 236|github.com/OCA/l10n-chile
 233|github.com/OCA/connector-jira
 234|github.com/OCA/connector-lengow
+237|github.com/OCA/l10n-vietnam
