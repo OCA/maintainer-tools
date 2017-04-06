@@ -22,6 +22,7 @@ all_labels = {
     'question': 'cc317c',
     'needs fixing': 'eb6420',
     'needs review': 'fbca04',
+    'approved': '045509',
     'work in progress': '0052cc',
     'wontfix': 'ffffff',
     }
