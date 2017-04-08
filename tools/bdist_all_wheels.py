@@ -35,6 +35,10 @@ setuptools.setup(
    description="Meta package for OCA {repo} Odoo addons",
    version="{branch}.{date}",
    install_requires={install_requires},
+   classifiers=[
+        'Programming Language :: Python :: 2.7',
+        'Framework :: Odoo',
+   ]
 )
 """
 
