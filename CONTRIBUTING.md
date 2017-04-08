@@ -879,6 +879,11 @@ increased or decreased. If it has decreased, this is usually a sign that a test
 should be added. The coveralls web interface can also show which lines need
 test cases.
 
+**NOTE:** if you add an example module to showcase modules' features
+you should name it ``module_name_example`` (ie: `cms_form` and `cms_form_example`).
+In this way coverage analysis will ignore this extra module by default.
+
+
 ## Git
 
 ### Commit message
