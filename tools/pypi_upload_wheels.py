@@ -35,6 +35,10 @@ class OcaPypi(object):
         self.cache = cache
         self.dryrun = dryrun
 
+    def _make_reg_key(self, wheelfilename):
+        package_name, _ = _split_wheelfilename(wheelfilename)
+        return str(self.repository_url + '#' + package_name)
+
     def _make_key(self, wheelfilename):
         return str(self.repository_url + '#' + os.path.basename(wheelfilename))
 
@@ -85,7 +89,8 @@ class OcaPypi(object):
                 _logger.debug("skipped %s: found in cache%s",
                               wheelfilename, detail)
                 return
-            if not self._registered(wheelfilename):
+            reg_key = self._make_reg_key(wheelfilename)
+            if reg_key not in dbm and not self._registered(wheelfilename):
                 _logger.info("registering %s to %s",
                              wheelfilename, self.repository_url)
                 r = self._register(wheelfilename)
@@ -95,8 +100,11 @@ class OcaPypi(object):
                     _logger.error("registering %s to %s failed: %s",
                                   wheelfilename, self.repository_url, r)
                     if not self.dryrun:
-                        dbm[key] = r or ''
+                        dbm[key] = r
                     return
+                else:
+                    if not self.dryrun:
+                        dbm[reg_key] = ''
             _logger.info("uploading %s to %s",
                          wheelfilename, self.repository_url)
             r = self._upload(wheelfilename)
