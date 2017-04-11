@@ -4,6 +4,7 @@ import logging
 import os
 import requests
 import subprocess
+import time
 from wheel.install import WheelFile
 from ConfigParser import RawConfigParser
 from pkg_resources import parse_version
@@ -11,6 +12,9 @@ from pkg_resources import parse_version
 import click
 
 _logger = logging.getLogger(__name__)
+
+
+REGISTER_RETRY = 2
 
 
 def _split_wheelfilename(wheelfilename):
@@ -58,12 +62,22 @@ class OcaPypi(object):
         cmd = ['twine', 'register', '--config-file', self.pypirc,
                '-r', self.repository, wheelfilename]
         if not self.dryrun:
-            try:
-                subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-            except subprocess.CalledProcessError as e:
-                if "HTTPError: 400 Client Error" in e.output:
-                    return e.output
-                raise
+            retry = REGISTER_RETRY
+            while True:
+                try:
+                    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+                    break  # success
+                except subprocess.CalledProcessError as e:
+                    if "HTTPError: 400 Client Error" in e.output:
+                        return e.output  # unrecoverable error
+                    else:
+                        retry -= 1
+                        if retry > 0:
+                            _logger.warning("error registering %s, retrying" %
+                                            (wheelfilename, ))
+                            time.sleep(5)
+                        else:
+                            raise
         else:
             _logger.info("dryrun: %s", cmd)
 
