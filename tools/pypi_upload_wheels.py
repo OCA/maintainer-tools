@@ -4,6 +4,7 @@ import logging
 import os
 import requests
 import subprocess
+import time
 from wheel.install import WheelFile
 from ConfigParser import RawConfigParser
 from pkg_resources import parse_version
@@ -11,6 +12,9 @@ from pkg_resources import parse_version
 import click
 
 _logger = logging.getLogger(__name__)
+
+
+REGISTER_RETRY = 2
 
 
 def _split_wheelfilename(wheelfilename):
@@ -35,6 +39,10 @@ class OcaPypi(object):
         self.cache = cache
         self.dryrun = dryrun
 
+    def _make_reg_key(self, wheelfilename):
+        package_name, _ = _split_wheelfilename(wheelfilename)
+        return str(self.repository_url + '#' + package_name)
+
     def _make_key(self, wheelfilename):
         return str(self.repository_url + '#' + os.path.basename(wheelfilename))
 
@@ -54,12 +62,22 @@ class OcaPypi(object):
         cmd = ['twine', 'register', '--config-file', self.pypirc,
                '-r', self.repository, wheelfilename]
         if not self.dryrun:
-            try:
-                subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-            except subprocess.CalledProcessError as e:
-                if "HTTPError: 400 Client Error" in e.output:
-                    return e.output
-                raise
+            retry = REGISTER_RETRY
+            while True:
+                try:
+                    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+                    break  # success
+                except subprocess.CalledProcessError as e:
+                    if "HTTPError: 400 Client Error" in e.output:
+                        return e.output  # unrecoverable error
+                    else:
+                        retry -= 1
+                        if retry > 0:
+                            _logger.warning("error registering %s, retrying" %
+                                            (wheelfilename, ))
+                            time.sleep(5)
+                        else:
+                            raise
         else:
             _logger.info("dryrun: %s", cmd)
 
@@ -85,7 +103,8 @@ class OcaPypi(object):
                 _logger.debug("skipped %s: found in cache%s",
                               wheelfilename, detail)
                 return
-            if not self._registered(wheelfilename):
+            reg_key = self._make_reg_key(wheelfilename)
+            if reg_key not in dbm and not self._registered(wheelfilename):
                 _logger.info("registering %s to %s",
                              wheelfilename, self.repository_url)
                 r = self._register(wheelfilename)
@@ -95,8 +114,11 @@ class OcaPypi(object):
                     _logger.error("registering %s to %s failed: %s",
                                   wheelfilename, self.repository_url, r)
                     if not self.dryrun:
-                        dbm[key] = r or ''
+                        dbm[key] = r
                     return
+                else:
+                    if not self.dryrun:
+                        dbm[reg_key] = ''
             _logger.info("uploading %s to %s",
                          wheelfilename, self.repository_url)
             r = self._upload(wheelfilename)
