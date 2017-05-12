@@ -25,6 +25,7 @@ section.
       * [Naming xml_id](#naming-xml_id)
         * [Security, View and Action](#security-view-and-action)
         * [Inherited XML](#inherited-xml)
+        * [Demo Records](#demo-records)
       * [External dependencies](#external-dependencies)
         * [`__openerp__.py`](#__openerp__py)
         * [ImportError](#importerror)
@@ -389,6 +390,17 @@ high value in its `priority` (greater than 100 is recommended) to avoid the erro
 
 Also, we can hide an element from the view using `invisible="1"`.
 
+#### Demo Records
+
+Suffix all demo record XML IDs with `demo`. This allows them to be easily
+distinguished from regular records, which otherwise requires examining the
+source or reinstalling the module with demo data disabled.
+
+```xml
+<record id="not_a_real_user_demo" model="res.users">
+    ...
+</record>
+```
 
 ### External dependencies
 
