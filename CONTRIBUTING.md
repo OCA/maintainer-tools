@@ -23,8 +23,10 @@ section.
       * [Format](#format)
       * [Records](#records)
       * [Naming xml_id](#naming-xml_id)
+        * [Data Records](#data-records)
         * [Security, View and Action](#security-view-and-action)
         * [Inherited XML](#inherited-xml)
+        * [Demo Records](#demo-records)
       * [External dependencies](#external-dependencies)
         * [`__openerp__.py`](#__openerp__py)
         * [ImportError](#importerror)
@@ -291,9 +293,22 @@ More info [here](https://github.com/odoo/odoo/pull/8218)
 
 ### Naming xml_id
 
+#### Data Records
+
+Use the followng pattern, where `<model_name>` is the name of the model that 
+the record is an instance of: `<model_name>_<record_name>`
+
+```xml
+<record id="res_users_important_person" model="res.users">
+    ...
+</record>
+```
+
 #### Security, View and Action
 
-Use the following pattern:
+Use the following patterns, where `<model_name>` is the name of the model that 
+the menu, view, etc. belongs to (e.g. for a `res.users` form view, the name 
+would be `res_users_view_form`):
 
 * For a menu: `<model_name>_menu`
 * For a view: `<model_name>_view_<view_type>`, where `view_type` is kanban,
@@ -389,6 +404,17 @@ high value in its `priority` (greater than 100 is recommended) to avoid the erro
 
 Also, we can hide an element from the view using `invisible="1"`.
 
+#### Demo Records
+
+Suffix all demo record XML IDs with `demo`. This allows them to be easily
+distinguished from regular records, which otherwise requires examining the
+source or reinstalling the module with demo data disabled.
+
+```xml
+<record id="res_users_not_a_real_user_demo" model="res.users">
+    ...
+</record>
+```
 
 ### External dependencies
 
