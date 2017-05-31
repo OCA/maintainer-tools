@@ -65,8 +65,8 @@ Images
 Contributors
 ------------
 
-* Firstname Lastname <email.address@example.org>
-* Second Person <second.person@example.org>
+* Firstname Lastname <email.address@example.org> (optional company website url)
+* Second Person <second.person@example.org> (optional company website url)
 
 Funders
 -------
