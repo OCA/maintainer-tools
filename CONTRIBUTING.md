@@ -79,6 +79,10 @@ section.
   * Make sure it has the `license` and `images` keys.
   * Make sure the text `,Odoo Community Association (OCA)` is appended
     to the `author` text.
+  * The `website` key must be `https://github.com/OCA/<repo>/<addon>`,
+    so as to provide the most relevant link to discover more information about the addon.
+    That link shows the addon README which in turn shows proper credits (authors, contributors and theirs companies),
+    and links to the relevant information the OCA website.
 * Don't use your company logo or your corporate branding. Using the website, the author and the list of contributors is enough for people to know about your employer/company and contact you.
 
 ### Version numbers

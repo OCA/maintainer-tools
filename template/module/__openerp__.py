@@ -6,7 +6,7 @@
     "summary": "Module summary",
     "version": "8.0.1.0.0",
     "category": "Uncategorized",
-    "website": "https://odoo-community.org/",
+    "website": "https://github.com/OCA/<repo>/<addon>",
     "author": "<AUTHOR(S)>, Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "application": False,
