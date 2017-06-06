@@ -133,3 +133,4 @@
 234|github.com/OCA/connector-lengow
 237|github.com/OCA/l10n-vietnam
 238|github.com/OCA/l10n-thailand
+239|github.com/OCA/vertical-realstate
