@@ -68,6 +68,8 @@ Contributors
 * Firstname Lastname <email.address@example.org>
 * Second Person <second.person@example.org>
 
+Do not contact contributors directly about support or help with technical issues.
+
 Funders
 -------
 
