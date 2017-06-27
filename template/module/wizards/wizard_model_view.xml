@@ -5,7 +5,7 @@
 <openerp>
 <data>
 
-<record id="wizard_model_view" model="ir.ui.view">
+<record id="wizard_model_view_form" model="ir.ui.view">
     <field name="name">My view description</field>
     <field name="model">module.wizard_model</field>
     <field name="arch" type="xml">

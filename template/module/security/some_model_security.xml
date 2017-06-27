@@ -5,11 +5,11 @@
 <openerp>
 <data>
 
-<record id="category" model="ir.module.category">
+<record id="ir_module_category_1" model="ir.module.category">
     <field name="name">Some model</field>
 </record>
 
-<record id="user_group" model="res.groups">
+<record id="res_groups_user" model="res.groups">
     <field name="name">User</field>
     <field name="category_id" ref="category"/>
     <field name="comment">
@@ -17,7 +17,7 @@
     </field>
 </record>
 
-<record id="manager_group" model="res.groups">
+<record id="res_groups_manager" model="res.groups">
     <field name="name">Manager</field>
     <field name="category_id" ref="category"/>
     <field name="implied_ids" eval="[(4, ref('user_group'))]"/>

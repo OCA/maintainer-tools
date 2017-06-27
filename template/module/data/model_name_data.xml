@@ -5,7 +5,7 @@
 <openerp>
 <data>
 
-<record id="my_data_record" model="model.name">
+<record id="model_name_my_record" model="model.name">
     <!-- My record data -->
 </record>
 
