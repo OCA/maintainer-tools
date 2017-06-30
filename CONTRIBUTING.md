@@ -467,6 +467,13 @@ except (ImportError, IOError) as err:
 This rule doesn't apply to the test files since these files are loaded only when
 running tests and in such a case your module and their external dependencies are installed.
 
+**You also need to test your code without the python lib nor the module installed** 
+to be sure other lines of your code don't break the installation.
+
+A good practice is to only call library from a method or function. 
+Then code is only called when module is intalled.
+
+
 #### README
 If your module uses extra dependencies of python or binaries, please explain
 how to install them in the `README.rst` file in the section `Installation`.
