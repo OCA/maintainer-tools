@@ -117,12 +117,16 @@ class OcaPypi(object):
 @click.option('--cache', required=True)
 @click.option('--dryrun/--no-dryrun', default=False)
 @click.option('--debug/--no-debug', default=False)
+@click.option('--quiet/--no-quiet', default=False)
 @click.pass_context
-def cli(ctx, pypirc, repository, cache, dryrun, debug):
+def cli(ctx, pypirc, repository, cache, dryrun, debug, quiet):
     if debug:
         level = logging.DEBUG
     else:
-        level = logging.INFO
+        if not quiet:
+            level = logging.INFO
+        else:
+            level = logging.WARNING
     logging.basicConfig(
         format='%(asctime)s:%(levelname)s:%(message)s',
         level=level)
