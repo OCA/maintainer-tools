@@ -918,7 +918,7 @@ the Runbot container generated for that branch/PR via SSH, where the
 environment will be very similar to Travis. You can do this by running:
 
 ```
-ssh -p [port] odoo@runbot[1 or 2].odoo-community.org
+ssh -p [port] -L 18080:localhost:18069 odoo@runbot[1 or 2].odoo-community.org
 ```
 
 The correct Runbot subdomain can be found by checking the info on 
@@ -933,11 +933,20 @@ Once you've connected to the container, you can run tests as follows:
 ```
 cp -r ~/data_dir/filestore/openerp_template ~/data_dir/filestore/[github_username]
 createdb -T openerp_template [github_username]
-[~/odoo-9.0/odoo.py or ~/odoo-10.0/odoo-bin] -d [github_username] --db-filter=[github_username] --xmlrpc-port=18069 --stop-after-init -i [module_name] --test-enable
+[~/odoo-9.0/odoo.py or ~/odoo-10.0/odoo-bin] -d [github_username] --db-filter=[github_username] --xmlrpc-port=18069 -i [module_name] --test-enable
 ```
 
-To repeat the tests, remove the DB by running `dropdb [github_username]` and
-then repeat the last two lines shown above.
+The test instance can be accessed through your browser at
+http://localhost:18080/ thanks to SSH port forwarding. To rebuild the DB as
+needed, run:
+
+```
+dropdb [github_username]
+createdb -T openerp_template [github_username]
+```
+
+**WARNING**: Do not stop the default Odoo service running in the container as
+this will bring down the entire Runbot instance.
 
 ## Git
 
