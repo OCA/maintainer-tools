@@ -48,6 +48,7 @@ section.
     * [Javascript](#javascript)
     * [CSS](#css)
     * [Tests](#tests)
+      * [Investigating Travis Test Failures](#investigating-travis-test-failures)
     * [Git](#git)
       * [Commit message](#commit-message)
       * [Review](#review)
@@ -909,6 +910,43 @@ test cases.
 you should name it ``module_name_example`` (ie: `cms_form` and `cms_form_example`).
 In this way coverage analysis will ignore this extra module by default.
 
+### Investigating Travis Test Failures
+
+It can sometimes be difficult to reproduce a Travis test failure locally due to
+subtle environment differences. In these scenarios it can be helpful to connect to
+the Runbot container generated for that branch/PR via SSH, where the
+environment will be very similar to Travis. You can do this by running:
+
+```
+ssh -p [port] -L 18080:localhost:18069 odoo@runbot[1 or 2].odoo-community.org
+```
+
+The correct Runbot subdomain can be found by checking the info on 
+https://runbot.odoo-community.org/runbot for your particular repo and branch.
+The port can also be found there by clicking on the gear icon next to the
+relevant Runbot instance and adding 1 to the port number in the dropdown. In
+order to be authenticated, your public SSH key will need to be associated with
+your GitHub account **before** the Runbot instance is generated.
+
+Once you've connected to the container, you can run tests as follows:
+
+```
+cp -r ~/data_dir/filestore/openerp_template ~/data_dir/filestore/[github_username]
+createdb -T openerp_template [github_username]
+[~/odoo-9.0/odoo.py or ~/odoo-10.0/odoo-bin] -d [github_username] --db-filter=[github_username] --xmlrpc-port=18069 -i [module_name] --test-enable
+```
+
+The test instance can be accessed through your browser at
+http://localhost:18080/ thanks to SSH port forwarding. To rebuild the DB as
+needed, run:
+
+```
+dropdb [github_username]
+createdb -T openerp_template [github_username]
+```
+
+**WARNING**: Do not stop the default Odoo service running in the container as
+this will bring down the entire Runbot instance.
 
 ## Git
 
