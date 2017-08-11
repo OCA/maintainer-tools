@@ -470,8 +470,8 @@ running tests and in such a case your module and their external dependencies are
 **You also need to test your code without the python lib nor the module installed** 
 to be sure other lines of your code don't break the installation.
 
-##### Recommandation
-A good practice is to only call library from a method or function. 
+##### Recommendation
+A good practice is to only call an external library from inside a method or function.
 Then code is only called when module is installed.
 
 
