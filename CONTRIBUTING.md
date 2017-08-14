@@ -924,9 +924,11 @@ ssh -p [port] -L 18080:localhost:18069 odoo@runbot[1 or 2].odoo-community.org
 The correct Runbot subdomain can be found by checking the info on 
 https://runbot.odoo-community.org/runbot for your particular repo and branch.
 The port can also be found there by clicking on the gear icon next to the
-relevant Runbot instance and adding 1 to the port number in the dropdown. In
-order to be authenticated, your public SSH key will need to be associated with
-your GitHub account **before** the Runbot instance is generated.
+relevant Runbot instance and adding 1 to the port number in the dropdown.
+
+In order to be authenticated, your public SSH key will need to be associated with
+your GitHub account **before** the Runbot instance is generated. You must also be
+the author of the commit that triggered the Runbot build.
 
 Once you've connected to the container, you can run tests as follows:
 
