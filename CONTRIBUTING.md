@@ -22,6 +22,7 @@ section.
     * [XML files](#xml-files)
       * [Format](#format)
       * [Records](#records)
+      * [Views](#views)
       * [Naming xml_id](#naming-xml_id)
         * [Data Records](#data-records)
         * [Security, View and Action](#security-view-and-action)
@@ -291,6 +292,17 @@ When declaring a record in XML:
 ```
 
 More info [here](https://github.com/odoo/odoo/pull/8218)
+
+### Views
+
+* For v8 and above it is recommended to avoid using the `string` attribute on
+  list views (`<tree>`) which [has been
+  deprecated](https://www.odoo.com/documentation/10.0/reference/views.html#lists)
+  and is no longer displayed.
+* For v9 and above it is recommended to avoid using the `colors` and `fonts`
+  attributes on list views (`<tree>`) which [have been
+  deprecated](https://www.odoo.com/documentation/10.0/reference/views.html#lists)
+  in favor of `decoration-{$name}`.
 
 ### Naming xml_id
 
