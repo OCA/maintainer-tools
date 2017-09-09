@@ -61,7 +61,6 @@
 95|github.com/OCA/account-invoicing
 112|github.com/OCA/department
 128|github.com/OCA/management-system
-170|github.com/OCA/connector-rt
 143|github.com/OCA/reporting-engine
 153|github.com/OCA/stock-logistics-warehouse
 145|github.com/OCA/rma
