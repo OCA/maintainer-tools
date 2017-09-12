@@ -5,6 +5,11 @@ language: python
 python:
     - "2.7"
 
+addons:
+  apt:
+    packages:
+      - python-distutils-extra
+
 install:
     - pip install coveralls flake8==2.6.2
     - pip install -r requirements.txt
