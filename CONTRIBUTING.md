@@ -19,6 +19,10 @@ section.
       * [Directories](#directories)
       * [File naming](#file-naming)
       * [Installation hooks](#installation-hooks)
+      * [External dependencies](#external-dependencies)
+        * [Manifest (`__manifest__.py/__openerp__.py`)](#manifest-__manifest__py__openerp__py)
+        * [ImportError](#importerror)
+        * [README](#user-content-readme)
     * [XML files](#xml-files)
       * [Format](#format)
       * [Records](#records)
@@ -29,10 +33,6 @@ section.
         * [Security, View and Action](#security-view-and-action)
         * [Inherited XML](#inherited-xml)
         * [Demo Records](#demo-records)
-      * [External dependencies](#external-dependencies)
-        * [`__openerp__.py`](#__openerp__py)
-        * [ImportError](#importerror)
-        * [README](#user-content-readme)
     * [Python](#python)
       * [PEP8 options](#pep8-options)
       * [Imports](#imports)
@@ -250,6 +250,67 @@ Filenames should use only `[a-z0-9_]`
 
 Use correct file permissions: folders 755 and files 644.
 
+### External dependencies
+
+#### Manifest (`__manifest__.py/__openerp__.py`)
+If your module uses extra dependencies of python or binaries you should add
+the `external_dependencies` section to `__openerp__.py`.
+
+```python
+{
+    'name': 'Example Module',
+    ...
+    'external_dependencies': {
+        'bin': [
+            'external_dependency_binary_1',
+            'external_dependency_binary_2',
+            ...
+            'external_dependency_binary_N',
+        ],
+        'python': [
+            'external_dependency_python_1',
+            'external_dependency_python_2',
+            ...
+            'external_dependency_python_N',
+        ],
+    },
+    ...
+    'installable': True,
+}
+```
+
+An entry in `bin` needs to be in `PATH`, check by running
+`which external_dependency_binary_N`.
+
+An entry in `python` needs to be in `PYTHONPATH`, check by running
+`python -c "import external_dependency_python_N"`.
+
+#### ImportError
+In python files where you use external dependencies you will
+need to add `try-except` with a debug log.
+
+```python
+try:
+    import external_dependency_python_N
+    import external_dependency_python_M
+    EXTERNAL_DEPENDENCY_BINARY_N_PATH = tools.find_in_path('external_dependency_binary_N')
+    EXTERNAL_DEPENDENCY_BINARY_M_PATH = tools.find_in_path('external_dependency_binary_M')
+except (ImportError, IOError) as err:
+    _logger.debug(err)
+```
+This rule doesn't apply to the test files since these files are loaded only when
+running tests and in such a case your module and their external dependencies are installed.
+
+#### README
+If your module uses extra dependencies of python or binaries, please explain
+how to install them in the `README.rst` file in the section `Installation`.
+
+#### requirements.txt
+
+As specified in [Repositories](#repositories), you should also define
+the python packages to install in a file `requirements.txt` in the 
+root folder of the repository. This will be used for travis.
+
 ## XML files
 
 ### Format
@@ -442,67 +503,6 @@ source or reinstalling the module with demo data disabled.
     ...
 </record>
 ```
-
-### External dependencies
-
-#### `__openerp__.py`
-If your module uses extra dependencies of python or binaries you should add
-the `external_dependencies` section to `__openerp__.py`.
-
-```python
-{
-    'name': 'Example Module',
-    ...
-    'external_dependencies': {
-        'bin': [
-            'external_dependency_binary_1',
-            'external_dependency_binary_2',
-            ...
-            'external_dependency_binary_N',
-        ],
-        'python': [
-            'external_dependency_python_1',
-            'external_dependency_python_2',
-            ...
-            'external_dependency_python_N',
-        ],
-    },
-    ...
-    'installable': True,
-}
-```
-
-An entry in `bin` needs to be in `PATH`, check by running
-`which external_dependency_binary_N`.
-
-An entry in `python` needs to be in `PYTHONPATH`, check by running
-`python -c "import external_dependency_python_N"`.
-
-#### ImportError
-In python files where you use external dependencies you will
-need to add `try-except` with a debug log.
-
-```python
-try:
-    import external_dependency_python_N
-    import external_dependency_python_M
-    EXTERNAL_DEPENDENCY_BINARY_N_PATH = tools.find_in_path('external_dependency_binary_N')
-    EXTERNAL_DEPENDENCY_BINARY_M_PATH = tools.find_in_path('external_dependency_binary_M')
-except (ImportError, IOError) as err:
-    _logger.debug(err)
-```
-This rule doesn't apply to the test files since these files are loaded only when
-running tests and in such a case your module and their external dependencies are installed.
-
-#### README
-If your module uses extra dependencies of python or binaries, please explain
-how to install them in the `README.rst` file in the section `Installation`.
-
-#### requirements.txt
-
-As specified in [Repositories](#repositories), you should also define
-the python packages to install in a file `requirements.txt` in the 
-root folder of the repository. This will be used for travis.
 
 ## Python
 
