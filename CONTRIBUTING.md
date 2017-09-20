@@ -254,7 +254,7 @@ Use correct file permissions: folders 755 and files 644.
 
 #### Manifest (`__manifest__.py/__openerp__.py`)
 If your module uses extra dependencies of python or binaries you should add
-the `external_dependencies` section to `__openerp__.py`.
+the `external_dependencies` section to `__manifest__.py`/`__openerp__.py`.
 
 ```python
 {
