@@ -26,6 +26,7 @@ OCA_PROJECTS = {
                    'account-fiscal-rule',
                    'operating-unit',
                    'intrastat',
+                   'mis-builder',
                    ],
     # 'backport': ['OCB',
     #              ],
