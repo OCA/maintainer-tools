@@ -30,6 +30,8 @@ OCA_PROJECTS = {
                    ],
     # 'backport': ['OCB',
     #              ],
+    'Apps Store': ['apps-store'],
+
     'banking': ['bank-payment',
                 'bank-statement-reconcile',
                 'bank-statement-import',
