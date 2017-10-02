@@ -134,3 +134,4 @@
 238|github.com/OCA/l10n-thailand
 239|github.com/OCA/vertical-realstate
 248|github.com/OCA/mis-builder
+249|github.com/OCA/apps-store
