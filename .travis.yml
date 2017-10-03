@@ -1,5 +1,7 @@
 # Config file .travis.yml
 
+dist: precise
+
 language: python
 
 python:
