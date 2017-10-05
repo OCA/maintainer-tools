@@ -123,6 +123,7 @@ A module is organized in a few directories:
 * `static/`: contains the web assets, separated into `css/`, `js/`, `img/`,
   `lib/`, ...
 * `views/`: contains the views and templates, and QWeb report print templates
+* `templates/`: if you have several web templates and several backend views you can split them here
 * `wizards/`: wizard model and views
 * `examples/`: external files
 
