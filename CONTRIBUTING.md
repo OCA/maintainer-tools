@@ -118,14 +118,14 @@ A module is organized in a few directories:
 * `controllers/`: contains controllers (http routes)
 * `data/`: data xml
 * `demo/`: demo xml
+* `examples/`: external files
+  `lib/`, ...
 * `models/`: model definitions
 * `report/`: reporting models (BI/analysis), Webkit/RML print report templates
 * `static/`: contains the web assets, separated into `css/`, `js/`, `img/`,
-  `lib/`, ...
-* `views/`: contains the views and templates, and QWeb report print templates
 * `templates/`: if you have several web templates and several backend views you can split them here
+* `views/`: contains the views and templates, and QWeb report print templates
 * `wizards/`: wizard model and views
-* `examples/`: external files
 
 
 ### File naming
