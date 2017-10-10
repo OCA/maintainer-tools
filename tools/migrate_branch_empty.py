@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 #  -*- coding: utf-8 -*-
 """
-This script helps to create a new branch for a new Odoo version from the
-another existing branch, making the needed changes on contents.
+This script helps to create a new branch for a new Odoo version, catching the
+required metafiles from another existing branch, and making the needed changes
+on contents.
 
 Installation
 ============
@@ -21,7 +22,7 @@ this script for a first time.
 
 Usage
 =====
-oca-migrate-branch [-h] [-p PROJECTS [PROJECTS ...]] [-e EMAIL]
+oca-migrate-branch-empty [-h] [-p PROJECTS [PROJECTS ...]] [-e EMAIL]
                         [-t TARGET_ORG]
                         source target
 
@@ -42,12 +43,15 @@ optional arguments:
 
 This script will perform the following operations for each project:
 
-* Create a branch starting from branch 'source' with 'target' as name. If it
-  already exists, then the project is skipped.
-* Mark all modules as installable = False.
-* Replace in README.md all references to source branch by the target branch.
-* Replace in .travis.yml all references to source branch by the target branch.
-* Remove __unported__ dir.
+* Create an empty branch with 'target' as name. If it already exists, then
+  the project is skipped.
+* Catch these possible metafiles from source branch, replacing all references
+  to it by the target branch:
+  * .travis.yml
+  * .gitignore
+  * CONTRIBUTING.md
+  * LICENSE
+  * README.md
 * Make target branch the default branch in the repository.
 * Create a milestone (if not exist) for new version.
 * Create an issue enumerating the modules to migrate, with the milestone
@@ -57,9 +61,6 @@ This script will perform the following operations for each project:
 Known issues / Roadmap
 ======================
 
-* Modules without installable key in the manifest are filled with this key,
-  but the indentation for this added line is assumed to be 4 spaces, and the
-  closing brace indentation is 0.
 * Issue enumerating the module list contains a list to a Wiki page that should
   be formatted this way:
   https://github.com/OCA/maintainer-tools/wiki/Migration-to-version-{branch}
@@ -71,7 +72,7 @@ Credits
 Contributors
 ------------
 
-* Pedro M. Baeza <pedro.baeza@serviciosbaeza.com>
+* Pedro M. Baeza <pedro.baeza@tecnativa.com>
 
 Maintainer
 ----------
@@ -86,7 +87,7 @@ OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.
 
-To contribute to this module, please visit http://odoo-community.org.
+To contribute to this module, please visit https://odoo-community.org.
 """
 
 import argparse
@@ -120,7 +121,7 @@ class BranchMigrator(object):
     def _replace_content(self, repo, path, replace_list, gh_file=None):
         if not gh_file:
             # Re-read path for retrieving content
-            gh_file = repo.contents(path, self.gh_target_branch)
+            gh_file = repo.contents(path, self.gh_source_branch)
         content = gh_file.decoded
         for replace in replace_list:
             content = re.sub(replace[0], replace[1], content, flags=re.DOTALL)
@@ -142,110 +143,41 @@ class BranchMigrator(object):
         """
         if not tree_data:
             return
-        branch = repo.branch(self.gh_target_branch)
-        tree_sha = branch.commit.commit.tree.sha if use_sha else None
+        if use_sha:
+            branch = repo.branch(self.gh_target_branch)
+            tree_sha = branch.commit.commit.tree.sha
+            parents = [branch.commit.sha]
+        else:
+            tree_sha = None
+            parents = []
         tree = repo.create_tree(tree_data, tree_sha)
         commit = repo.create_commit(
-            message=message, tree=tree.sha, parents=[branch.commit.sha],
-            author=self.gh_credentials, committer=self.gh_credentials)
-        repo.ref('heads/{}'.format(branch.name)).update(commit.sha)
+            message=message, tree=tree.sha, parents=parents,
+            author=self.gh_credentials, committer=self.gh_credentials,
+        )
         return commit
 
-    def _mark_modules_uninstallable(self, repo, root_contents):
-        """Make uninstallable the existing modules in the repo."""
-        tree_data = []
+    def _get_modules_list(self, repo, root_contents):
+        """Get the list of the modules in previous branch."""
         modules = []
         for root_content in root_contents.values():
             if root_content.type != 'dir':
                 continue
             module_contents = repo.contents(
-                root_content.path, self.gh_target_branch)
+                root_content.path, self.gh_source_branch,
+            )
+            manifest = False
             for manifest_file in MANIFESTS:
                 manifest = module_contents.get(manifest_file)
                 if manifest:
                     break
             if manifest:
                 modules.append(root_content.path)
-                # Re-read path for retrieving content
-                gh_file = repo.contents(manifest.path, self.gh_target_branch)
-                manifest_dict = eval(gh_file.decoded)
-                if manifest_dict.get('installable') is None:
-                    src = ",?\s*}"
-                    dest = ",\n    'installable': False,\n}"
-                else:
-                    src = '["\']installable["\']: *True'
-                    dest = "'installable': False"
-                tree_data.append(self._replace_content(
-                    repo, manifest.path, [(src, dest)], gh_file=gh_file))
-        self._create_commit(
-            repo, tree_data, "[MIG] Make modules uninstallable")
         return modules
 
-    def _rename_manifests(self, repo, root_contents):
-        """ Rename __openerp__.py to __manifest__.py as per Odoo 10.0 API """
-        branch = repo.branch(self.gh_target_branch)
-        tree = repo.tree(branch.commit.sha).recurse().tree
-        tree_data = []
-        for entry in tree:
-            if entry.type == 'tree':
-                continue
-            path = entry.path
-            if path.endswith('__openerp__.py'):
-                path = path.replace('__openerp__.py', '__manifest__.py')
-            tree_data.append({
-                'path': path,
-                'sha': entry.sha,
-                'type': entry.type,
-                'mode': entry.mode,
-            })
-        self._create_commit(
-            repo, tree_data, "[MIG] Rename manifest files", use_sha=False)
-
-    def _delete_setup_dirs(self, repo, root_contents, modules):
-        if 'setup' not in root_contents:
-            return
-        exclude_paths = ['setup/%s' % module for module in modules]
-        branch = repo.branch(self.gh_target_branch)
-        tree = repo.tree(branch.commit.sha).recurse().tree
-        tree_data = []
-        for entry in tree:
-            if entry.type == 'tree':
-                continue
-            for path in exclude_paths:
-                if entry.path == path or entry.path.startswith(path + '/'):
-                    break
-            else:
-                tree_data.append({
-                    'path': entry.path,
-                    'sha': entry.sha,
-                    'type': entry.type,
-                    'mode': entry.mode,
-                })
-        self._create_commit(
-            repo, tree_data, "[MIG] Remove setup module directories",
-            use_sha=False)
-
-    def _delete_unported_dir(self, repo, root_contents):
-        if '__unported__' not in root_contents.keys():
-            return
-        branch = repo.branch(self.gh_target_branch)
-        tree = repo.tree(branch.commit.sha).tree
-        tree_data = []
-        # Reconstruct tree without __unported__ entry
-        for entry in tree:
-            if '__unported__' not in entry.path:
-                tree_data.append({
-                    'path': entry.path,
-                    'sha': entry.sha,
-                    'type': entry.type,
-                    'mode': entry.mode,
-                })
-        self._create_commit(
-            repo, tree_data, "[MIG] Remove __unported__ dir", use_sha=False)
-
-    def _update_metafiles(self, repo, root_contents):
-        """Update metafiles (README.md, .travis.yml...) for pointing to
-        the new branch.
+    def _create_metafiles(self, repo, root_contents):
+        """Create metafiles (README.md, .travis.yml...) pointing to the new
+        branch.
         """
         tree_data = []
         source_string = self.gh_source_branch.replace('.', '\.')
@@ -257,8 +189,7 @@ class BranchMigrator(object):
                 None: [
                     (source_string, target_string),
                     (source_string_dash, target_string_dash),
-                    ("\[//]: # \(addons\).*\[//]: # \(end addons\)",
-                     "[//]: # (addons)\n[//]: # (end addons)"),
+                    ("\[//]: # \(addons\).*\[//]: # \(end addons\)", ""),
                 ],
             },
             '.travis.yml': {
@@ -273,6 +204,15 @@ class BranchMigrator(object):
                     (r'(?m)virtualenv:.*\n.*system_site_packages: true\n', ''),
                 ],
             },
+            '.gitignore': {
+                None: [],
+            },
+            'CONTRIBUTING.md': {
+                None: [],
+            },
+            'LICENSE': {
+                None: [],
+            }
         }
         for filename in REPLACES:
             if not root_contents.get(filename):
@@ -283,8 +223,10 @@ class BranchMigrator(object):
                     continue
                 replaces += REPLACES[filename][version]
             tree_data.append(self._replace_content(repo, filename, replaces))
-        self._create_commit(
-            repo, tree_data, "[MIG] Update metafiles")
+        commit = self._create_commit(
+            repo, tree_data, "[MIG] Add metafiles\n\n[skip ci]", use_sha=False,
+        )
+        return commit
 
     def _make_default_branch(self, repo):
         repo.edit(repo.name, default_branch=self.gh_target_branch)
@@ -325,16 +267,12 @@ class BranchMigrator(object):
         if branch:
             print "Branch already exists. Skipping..."
             return
+        root_contents = repo.contents('', self.gh_source_branch)
+        modules = self._get_modules_list(repo, root_contents)
+        commit = self._create_metafiles(repo, root_contents)
         repo.create_ref(
-            'refs/heads/%s' % self.gh_target_branch,
-            source_branch.commit.sha)
-        root_contents = repo.contents('', self.gh_target_branch)
-        modules = self._mark_modules_uninstallable(repo, root_contents)
-        if self.gh_target_branch == '10.0':
-            self._rename_manifests(repo, root_contents)
-        self._delete_unported_dir(repo, root_contents)
-        self._delete_setup_dirs(repo, root_contents, modules)
-        self._update_metafiles(repo, root_contents)
+            'refs/heads/%s' % self.gh_target_branch, commit.sha,
+        )
         self._make_default_branch(repo)
         milestone = self._create_branch_milestone(repo)
         self._create_migration_issue(repo, sorted(modules), milestone)
