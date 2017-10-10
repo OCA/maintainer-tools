@@ -135,3 +135,7 @@
 239|github.com/OCA/vertical-realstate
 248|github.com/OCA/mis-builder
 249|github.com/OCA/apps-store
+250|github.com/OCA/server-ux
+251|github.com/OCA/server-auth
+252|github.com/OCA/server-brand
+253|github.com/OCA/server-backend
