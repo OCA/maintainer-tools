@@ -23,6 +23,7 @@ section.
       * [Format](#format)
       * [Records](#records)
       * [Views](#views)
+      * [QWeb](#qweb)
       * [Naming xml_id](#naming-xml_id)
         * [Data Records](#data-records)
         * [Security, View and Action](#security-view-and-action)
@@ -308,6 +309,13 @@ More info [here](https://github.com/odoo/odoo/pull/8218)
   attributes on list views (`<tree>`) which [have been
   deprecated](https://www.odoo.com/documentation/10.0/reference/views.html#lists)
   in favor of `decoration-{$name}`.
+
+### QWeb
+
+* `t-*-options` QWeb directives (`t-field-options`, `t-esc-options` and
+  `t-raw-options`) should not be used in v10 and above, as they are [to be
+  removed](https://github.com/odoo/odoo/blob/8f99b24f6cb1ea70b371e2944ff36b75a6f9c80e/odoo/addons/base/ir/ir_qweb/ir_qweb.py#L155)
+  after version 10.
 
 ### Naming xml_id
 
