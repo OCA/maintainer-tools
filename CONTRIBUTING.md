@@ -134,8 +134,8 @@ For `models`, `views` and `data` declarations, split files by the model
 involved, either created or inherited. These files should be named after the
 model. For example, demo data for res.partner should go in a file named
 `demo/res_partner.xml` and a view for partner should go in a file named
-`views/res_partner.xml`. An exception can be made when the model is a 
-model intended to be used only as a one2many model nested on the main 
+`views/res_partner.xml`. An exception can be made when the model is a
+model intended to be used only as a one2many model nested on the main
 model. In this case, you can include the model definition inside it.
 Example `sale.order.line` model can be together with `sale.order` in
 the file `models/sale_order.py`.
@@ -321,7 +321,7 @@ More info [here](https://github.com/odoo/odoo/pull/8218)
 
 #### Data Records
 
-Use the followng pattern, where `<model_name>` is the name of the model that 
+Use the followng pattern, where `<model_name>` is the name of the model that
 the record is an instance of: `<model_name>_<record_name>`
 
 ```xml
@@ -332,8 +332,8 @@ the record is an instance of: `<model_name>_<record_name>`
 
 #### Security, View and Action
 
-Use the following patterns, where `<model_name>` is the name of the model that 
-the menu, view, etc. belongs to (e.g. for a `res.users` form view, the name 
+Use the following patterns, where `<model_name>` is the name of the model that
+the menu, view, etc. belongs to (e.g. for a `res.users` form view, the name
 would be `res_users_view_form`):
 
 * For a menu: `<model_name>_menu`
@@ -560,8 +560,10 @@ except ImportError:
 
 ### Idioms
 
-* Each python file should have
-  ``# coding: utf-8`` or ``# -*- coding: utf-8 -*-`` as first line
+* For Python 2 (Odoo < 11.0), all python files should contain
+  ``# coding: utf-8`` or ``# -*- coding: utf-8 -*-`` as first line.
+* For Python 3 (Odoo >= 11.0), no need for utf-8 coding line as this is
+  implicit.
 * Prefer `%` over `.format()`, prefer `%(varname)` instead of positional.
   This is better for translation and clarity.
 * Always favor **Readability** over **conciseness** or using the language
@@ -946,7 +948,7 @@ environment will be very similar to Travis. You can do this by running:
 ssh -p [port] -L 18080:localhost:18069 odoo@runbot[1 or 2].odoo-community.org
 ```
 
-The correct Runbot subdomain can be found by checking the info on 
+The correct Runbot subdomain can be found by checking the info on
 https://runbot.odoo-community.org/runbot for your particular repo and branch.
 The port can also be found there by clicking on the gear icon next to the
 relevant Runbot instance and adding 1 to the port number in the dropdown.
@@ -1112,7 +1114,7 @@ Pull requests can be closed if:
 * Project name for connectors is "connector-magento" for Magento connector
 
 #### Branch configuration
-Python packages to install, must be preferably, define in requirements.txt than travis.yml file. 
+Python packages to install, must be preferably, define in requirements.txt than travis.yml file.
 Requirements.txt avoid to repeat packages in all travis.yml files of repositories in case of using with oca_dependencies.txt file.
 
 ### Issues
