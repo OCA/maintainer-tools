@@ -498,6 +498,11 @@ running tests and in such a case your module and their external dependencies are
 If your module uses extra dependencies of python or binaries, please explain
 how to install them in the `README.rst` file in the section `Installation`.
 
+#### requirements.txt
+
+As specified in [Repositories](#repositories), you should also define
+the python packages to install in a file `requirements.txt` in the 
+root folder of the repository. This will be used for travis.
 
 ## Python
 
