@@ -5,7 +5,7 @@
 #   $ docker run -it -e GITHUB_TOKEN=### -e TRANSIFEX_USER= -e TRANSIFEX_PASSWORD= -e TRANSIFEX_ORGANIZATION= tx-bot
 
 FROM ubuntu:14.04
-MAINTAINER Moises Lopez <moylop260@vauxoo.com>
+LABEL maintainer="Moises Lopez <moylop260@vauxoo.com>"
 
 ENV MT_DIR /root/mt
 ADD ./tools ${MT_DIR}/tools 
