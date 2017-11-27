@@ -904,7 +904,7 @@ class Event(models.Model):
   ```python
     try:
         sentences
-    except:
+    except Exception:
         _logger.debug('Why the exception is safe....', exc_info=1))
   ```
 
