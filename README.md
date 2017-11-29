@@ -1,12 +1,12 @@
-[![Build Status](https://travis-ci.org/OCA/maintainers-tools.svg?branch=master)](https://travis-ci.org/OCA/maintainers-tools)
-[![Coverage Status](https://img.shields.io/coveralls/OCA/maintainers-tools.svg)](https://coveralls.io/r/OCA/maintainers-tools?branch=master)
+[![Build Status](https://travis-ci.org/OCA/maintainer-tools.svg?branch=master)](https://travis-ci.org/OCA/maintainer-tools)
+[![Coverage Status](https://img.shields.io/coveralls/OCA/maintainer-tools.svg)](https://coveralls.io/r/OCA/maintainers-tools?branch=master)
 
-# OCA Maintainers Tools
+# OCA Maintainer Tools
 
 ## Installation
 
-    $ git clone git@github.com:OCA/maintainers-tools.git
-    $ cd maintainers-tools
+    $ git clone git@github.com:OCA/maintainer-tools.git
+    $ cd maintainer-tools
     $ virtualenv env
     $ . env/bin/activate
     $ python setup.py install
@@ -38,11 +38,11 @@ Prerequisites:
 
 Run the script in "dry-run" mode:
 
-    $ oca-copy-maintainers --dry-run
+    $ oca-copy-maintainer --dry-run
 
 Apply the changes on GitHub:
 
-    $ oca-copy-maintainers
+    $ oca-copy-maintainer
 
 The first time it runs, it will ask you for your odoo's username and
 password. You may store them using the `--store` option, but be warned
@@ -67,7 +67,7 @@ To copy the branches of a particular project, put the name of the project (the G
     $ oca-copy-branches PATH --projects OCA/magento-connector
 
 The same tool can also be used to move other branches to GitHub, see
-https://github.com/OCA/maintainers-tools/wiki/How-to-move-a-Merge-Proposal-to-GitHub
+https://github.com/OCA/maintainer-tools/wiki/How-to-move-a-Merge-Proposal-to-GitHub
 
 **Set labels on OCA repository on GitHub**
 
