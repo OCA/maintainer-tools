@@ -140,3 +140,6 @@
 251|github.com/OCA/server-auth
 252|github.com/OCA/server-brand
 253|github.com/OCA/server-backend
+254|github.com/OCA/server-env
+255|github.com/OCA/ddmrp
+256|github.com/OCA/project-agile
