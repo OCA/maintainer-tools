@@ -48,6 +48,9 @@ coverage.xml
 # Eclipse
 .settings
 
+# Visual Studio cache/options directory
+.vs/
+
 # Django stuff:
 *.log
 
