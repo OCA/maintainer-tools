@@ -23,6 +23,7 @@ section.
         * [Manifest (`__manifest__.py/__openerp__.py`)](#manifest-__manifest__py__openerp__py)
         * [ImportError](#importerror)
         * [README](#user-content-readme)
+        * [requirements.txt](#requirementstxt)
     * [XML files](#xml-files)
       * [Format](#format)
       * [Records](#records)
