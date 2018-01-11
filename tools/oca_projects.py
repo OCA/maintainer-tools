@@ -186,6 +186,7 @@ def get_repositories():
         'OCB',
         'OpenUpgrade',
         'pylint-odoo',
+        'oca-custom',
     }
     gh = login()
     all_repos = [repo.name for repo in gh.iter_user_repos('OCA')
