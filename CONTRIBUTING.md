@@ -16,6 +16,7 @@ section.
   * [OCA Guidelines](#oca-guidelines)
     * [Modules](#modules)
       * [Version numbers](#version-numbers)
+      * [Migrations](#migrations)
       * [Directories](#directories)
       * [File naming](#file-naming)
       * [Installation hooks](#installation-hooks)
@@ -112,6 +113,9 @@ The `x.y.z` version numbers follow the semantics `breaking.feature.fix`:
 If applicable, breaking changes are expected to include instructions
 or scripts to perform migration on current installations.
 
+### Migrations
+
+When you introduce a breaking change, you *must* provide a migration script to make it possible to upgrade from lower versions. For a migration to another major version of Odoo, it's quite probable you'll need a migration script too. In such cases, migration scripts are highly appreciated, but a note in the README about relevant changes needing migration is sufficient too so that later contributors can add migration scripts without having to analyze all changes again.
 
 ### Directories
 
@@ -199,6 +203,10 @@ addons/<my_module_name>/
 |   `-- <main_model>.xml
 |-- demo/
 |   `-- <inherited_model>.xml
+|-- migrations/
+|   |-- 8.0.x.y.z/
+|   |   |-- pre_migration.py
+|   |   |-- post_migration.py
 |-- models/
 |   |-- __init__.py
 |   |-- <main_model>.py
