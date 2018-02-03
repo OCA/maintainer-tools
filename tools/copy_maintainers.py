@@ -35,9 +35,9 @@ class FakeProject(object):
 
 def get_cla_project(odoo):
     Partner = odoo.model('res.partner')
-    domain = [('x_github_login', '!=', False),
+    domain = [('github_login', '!=', False),
               '|',
-              ('category_id.name', '=', 'ICLA'),
+              ('category_id.name', 'in', ('ECLA', 'ICLA')),
               ('parent_id.category_id.name', '=', 'ECLA')]
     members = Partner.browse(domain)
     return FakeProject('OCA Contributors', members)
@@ -45,7 +45,7 @@ def get_cla_project(odoo):
 
 def get_members_project(odoo):
     Partner = odoo.model('res.partner')
-    domain = [('x_github_login', '!=', False),
+    domain = [('github_login', '!=', False),
               ('membership_state', 'in', ('paid', 'free'))]
     members = Partner.browse(domain)
     print(members)
@@ -58,7 +58,8 @@ def copy_users(odoo, team=None, dry_run=False):
     # on odoo, the model is a project, but they are teams on GitHub
     Project = odoo.model('project.project')
     base_domain = [('privacy_visibility = public'),
-                   ('state != template')]
+                   #('state != template'),
+                   ]
     if team == 'OCA Contributors':
         projects = [get_cla_project(odoo)]
     elif team == 'OCA Members':
@@ -88,15 +89,15 @@ def copy_users(odoo, team=None, dry_run=False):
     no_github_login = set()
     for odoo_project, github_team in valid:
         print()
-        print('Syncing project "%s"' % odoo_project.name)
+        print(u'Syncing project "%s"' % odoo_project.name)
         users = [odoo_project.user_id]
         users += odoo_project.members
         logins = set(['oca-transbot',
                       'OCA-git-bot',
                       ])
         for user in users:
-            if user.x_github_login:
-                logins.add(user.x_github_login)
+            if user.github_login:
+                logins.add(user.github_login)
             else:
                 no_github_login.add("%s (%s)" % (user.name, user.login))
         current_logins = set(user.login for user in github_team.iter_members())
@@ -104,30 +105,32 @@ def copy_users(odoo, team=None, dry_run=False):
         keep_logins = logins.intersection(current_logins)
         remove_logins = current_logins - logins
         add_logins = logins - current_logins
-        print("Add   ", colors.GREEN + ', '.join(add_logins) + colors.ENDC)
-        print("Keep  ", ', '.join(keep_logins))
-        print("Remove", colors.FAIL + ', '.join(remove_logins) + colors.ENDC)
+        print("Add   ", colors.GREEN + ', '.join(l.encode('utf-8') for l in add_logins) + colors.ENDC)
+        print("Keep  ", ', '.join(l.encode('utf-8') for l in keep_logins))
+        print("Remove", colors.FAIL + ', '.join(l.encode('utf-8') for l in remove_logins) + colors.ENDC)
         if not dry_run:
             for login in add_logins:
                 try:
                     github_team.invite(login)
                 except Exception as exc:
-                    print('Failed to invite %s: %s' % (login, exc))
+                    print('Failed to invite %r: %s' % (login, exc))
+                else:
+                    print('%r' % login)
             for login in remove_logins:
                 try:
                     github_team.remove_member(login)
                 except Exception as exc:
-                    print('Failed to remove %s: %s' % (login, exc))
+                    print('Failed to remove %r: %s' % (login, exc))
 
     if no_github_login:
         print()
-        print('Following users miss GitHub login:')
-        print(colors.FAIL + '\n'.join(user for user in no_github_login) +
+        print(u'Following users miss GitHub login:')
+        print(colors.FAIL + '\n'.join(user.encode('utf-8') for user in no_github_login) +
               colors.ENDC)
 
     if not_found:
         print()
-        print('The following odoo projects have no team in GitHub:')
+        print(u'The following odoo projects have no team in GitHub:')
         for project in not_found:
             print(project.name)
 
