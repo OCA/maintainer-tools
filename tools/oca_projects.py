@@ -26,9 +26,12 @@ OCA_PROJECTS = {
                    'account-fiscal-rule',
                    'operating-unit',
                    'intrastat',
+                   'mis-builder',
                    ],
     # 'backport': ['OCB',
     #              ],
+    'Apps Store': ['apps-store'],
+
     'banking': ['bank-payment',
                 'bank-statement-reconcile',
                 'bank-statement-import',
@@ -116,6 +119,7 @@ OCA_PROJECTS = {
                   'stock-logistics-warehouse',
                   'stock-logistics-reporting',
                   'rma',
+                  'ddmrp',
                   ],
     'manufacturing': ['manufacture',
                       'manufacture-reporting',
@@ -130,6 +134,7 @@ OCA_PROJECTS = {
                 ],
     'project / services': ['project-reporting',
                            'project-service',
+                           'project-agile',
                            'contract',
                            'program',
                            'business-requirement',
@@ -141,6 +146,11 @@ OCA_PROJECTS = {
               'report-print-send',
               'webkit-tools',
               'server-tools',
+              'server-auth',
+              'server-env',
+              'server-backend',
+              'server-brand',
+              'server-ux',
               'community-data-files',
               'webhook',
               'interface-github',
@@ -176,6 +186,7 @@ def get_repositories():
         'OCB',
         'OpenUpgrade',
         'pylint-odoo',
+        'oca-custom',
     }
     gh = login()
     all_repos = [repo.name for repo in gh.iter_user_repos('OCA')

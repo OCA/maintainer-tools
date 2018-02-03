@@ -58,7 +58,6 @@ def copy_users(odoo, team=None, dry_run=False):
     # on odoo, the model is a project, but they are teams on GitHub
     Project = odoo.model('project.project')
     base_domain = [('privacy_visibility = public'),
-                   #('state != template'),
                    ]
     if team == 'OCA Contributors':
         projects = [get_cla_project(odoo)]
@@ -140,7 +139,7 @@ def main():
     group = parser.add_argument_group('Copy maintainers options')
     group.add_argument("-t", "--team",
                        help="Name of the team to synchronize.")
-    group.add_argument("--dry-run",
+    group.add_argument("-n", "--dry-run",
                        action='store_true',
                        help="Prints the actions to do, "
                             "but does not apply them")

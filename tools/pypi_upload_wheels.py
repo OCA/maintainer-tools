@@ -1,10 +1,8 @@
-import anydbm
+import dumbdbm
 import contextlib
 import logging
 import os
-import requests
 import subprocess
-import time
 from wheel.install import WheelFile
 from ConfigParser import RawConfigParser
 from pkg_resources import parse_version
@@ -35,13 +33,13 @@ class OcaPypi(object):
         parser.read(pypirc)
         self.pypirc = pypirc
         self.repository = repository
-        self.repository_url = parser.get(repository, 'repository')
+        if parser.has_option(repository, 'repository'):
+            self.repository_url = parser.get(repository, 'repository')
+        else:
+            # this is the legacy pypi url that we use in the cache keys
+            self.repository_url = 'https://pypi.python.org/pypi'
         self.cache = cache
         self.dryrun = dryrun
-
-    def _make_reg_key(self, wheelfilename):
-        package_name, _ = _split_wheelfilename(wheelfilename)
-        return str(self.repository_url + '#' + package_name)
 
     def _make_key(self, wheelfilename):
         return str(self.repository_url + '#' + os.path.basename(wheelfilename))
@@ -52,35 +50,6 @@ class OcaPypi(object):
     def _key_to_wheel(self, key):
         return key[len(self.repository_url) + 1:]
 
-    def _registered(self, wheelfilename):
-        package_name, package_ver = _split_wheelfilename(wheelfilename)
-        package_url = self.repository_url + '/' + package_name
-        r = requests.head(package_url)
-        return r.status_code == 200
-
-    def _register(self, wheelfilename):
-        cmd = ['twine', 'register', '--config-file', self.pypirc,
-               '-r', self.repository, wheelfilename]
-        if not self.dryrun:
-            retry = REGISTER_RETRY
-            while True:
-                try:
-                    subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-                    break  # success
-                except subprocess.CalledProcessError as e:
-                    if "HTTPError: 400 Client Error" in e.output:
-                        return e.output  # unrecoverable error
-                    else:
-                        retry -= 1
-                        if retry > 0:
-                            _logger.warning("error registering %s, retrying" %
-                                            (wheelfilename, ))
-                            time.sleep(5)
-                        else:
-                            raise
-        else:
-            _logger.info("dryrun: %s", cmd)
-
     def _upload(self, wheelfilename):
         cmd = ['twine', 'upload', '--config-file', self.pypirc,
                '-r', self.repository, '--skip-existing', wheelfilename]
@@ -90,43 +59,27 @@ class OcaPypi(object):
             except subprocess.CalledProcessError as e:
                 if "HTTPError: 400 Client Error" in e.output:
                     return e.output
+                print e.output
                 raise
         else:
             _logger.info("dryrun: %s", cmd)
 
-    def upload_wheel(self, wheelfilename):
+    def upload_wheel(self, wheelfilename, dbm):
         key = self._make_key(wheelfilename)
-        with contextlib.closing(anydbm.open(self.cache, 'c')) as dbm:
-            if key in dbm:
-                value = dbm[key]
-                detail = '' if not value else ' (with error)'
-                _logger.debug("skipped %s: found in cache%s",
-                              wheelfilename, detail)
-                return
-            reg_key = self._make_reg_key(wheelfilename)
-            if reg_key not in dbm and not self._registered(wheelfilename):
-                _logger.info("registering %s to %s",
-                             wheelfilename, self.repository_url)
-                r = self._register(wheelfilename)
-                if r:
-                    # registration failed, store the error in cache
-                    # so we don't try again, and do not try to upload
-                    _logger.error("registering %s to %s failed: %s",
-                                  wheelfilename, self.repository_url, r)
-                    if not self.dryrun:
-                        dbm[key] = r
-                    return
-                else:
-                    if not self.dryrun:
-                        dbm[reg_key] = ''
-            _logger.info("uploading %s to %s",
-                         wheelfilename, self.repository_url)
-            r = self._upload(wheelfilename)
-            if r:
-                _logger.error("uploading %s to %s failed: %s",
-                              wheelfilename, self.repository_url, r)
-            if not self.dryrun:
-                dbm[key] = r or ''
+        if key in dbm:
+            value = dbm[key]
+            detail = '' if not value else ' (with error)'
+            _logger.debug("skipped %s: found in cache%s",
+                          wheelfilename, detail)
+            return
+        _logger.info("uploading %s to %s",
+                     wheelfilename, self.repository)
+        r = self._upload(wheelfilename)
+        if r:
+            _logger.error("uploading %s to %s failed: %s",
+                          wheelfilename, self.repository, r)
+        if not self.dryrun:
+            dbm[key] = r or ''
 
     def upload_wheels(self, wheelfilenames):
         to_upload = []
@@ -136,11 +89,12 @@ class OcaPypi(object):
                 to_upload.append(wheelfilename)
             else:
                 _logger.warn("skipped %s: not a wheel file", wheelfilename)
-        for wheelfilename in sorted(to_upload, key=_split_wheelfilename):
-            self.upload_wheel(wheelfilename)
+        with contextlib.closing(dumbdbm.open(self.cache, 'c')) as dbm:
+            for wheelfilename in sorted(to_upload, key=_split_wheelfilename):
+                self.upload_wheel(wheelfilename, dbm)
 
     def cache_print_errors(self):
-        with contextlib.closing(anydbm.open(self.cache, 'r')) as dbm:
+        with contextlib.closing(dumbdbm.open(self.cache, 'r')) as dbm:
             for key, value in dbm.items():
                 if not self._key_match(key):
                     continue
@@ -149,7 +103,7 @@ class OcaPypi(object):
                     click.echo(u"{}: {}".format(wheel, value))
 
     def cache_rm_wheels(self, wheelfilenames):
-        with contextlib.closing(anydbm.open(self.cache, 'w')) as dbm:
+        with contextlib.closing(dumbdbm.open(self.cache, 'w')) as dbm:
             for wheelfilename in wheelfilenames:
                 wheelfilename = os.path.basename(wheelfilename)
                 key = self._make_key(wheelfilename)
@@ -163,12 +117,16 @@ class OcaPypi(object):
 @click.option('--cache', required=True)
 @click.option('--dryrun/--no-dryrun', default=False)
 @click.option('--debug/--no-debug', default=False)
+@click.option('--quiet/--no-quiet', default=False)
 @click.pass_context
-def cli(ctx, pypirc, repository, cache, dryrun, debug):
+def cli(ctx, pypirc, repository, cache, dryrun, debug, quiet):
     if debug:
         level = logging.DEBUG
     else:
-        level = logging.INFO
+        if not quiet:
+            level = logging.INFO
+        else:
+            level = logging.WARNING
     logging.basicConfig(
         format='%(asctime)s:%(levelname)s:%(message)s',
         level=level)

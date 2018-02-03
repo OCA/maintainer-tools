@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # Copyright <YEAR(S)> <AUTHOR(S)>
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 {
     "name": "Module name",
     "summary": "Module summary",
     "version": "8.0.1.0.0",
     "category": "Uncategorized",
-    "website": "https://odoo-community.org/",
+    "website": "https://github.com/OCA/<repo>" or "https://github.com/OCA/<repo>/tree/<branch>/<addon>",
     "author": "<AUTHOR(S)>, Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "application": False,

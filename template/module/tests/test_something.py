@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright <YEAR(S)> <AUTHOR(S)>
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from openerp.tests.common import HttpCase, TransactionCase
 
@@ -29,9 +29,17 @@ class SomethingCase(TransactionCase):
 
 
 class UICase(HttpCase):
+
+    post_install = True
+    at_install = False
+
     def test_ui_web(self):
         """Test backend tests."""
-        self.phantom_js("/web/tests?debug=assets&module=module_name", "", login="admin")
+        self.phantom_js(
+            "/web/tests?debug=assets&module=module_name",
+            "",
+            login="admin",
+        )
 
     def test_ui_website(self):
         """Test frontend tour."""

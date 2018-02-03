@@ -16,22 +16,25 @@ section.
   * [OCA Guidelines](#oca-guidelines)
     * [Modules](#modules)
       * [Version numbers](#version-numbers)
+      * [Migrations](#migrations)
       * [Directories](#directories)
       * [File naming](#file-naming)
       * [Installation hooks](#installation-hooks)
+      * [External dependencies](#external-dependencies)
+        * [Manifest (`__manifest__.py/__openerp__.py`)](#manifest-__manifest__py__openerp__py)
+        * [ImportError](#importerror)
+        * [README](#user-content-readme)
+        * [requirements.txt](#requirementstxt)
     * [XML files](#xml-files)
       * [Format](#format)
       * [Records](#records)
       * [Views](#views)
+      * [QWeb](#qweb)
       * [Naming xml_id](#naming-xml_id)
         * [Data Records](#data-records)
         * [Security, View and Action](#security-view-and-action)
         * [Inherited XML](#inherited-xml)
         * [Demo Records](#demo-records)
-      * [External dependencies](#external-dependencies)
-        * [`__openerp__.py`](#__openerp__py)
-        * [ImportError](#importerror)
-        * [README](#user-content-readme)
     * [Python](#python)
       * [PEP8 options](#pep8-options)
       * [Imports](#imports)
@@ -83,7 +86,12 @@ section.
   * Make sure it has the `license` and `images` keys.
   * Make sure the text `,Odoo Community Association (OCA)` is appended
     to the `author` text.
-* Don't use your company logo or your corporate branding. Using the website, the author and the list of contributors is enough for people to know about your employer/company and contact you.
+  * The `website` key must be `https://github.com/OCA/<repo>`,
+    so as to provide the most relevant link to discover more information about the addon.
+    That link shows the repository README. Alternatively `https://github.com/OCA/<repo>/tree/<branch>/<addon>`
+    may be used, to provide a direct link to the addon README, which includes proper credits
+    (authors, contributors and theirs companies), and links to the relevant information on the OCA website.
+* Don't use your company logo or your corporate branding. Using the author and the list of contributors is enough for people to know about your employer/company and contact you.
 
 ### Version numbers
 
@@ -105,6 +113,9 @@ The `x.y.z` version numbers follow the semantics `breaking.feature.fix`:
 If applicable, breaking changes are expected to include instructions
 or scripts to perform migration on current installations.
 
+### Migrations
+
+When you introduce a breaking change, you *must* provide a migration script to make it possible to upgrade from lower versions. For a migration to another major version of Odoo, it's quite probable you'll need a migration script too. In such cases, migration scripts are highly appreciated, but a note in the README about relevant changes needing migration is sufficient too so that later contributors can add migration scripts without having to analyze all changes again.
 
 ### Directories
 
@@ -113,13 +124,14 @@ A module is organized in a few directories:
 * `controllers/`: contains controllers (http routes)
 * `data/`: data xml
 * `demo/`: demo xml
+* `examples/`: external files
+  `lib/`, ...
 * `models/`: model definitions
 * `report/`: reporting models (BI/analysis), Webkit/RML print report templates
 * `static/`: contains the web assets, separated into `css/`, `js/`, `img/`,
-  `lib/`, ...
+* `templates/`: if you have several web templates and several backend views you can split them here
 * `views/`: contains the views and templates, and QWeb report print templates
 * `wizards/`: wizard model and views
-* `examples/`: external files
 
 
 ### File naming
@@ -128,8 +140,8 @@ For `models`, `views` and `data` declarations, split files by the model
 involved, either created or inherited. These files should be named after the
 model. For example, demo data for res.partner should go in a file named
 `demo/res_partner.xml` and a view for partner should go in a file named
-`views/res_partner.xml`. An exception can be made when the model is a 
-model intended to be used only as a one2many model nested on the main 
+`views/res_partner.xml`. An exception can be made when the model is a
+model intended to be used only as a one2many model nested on the main
 model. In this case, you can include the model definition inside it.
 Example `sale.order.line` model can be together with `sale.order` in
 the file `models/sale_order.py`.
@@ -191,6 +203,10 @@ addons/<my_module_name>/
 |   `-- <main_model>.xml
 |-- demo/
 |   `-- <inherited_model>.xml
+|-- migrations/
+|   |-- 8.0.x.y.z/
+|   |   |-- pre_migration.py
+|   |   |-- post_migration.py
 |-- models/
 |   |-- __init__.py
 |   |-- <main_model>.py
@@ -242,6 +258,67 @@ addons/<my_module_name>/
 Filenames should use only `[a-z0-9_]`
 
 Use correct file permissions: folders 755 and files 644.
+
+### External dependencies
+
+#### Manifest (`__manifest__.py/__openerp__.py`)
+If your module uses extra dependencies of python or binaries you should add
+the `external_dependencies` section to `__manifest__.py`/`__openerp__.py`.
+
+```python
+{
+    'name': 'Example Module',
+    ...
+    'external_dependencies': {
+        'bin': [
+            'external_dependency_binary_1',
+            'external_dependency_binary_2',
+            ...
+            'external_dependency_binary_N',
+        ],
+        'python': [
+            'external_dependency_python_1',
+            'external_dependency_python_2',
+            ...
+            'external_dependency_python_N',
+        ],
+    },
+    ...
+    'installable': True,
+}
+```
+
+An entry in `bin` needs to be in `PATH`, check by running
+`which external_dependency_binary_N`.
+
+An entry in `python` needs to be in `PYTHONPATH`, check by running
+`python -c "import external_dependency_python_N"`.
+
+#### ImportError
+In python files where you use external dependencies you will
+need to add `try-except` with a debug log.
+
+```python
+try:
+    import external_dependency_python_N
+    import external_dependency_python_M
+    EXTERNAL_DEPENDENCY_BINARY_N_PATH = tools.find_in_path('external_dependency_binary_N')
+    EXTERNAL_DEPENDENCY_BINARY_M_PATH = tools.find_in_path('external_dependency_binary_M')
+except (ImportError, IOError) as err:
+    _logger.debug(err)
+```
+This rule doesn't apply to the test files since these files are loaded only when
+running tests and in such a case your module and their external dependencies are installed.
+
+#### README
+If your module uses extra dependencies of python or binaries, please explain
+how to install them in the `README.rst` file in the section `Installation`.
+
+#### requirements.txt
+
+As specified in [Repositories](#repositories), you should also define
+the python packages to install in a file `requirements.txt` in the 
+root folder of the repository. This will be used for travis.
 
 ## XML files
 
@@ -304,11 +381,18 @@ More info [here](https://github.com/odoo/odoo/pull/8218)
   deprecated](https://www.odoo.com/documentation/10.0/reference/views.html#lists)
   in favor of `decoration-{$name}`.
 
+### QWeb
+
+* `t-*-options` QWeb directives (`t-field-options`, `t-esc-options` and
+  `t-raw-options`) should not be used in v10 and above, as they are [to be
+  removed](https://github.com/odoo/odoo/blob/8f99b24f6cb1ea70b371e2944ff36b75a6f9c80e/odoo/addons/base/ir/ir_qweb/ir_qweb.py#L155)
+  after version 10.
+
 ### Naming xml_id
 
 #### Data Records
 
-Use the followng pattern, where `<model_name>` is the name of the model that 
+Use the followng pattern, where `<model_name>` is the name of the model that
 the record is an instance of: `<model_name>_<record_name>`
 
 ```xml
@@ -319,8 +403,8 @@ the record is an instance of: `<model_name>_<record_name>`
 
 #### Security, View and Action
 
-Use the following patterns, where `<model_name>` is the name of the model that 
-the menu, view, etc. belongs to (e.g. for a `res.users` form view, the name 
+Use the following patterns, where `<model_name>` is the name of the model that
+the menu, view, etc. belongs to (e.g. for a `res.users` form view, the name
 would be `res_users_view_form`):
 
 * For a menu: `<model_name>_menu`
@@ -429,62 +513,6 @@ source or reinstalling the module with demo data disabled.
 </record>
 ```
 
-### External dependencies
-
-#### `__openerp__.py`
-If your module uses extra dependencies of python or binaries you should add
-the `external_dependencies` section to `__openerp__.py`.
-
-```python
-{
-    'name': 'Example Module',
-    ...
-    'external_dependencies': {
-        'bin': [
-            'external_dependency_binary_1',
-            'external_dependency_binary_2',
-            ...
-            'external_dependency_binary_N',
-        ],
-        'python': [
-            'external_dependency_python_1',
-            'external_dependency_python_2',
-            ...
-            'external_dependency_python_N',
-        ],
-    },
-    ...
-    'installable': True,
-}
-```
-
-An entry in `bin` needs to be in `PATH`, check by running
-`which external_dependency_binary_N`.
-
-An entry in `python` needs to be in `PYTHONPATH`, check by running
-`python -c "import external_dependency_python_N"`.
-
-#### ImportError
-In python files where you use external dependencies you will
-need to add `try-except` with a debug log.
-
-```python
-try:
-    import external_dependency_python_N
-    import external_dependency_python_M
-    EXTERNAL_DEPENDENCY_BINARY_N_PATH = tools.find_in_path('external_dependency_binary_N')
-    EXTERNAL_DEPENDENCY_BINARY_M_PATH = tools.find_in_path('external_dependency_binary_M')
-except (ImportError, IOError) as err:
-    _logger.debug(err)
-```
-This rule doesn't apply to the test files since these files are loaded only when
-running tests and in such a case your module and their external dependencies are installed.
-
-#### README
-If your module uses extra dependencies of python or binaries, please explain
-how to install them in the `README.rst` file in the section `Installation`.
-
-
 ## Python
 
 ### PEP8 options
@@ -547,8 +575,10 @@ except ImportError:
 
 ### Idioms
 
-* Each python file should have
-  ``# coding: utf-8`` or ``# -*- coding: utf-8 -*-`` as first line
+* For Python 2 (Odoo < 11.0), all python files should contain
+  ``# coding: utf-8`` or ``# -*- coding: utf-8 -*-`` as first line.
+* For Python 3 (Odoo >= 11.0), no need for utf-8 coding line as this is
+  implicit.
 * Prefer `%` over `.format()`, prefer `%(varname)` instead of positional.
   This is better for translation and clarity.
 * Always favor **Readability** over **conciseness** or using the language
@@ -883,7 +913,7 @@ class Event(models.Model):
   ```python
     try:
         sentences
-    except:
+    except Exception:
         _logger.debug('Why the exception is safe....', exc_info=1))
   ```
 
@@ -933,7 +963,7 @@ environment will be very similar to Travis. You can do this by running:
 ssh -p [port] -L 18080:localhost:18069 odoo@runbot[1 or 2].odoo-community.org
 ```
 
-The correct Runbot subdomain can be found by checking the info on 
+The correct Runbot subdomain can be found by checking the info on
 https://runbot.odoo-community.org/runbot for your particular repo and branch.
 The port can also be found there by clicking on the gear icon next to the
 relevant Runbot instance and adding 1 to the port number in the dropdown.
@@ -1099,7 +1129,7 @@ Pull requests can be closed if:
 * Project name for connectors is "connector-magento" for Magento connector
 
 #### Branch configuration
-Python packages to install, must be preferably, define in requirements.txt than travis.yml file. 
+Python packages to install, must be preferably, define in requirements.txt than travis.yml file.
 Requirements.txt avoid to repeat packages in all travis.yml files of repositories in case of using with oca_dependencies.txt file.
 
 ### Issues

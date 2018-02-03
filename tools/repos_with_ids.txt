@@ -61,7 +61,6 @@
 95|github.com/OCA/account-invoicing
 112|github.com/OCA/department
 128|github.com/OCA/management-system
-170|github.com/OCA/connector-rt
 143|github.com/OCA/reporting-engine
 153|github.com/OCA/stock-logistics-warehouse
 145|github.com/OCA/rma
@@ -134,3 +133,13 @@
 237|github.com/OCA/l10n-vietnam
 238|github.com/OCA/l10n-thailand
 239|github.com/OCA/vertical-realstate
+240|github.com/OCA/maintenance
+248|github.com/OCA/mis-builder
+249|github.com/OCA/apps-store
+250|github.com/OCA/server-ux
+251|github.com/OCA/server-auth
+252|github.com/OCA/server-brand
+253|github.com/OCA/server-backend
+254|github.com/OCA/server-env
+255|github.com/OCA/ddmrp
+256|github.com/OCA/project-agile

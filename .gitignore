@@ -45,6 +45,15 @@ coverage.xml
 # Pycharm
 .idea
 
+# Eclipse
+.settings
+
+# Visual Studio cache/options directory
+.vs/
+
+# OSX Files
+.DS_Store
+
 # Django stuff:
 *.log
 
