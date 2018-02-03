@@ -9,8 +9,8 @@ from . config import read_config, write_config
 
 
 ODOO_URL = 'https://odoo10.odoo-community.org'
-# ODOO_DB = 'openerp_oca_prod'
-ODOO_DB = 'odoo_community_v10' 
+ODOO_DB = 'odoo_community_v10'
+
 
 def login(username, store):
     config = read_config()

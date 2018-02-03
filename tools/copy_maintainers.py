@@ -104,9 +104,15 @@ def copy_users(odoo, team=None, dry_run=False):
         keep_logins = logins.intersection(current_logins)
         remove_logins = current_logins - logins
         add_logins = logins - current_logins
-        print("Add   ", colors.GREEN + ', '.join(l.encode('utf-8') for l in add_logins) + colors.ENDC)
+        print("Add   ", (colors.GREEN +
+                         ', '.join(l.encode('utf-8')
+                                   for l in add_logins) +
+                         colors.ENDC))
         print("Keep  ", ', '.join(l.encode('utf-8') for l in keep_logins))
-        print("Remove", colors.FAIL + ', '.join(l.encode('utf-8') for l in remove_logins) + colors.ENDC)
+        print("Remove", (colors.FAIL +
+                         ', '.join(l.encode('utf-8')
+                                   for l in remove_logins) +
+                         colors.ENDC))
         if not dry_run:
             for login in add_logins:
                 try:
@@ -124,7 +130,9 @@ def copy_users(odoo, team=None, dry_run=False):
     if no_github_login:
         print()
         print(u'Following users miss GitHub login:')
-        print(colors.FAIL + '\n'.join(user.encode('utf-8') for user in no_github_login) +
+        print(colors.FAIL +
+              '\n'.join(user.encode('utf-8')
+                        for user in no_github_login) +
               colors.ENDC)
 
     if not_found:
