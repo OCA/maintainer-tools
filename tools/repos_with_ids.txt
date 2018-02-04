@@ -143,3 +143,4 @@
 254|github.com/OCA/server-env
 255|github.com/OCA/ddmrp
 256|github.com/OCA/project-agile
+257|github.com/OCA/l10n-japan
