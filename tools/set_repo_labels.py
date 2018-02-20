@@ -25,6 +25,7 @@ all_labels = {
     'approved': '045509',
     'work in progress': '0052cc',
     'wontfix': 'ffffff',
+    'migration': 'd4c5f9',
     }
 
 
