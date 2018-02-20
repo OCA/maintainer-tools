@@ -38,7 +38,7 @@ def get_cla_project(odoo):
     Partner = odoo.model('res.partner')
     domain = [('github_login', '!=', False),
               '|',
-              ('category_id.name', 'in', ('ICLA', 'ECLA')),
+              ('category_id.name', 'in', ('ECLA', 'ICLA')),
               ('parent_id.category_id.name', '=', 'ECLA')]
     members = Partner.browse(domain)
     return FakeProject('OCA Contributors', members)
@@ -158,13 +158,15 @@ def copy_users(odoo, team=None, dry_run=False):
 
     if no_github_login:
         print()
-        print('Following users miss GitHub login:')
-        print(colors.FAIL + '\n'.join(user for user in no_github_login) +
+        print(u'Following users miss GitHub login:')
+        print(colors.FAIL +
+              '\n'.join(user.encode('utf-8')
+                        for user in no_github_login) +
               colors.ENDC)
 
     if not_found:
         print()
-        print('The following odoo projects have no team in GitHub:')
+        print(u'The following Odoo projects have no team in GitHub:')
         for project in not_found:
             print(project.name)
 
