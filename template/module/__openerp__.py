@@ -31,6 +31,7 @@
         "wizards/wizard_model_view.xml",
     ],
     "demo": [
+        "demo/assets.xml",
         "demo/res_partner_demo.xml",
     ],
     "qweb": [
