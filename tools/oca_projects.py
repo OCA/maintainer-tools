@@ -27,6 +27,7 @@ OCA_PROJECTS = {
                    'operating-unit',
                    'intrastat',
                    'mis-builder',
+                   'currency',
                    ],
     # 'backport': ['OCB',
     #              ],
