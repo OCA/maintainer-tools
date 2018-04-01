@@ -144,3 +144,4 @@
 255|github.com/OCA/ddmrp
 256|github.com/OCA/project-agile
 257|github.com/OCA/l10n-japan
+260|github.com/OCA/connector-infor
