@@ -34,6 +34,7 @@
 
 <template id="assets_editor" inherit_id="website.assets_editor">
     <xpath expr=".">
+        <!-- If tour is only for testing, better add it in demo/assets.xml -->
         <script type="text/javascript"
                 src="/module/static/src/js/module_name.tour.js"/>
     </xpath>
