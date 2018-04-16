@@ -1,3 +1,4 @@
+appdirs
 ERPpeek==1.6.1
 PyYAML==3.11
 argparse==1.2.1
