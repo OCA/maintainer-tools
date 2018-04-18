@@ -317,7 +317,7 @@ how to install them in the `README.rst` file in the section `Installation`.
 #### requirements.txt
 
 As specified in [Repositories](#repositories), you should also define
-the python packages to install in a file `requirements.txt` in the 
+the python packages to install in a file `requirements.txt` in the
 root folder of the repository. This will be used for travis.
 
 ## XML files
@@ -1135,6 +1135,26 @@ Requirements.txt avoid to repeat packages in all travis.yml files of repositorie
 ### Issues
 
 * Issues are used for blueprints and bugs.
+
+#### How to report ECMAScript logs
+
+If you are reporting some client-side failure and you include client-side logs,
+**you must enable the developer mode with assets before you paste the logs**:
+
+* In Odoo >= 10.0: Go to *Settings > Activate the developer mode (with
+  assets)*.
+* In Odoo < 10.0: Click on your user menu (top right corner) > *About >
+  Activate the developer mode*.
+
+Otherwise, your logs would come from the compressed version of the ECMAScript
+(a.k.a. JavaScript) sources, which means they would be **completely useless**.
+
+Then, you can paste the logs. Just remember to wrap them between
+triple-backtick blocks, like here:
+
+    ```
+    (pasted logs)
+    ```
 
 ## Differences With Odoo Guidelines
 
