@@ -63,9 +63,12 @@ def main():
                         r = call(['git', 'diff', '--exit-code', 'README.md'],
                                  raise_on_error=False)
                         if r != 0:
-                            call(['git', 'commit',
-                                  '-m', '[UPD] addons table in README.md',
-                                  'README.md'])
+                            call([
+                                'git', 'commit',
+                                '-m',
+                                '[UPD] addons table in README.md [ci skip]',
+                                'README.md',
+                            ])
                             call(['git', 'push', 'origin', branch])
                     except NonFatalError:
                         logging.exception("Non fatal error in %s", repo,
