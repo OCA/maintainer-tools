@@ -255,13 +255,12 @@ def temporary_clone(project_name, branch, protocol='git', org_name='OCA'):
     branches = [b.strip() for b in branches.split()]
     if branch not in branches:
         raise BranchNotFoundError()
-    # shallow clone to temp dir, with --reference to cache
+    # clone to temp dir, with --reference to cache
     tempdir = tempfile.mkdtemp()
     try:
         clone_cmd = [
             'git', 'clone', '--quiet',
             '--reference', repo_cache_dir,
-            '--depth=10',
             '--branch', branch,
             '--',
             repo_url,
