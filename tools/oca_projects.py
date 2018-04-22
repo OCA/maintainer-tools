@@ -184,24 +184,48 @@ OCA_PROJECTS = {
 }
 
 
+NOT_ADDONS = {
+    'odoo-community.org',
+    'contribute-md-template',
+    'maintainer-tools',
+    'maintainer-quality-tools',
+    'odoo-sphinx-autodoc',
+    'openupgradelib',
+    'connector-magento-php-extension',
+    'OCB',
+    'OpenUpgrade',
+    'pylint-odoo',
+    'oca-custom',
+}
+
+
+BRANCHES = (
+    '6.1',
+    '7.0',
+    '8.0',
+    '9.0',
+    '10.0',
+    '11.0',
+)
+
+
 def get_repositories():
-    ignored = {
-        'odoo-community.org',
-        'contribute-md-template',
-        'maintainer-tools',
-        'maintainer-quality-tools',
-        'odoo-sphinx-autodoc',
-        'openupgradelib',
-        'connector-magento-php-extension',
-        'OCB',
-        'OpenUpgrade',
-        'pylint-odoo',
-        'oca-custom',
-    }
     gh = login()
     all_repos = [repo.name for repo in gh.iter_user_repos('OCA')
-                 if repo.name not in ignored]
+                 if repo.name not in NOT_ADDONS]
     return all_repos
+
+
+def get_repositories_and_branches(branches=BRANCHES):
+    gh = login()
+    for repo in gh.iter_user_repos('OCA'):
+        if repo.name in NOT_ADDONS:
+            continue
+        for branch in repo.iter_branches():
+            if branches and branch.name not in branches:
+                continue
+            yield repo.name, branch.name
+
 
 try:
     OCA_REPOSITORY_NAMES = get_repositories()
