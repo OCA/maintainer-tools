@@ -12,7 +12,7 @@ slumber
 polib
 wheel
 twine
-setuptools-odoo>=2.0.4
+setuptools-odoo>=2.1
 click
 # https://github.com/odoo/odoo/pull/15718
 setuptools<31
