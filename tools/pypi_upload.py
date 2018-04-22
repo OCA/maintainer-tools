@@ -112,7 +112,7 @@ class OcaPypi(object):
         for distfilename in distfilenames:
             if os.path.isfile(distfilename) and \
                     (distfilename.lower().endswith('.whl') or
-                     distfilename.lower().endswith('.tar.gz')):
+                     distfilename.lower().endswith('.tar.gzXXX')):
                 to_upload.append(distfilename)
             else:
                 _logger.warn("skipped %s: not a python distribution",
