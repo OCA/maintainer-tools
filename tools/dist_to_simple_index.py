@@ -67,6 +67,7 @@ def dist_to_simple_index(target, setup_dirs, python=sys.executable):
                     "silently ignored. Distributions that already exist in "
                     "the target directory are never overwritten.")
 @click.option('--target', required=True,
+              type=click.Path(dir_okay=True, file_okay=False, exists=True),
               help="Root of a PEP 503 directory structure.")
 @click.option('--python', '-p',
               default=sys.executable, show_default=True,

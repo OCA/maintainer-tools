@@ -24,6 +24,7 @@ from .dist_to_simple_index import dist_to_simple_index
 
 @click.command()
 @click.option('--target', required=True,
+              type=click.Path(dir_okay=True, file_okay=False, exists=True),
               help="Root of a PEP 503 directory structure.")
 @click.option('--push/--no-push',
               help="Git push changes made to setup directories.")
