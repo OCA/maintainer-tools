@@ -51,7 +51,7 @@ def dist_to_simple_index(target, setup_dirs, python=sys.executable):
             # --ignore-existing: never overwrite an existing package
             # os.path.join: make sure directory names end with /
             subprocess.check_call([
-                'rsync', '-av', '--ignore-existing',
+                'rsync', '-v', '--ignore-existing',
                 os.path.join(dist_dir, ''),
                 os.path.join(target, pkgname, ''),
             ])
