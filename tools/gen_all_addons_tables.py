@@ -13,13 +13,7 @@ import os
 import subprocess
 import sys
 
-
-from .oca_projects import (
-    OCA_REPOSITORY_NAMES, BranchNotFoundError, temporary_clone,
-)
-
-
-BRANCHES = ['8.0', '9.0', '10.0', '11.0']
+from .oca_projects import get_repositories_and_branches, temporary_clone
 
 
 class FatalError(RuntimeError):
@@ -47,34 +41,30 @@ def call(cmd, cwd='.', raise_on_error=True, raise_fatal_error=True,
 
 
 def main():
-    for repo in OCA_REPOSITORY_NAMES:
-        for branch in BRANCHES:
+    for repo, branch in get_repositories_and_branches():
+        with temporary_clone(repo, branch):
+            sys.stderr.write(
+                "============> updating addons table in %s@%s\n" %
+                (repo, branch)
+            )
             try:
-                with temporary_clone(repo, branch):
-                    sys.stderr.write(
-                        "============> updating addons table in %s@%s\n" %
-                        (repo, branch)
-                    )
-                    try:
-                        if not os.path.isfile('README.md'):
-                            continue
-                        call(['oca-gen-addons-table'],
-                             raise_fatal_error=False)
-                        r = call(['git', 'diff', '--exit-code', 'README.md'],
-                                 raise_on_error=False)
-                        if r != 0:
-                            call([
-                                'git', 'commit',
-                                '-m',
-                                '[UPD] addons table in README.md [ci skip]',
-                                'README.md',
-                            ])
-                            call(['git', 'push', 'origin', branch])
-                    except NonFatalError:
-                        logging.exception("Non fatal error in %s", repo,
-                                          exc_info=True)
-            except BranchNotFoundError:
-                pass  # noqa
+                if not os.path.isfile('README.md'):
+                    continue
+                call(['oca-gen-addons-table'],
+                     raise_fatal_error=False)
+                r = call(['git', 'diff', '--exit-code', 'README.md'],
+                         raise_on_error=False)
+                if r != 0:
+                    call([
+                        'git', 'commit',
+                        '-m',
+                        '[UPD] addons table in README.md [ci skip]',
+                        'README.md',
+                    ])
+                    call(['git', 'push', 'origin', branch])
+            except NonFatalError:
+                logging.exception("Non fatal error in %s", repo,
+                                  exc_info=True)
 
 
 if __name__ == '__main__':
