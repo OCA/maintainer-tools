@@ -8,16 +8,6 @@ import tempfile
 import click
 
 
-@contextlib.contextmanager
-def changedir(d):
-    cwd = os.getcwd()
-    os.chdir(d)
-    try:
-        yield
-    finally:
-        os.chdir(cwd)
-
-
 def find_pkgname(dist_dir):
     """ Find the package name by looking at .whl files """
     pkgname = None
@@ -40,13 +30,12 @@ def dist_to_simple_index(target, setup_dirs, python=sys.executable):
             continue
         dist_dir = tempfile.mkdtemp()
         try:
-            with changedir(setup_dir):
-                subprocess.check_call([
-                    python, 'setup.py',
-                    'clean',
-                    'sdist', '--dist-dir', dist_dir,
-                    'bdist_wheel', '--dist-dir', dist_dir,
-                ])
+            subprocess.check_call([
+                python, 'setup.py',
+                'clean',
+                'sdist', '--dist-dir', dist_dir,
+                'bdist_wheel', '--dist-dir', dist_dir,
+            ], cwd=setup_dir)
             pkgname = find_pkgname(dist_dir)
             # --ignore-existing: never overwrite an existing package
             # os.path.join: make sure directory names end with /
