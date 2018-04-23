@@ -115,8 +115,8 @@ class OcaPypi(object):
                      distfilename.lower().endswith('.tar.gzXXX')):
                 to_upload.append(distfilename)
             else:
-                _logger.warn("skipped %s: not a python distribution",
-                             distfilename)
+                _logger.debug("skipped %s: not a python distribution",
+                              distfilename)
         with contextlib.closing(dumbdbm.open(self.cache, 'c')) as dbm:
             for distfilename in sorted(to_upload, key=_split_filename):
                 self.upload_dist(distfilename, dbm)
