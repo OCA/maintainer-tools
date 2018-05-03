@@ -37,12 +37,15 @@ def dist_to_simple_index(target, setup_dirs, python=sys.executable):
                 'bdist_wheel', '--dist-dir', dist_dir,
             ], cwd=setup_dir)
             pkgname = find_pkgname(dist_dir)
+            fulltarget = os.path.join(target, pkgname, '')
+            if not os.path.isdir(fulltarget):
+                os.mkdir(fulltarget)
             # --ignore-existing: never overwrite an existing package
             # os.path.join: make sure directory names end with /
             subprocess.check_call([
                 'rsync', '-rv', '--ignore-existing',
                 os.path.join(dist_dir, ''),
-                os.path.join(target, pkgname, ''),
+                fulltarget,
             ])
         finally:
             shutil.rmtree(dist_dir)
