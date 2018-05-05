@@ -91,6 +91,15 @@ def gen_one_addon_readme(repo_name, branch, addon_dir, manifest):
     if development_status in DEVELOPMENT_STATUS_BADGES:
         badges.append(DEVELOPMENT_STATUS_BADGES[development_status])
     badges.append(make_runbot_badge(runbot_id, branch))
+    authors = [
+        a.strip()
+        for a in manifest.get('author', '').split(',')
+        if '(OCA)' not in a
+        # remove OCA because it's in authors for the purpose
+        # of finding OCA addons in apps.odoo.com, OCA is not
+        # a real author, but is rather referenced in the
+        # maintainers section
+    ]
     # generate
     template_filename = \
         os.path.join(os.path.dirname(__file__), 'gen_addon_readme.template')
@@ -100,6 +109,7 @@ def gen_one_addon_readme(repo_name, branch, addon_dir, manifest):
         template = Template(tf.read())
     with io.open(readme_filename, 'w', encoding='utf8') as rf:
         rf.write(template.render(
+            authors=authors,
             badges=badges,
             branch=branch,
             fragments=fragments,

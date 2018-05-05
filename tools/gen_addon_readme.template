@@ -41,6 +41,15 @@ Bugs are tracked on `GitHub Issues <https://github.com/OCA/{{ repo_name }}/issue
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us smashing it by providing a detailed and welcomed feedback.
 
+{% if authors -%}
+Authors
+=======
+
+{% for author in authors -%}
+* {{ author }}
+{% endfor %}
+{% endif -%}
+
 {{ fragment('CONTRIBUTORS', 'Contributors') }}
 {{- fragment('CREDITS', 'Credits') -}}
 Maintainers
