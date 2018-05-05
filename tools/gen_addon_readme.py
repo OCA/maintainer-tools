@@ -5,8 +5,9 @@ import os
 import click
 from jinja2 import Template
 
+from .gitutils import commit_if_needed
+from .manifest import read_manifest, find_addons, NoManifestFound
 from .runbot_ids import get_runbot_ids
-from .manifest import read_manifest
 
 
 FRAGMENTS = (
@@ -74,15 +75,7 @@ def make_runbot_badge(runbot_id, branch):
     )
 
 
-@click.command()
-@click.option('--repo-name', required=True)
-@click.option('--branch', required=True)
-@click.option('--addon-dir',
-              type=click.Path(dir_okay=True, file_okay=False, exists=True),
-              default='.',
-              show_default=True)
-def gen_addon_readme(repo_name, branch, addon_dir):
-    """ Generate README.rst from fragments """
+def gen_one_addon_readme(repo_name, branch, addon_dir, manifest):
     fragments = {}
     for fragment_name in FRAGMENTS:
         fragment_filename = os.path.join(addon_dir, fragment_name + '.rst')
@@ -90,7 +83,6 @@ def gen_addon_readme(repo_name, branch, addon_dir):
             with io.open(fragment_filename, 'rU', encoding='utf8') as f:
                 fragments[fragment_name] = f.read()
     runbot_id = get_runbot_ids()[repo_name]
-    manifest = read_manifest(addon_dir)
     badges = []
     license = manifest.get('license')
     if license in LICENSE_BADGES:
@@ -99,7 +91,6 @@ def gen_addon_readme(repo_name, branch, addon_dir):
     if development_status in DEVELOPMENT_STATUS_BADGES:
         badges.append(DEVELOPMENT_STATUS_BADGES[development_status])
     badges.append(make_runbot_badge(runbot_id, branch))
-    # TODO manifest maintainers key
     # generate
     template_filename = \
         os.path.join(os.path.dirname(__file__), 'gen_addon_readme.template')
@@ -116,6 +107,37 @@ def gen_addon_readme(repo_name, branch, addon_dir):
             repo_name=repo_name,
             runbot_id=runbot_id,
         ))
+    return readme_filename
+
+
+@click.command()
+@click.option('--repo-name', required=True)
+@click.option('--branch', required=True)
+@click.option('--addon-dir', 'addon_dirs',
+              type=click.Path(dir_okay=True, file_okay=False, exists=True),
+              multiple=True)
+@click.option('--addons-dir',
+              type=click.Path(dir_okay=True, file_okay=False, exists=True))
+@click.option('--commit/--no-commit')
+def gen_addon_readme(repo_name, branch, addon_dirs, addons_dir, commit):
+    """ Generate README.rst from fragments """
+    addon_dirs = list(addon_dirs)
+    if addons_dir:
+        for _, addon_dir, _ in find_addons(addons_dir):
+            addon_dirs.append(addon_dir)
+    readme_filenames = []
+    for addon_dir in addon_dirs:
+        try:
+            manifest = read_manifest(addon_dir)
+        except NoManifestFound:
+            continue
+        if not os.path.exists(os.path.join(addon_dir, 'DESCRIPTION.rst')):
+            continue
+        readme_filename = gen_one_addon_readme(
+            repo_name, branch, addon_dir, manifest)
+        readme_filenames.append(readme_filename)
+    if commit:
+        commit_if_needed(readme_filenames, '[UPD] README.rst')
 
 
 if __name__ == '__main__':
