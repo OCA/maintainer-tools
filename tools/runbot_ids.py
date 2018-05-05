@@ -21,4 +21,3 @@ def get_runbot_ids():
         repo_name = mo.group('repo_name')
         res[repo_name] = repo_id
     return res
-
