@@ -1,10 +1,11 @@
-import dumbdbm
 import contextlib
+import dumbdbm
 import logging
 import os
 import subprocess
-from wheel.install import WheelFile
 from ConfigParser import RawConfigParser
+
+from wheel.install import WheelFile
 from pkg_resources import parse_version
 
 import click
@@ -15,11 +16,34 @@ _logger = logging.getLogger(__name__)
 REGISTER_RETRY = 2
 
 
-def _split_wheelfilename(wheelfilename):
-    wheelfile = WheelFile(wheelfilename)
-    package_name = wheelfile.parsed_filename.group('name')
+def _split_filename(filename):
+    """ Split a .whl or .tar.gz distribution file name
+    into a (package_name, version) tuple
+
+    >>> _split_filename('abc-1.1.tar.gz')
+    ('abc', <Version('1.1')>)
+    >>> _split_filename('dir/abc-1.1.tar.gz')
+    ('abc', <Version('1.1')>)
+    >>> _split_filename('a_bc-1.1.tar.gz')
+    ('a-bc', <Version('1.1')>)
+    >>> _split_filename('a_b-c-1.1.tar.gz')
+    ('a-b-c', <Version('1.1')>)
+    >>> _split_filename('mis_builder-3.1.1.99.dev17-py2-none-any.whl')
+    ('mis-builder', <Version('3.1.1.99.dev17')>)
+    >>> _split_filename('a/b/mis_builder-3.1.1.99.dev17-py2-none-any.whl')
+    ('mis-builder', <Version('3.1.1.99.dev17')>)
+    """
+    basename = os.path.basename(filename)
+    if basename.endswith('.whl'):
+        wheelfile = WheelFile(basename)
+        package_name = wheelfile.parsed_filename.group('name')
+        package_ver = wheelfile.parsed_filename.group('ver')
+    elif basename.endswith('.tar.gz'):
+        package_ver = basename.split('-')[-1][:-7]
+        package_name = basename[:-(len(package_ver) + 8)]
+    else:
+        raise RuntimeError("Unrecognized file type %s" % (filename,))
     package_name = package_name.replace('_', '-')
-    package_ver = wheelfile.parsed_filename.group('ver')
     package_ver = parse_version(package_ver)
     return package_name, package_ver
 
@@ -41,8 +65,8 @@ class OcaPypi(object):
         self.cache = cache
         self.dryrun = dryrun
 
-    def _make_key(self, wheelfilename):
-        return str(self.repository_url + '#' + os.path.basename(wheelfilename))
+    def _make_key(self, distfilename):
+        return str(self.repository_url + '#' + os.path.basename(distfilename))
 
     def _key_match(self, key):
         return key.startswith(self.repository_url + '#')
@@ -50,9 +74,9 @@ class OcaPypi(object):
     def _key_to_wheel(self, key):
         return key[len(self.repository_url) + 1:]
 
-    def _upload(self, wheelfilename):
+    def _upload(self, distfilename):
         cmd = ['twine', 'upload', '--config-file', self.pypirc,
-               '-r', self.repository, '--skip-existing', wheelfilename]
+               '-r', self.repository, '--skip-existing', distfilename]
         if not self.dryrun:
             try:
                 subprocess.check_output(cmd, stderr=subprocess.STDOUT)
@@ -64,34 +88,38 @@ class OcaPypi(object):
         else:
             _logger.info("dryrun: %s", cmd)
 
-    def upload_wheel(self, wheelfilename, dbm):
-        key = self._make_key(wheelfilename)
+    def upload_dist(self, distfilename, dbm):
+        key = self._make_key(distfilename)
         if key in dbm:
             value = dbm[key]
             detail = '' if not value else ' (with error)'
             _logger.debug("skipped %s: found in cache%s",
-                          wheelfilename, detail)
+                          distfilename, detail)
             return
         _logger.info("uploading %s to %s",
-                     wheelfilename, self.repository)
-        r = self._upload(wheelfilename)
+                     distfilename, self.repository)
+        r = self._upload(distfilename)
         if r:
             _logger.error("uploading %s to %s failed: %s",
-                          wheelfilename, self.repository, r)
+                          distfilename, self.repository, r)
         if not self.dryrun:
             dbm[key] = r or ''
+        else:
+            _logger.info("dryrun: caching %s: %s", key, (r or ''))
 
-    def upload_wheels(self, wheelfilenames):
+    def upload_dists(self, distfilenames):
         to_upload = []
-        for wheelfilename in wheelfilenames:
-            if os.path.isfile(wheelfilename) and \
-                    wheelfilename.lower().endswith('.whl'):
-                to_upload.append(wheelfilename)
+        for distfilename in distfilenames:
+            if os.path.isfile(distfilename) and \
+                    (distfilename.lower().endswith('.whl') or
+                     distfilename.lower().endswith('.tar.gzXXX')):
+                to_upload.append(distfilename)
             else:
-                _logger.warn("skipped %s: not a wheel file", wheelfilename)
+                _logger.debug("skipped %s: not a python distribution",
+                              distfilename)
         with contextlib.closing(dumbdbm.open(self.cache, 'c')) as dbm:
-            for wheelfilename in sorted(to_upload, key=_split_wheelfilename):
-                self.upload_wheel(wheelfilename, dbm)
+            for distfilename in sorted(to_upload, key=_split_filename):
+                self.upload_dist(distfilename, dbm)
 
     def cache_print_errors(self):
         with contextlib.closing(dumbdbm.open(self.cache, 'r')) as dbm:
@@ -102,11 +130,11 @@ class OcaPypi(object):
                     wheel = self._key_to_wheel(key)
                     click.echo(u"{}: {}".format(wheel, value))
 
-    def cache_rm_wheels(self, wheelfilenames):
+    def cache_rm(self, distfilenames):
         with contextlib.closing(dumbdbm.open(self.cache, 'w')) as dbm:
-            for wheelfilename in wheelfilenames:
-                wheelfilename = os.path.basename(wheelfilename)
-                key = self._make_key(wheelfilename)
+            for distfilename in distfilenames:
+                distfilename = os.path.basename(distfilename)
+                key = self._make_key(distfilename)
                 if key in dbm:
                     del dbm[key]
 
@@ -134,10 +162,20 @@ def cli(ctx, pypirc, repository, cache, dryrun, debug, quiet):
 
 
 @click.command()
-@click.argument('wheels', nargs=-1)
+@click.argument('dists', nargs=-1)
+@click.option('--dist-dir',
+              help="Directory that is walked recursively to "
+                   "find .whl and .tar.gz files to upload.")
 @click.pass_context
-def upload(ctx, wheels):
-    ctx.obj.upload_wheels(wheels)
+def upload(ctx, dists, dist_dir):
+    if dists:
+        ctx.obj.upload_dists(dists)
+    if dist_dir:
+        for dirpath, _, filenames in os.walk(dist_dir):
+            ctx.obj.upload_dists([
+                os.path.join(dirpath, filename)
+                for filename in filenames
+            ])
 
 
 @click.command()
@@ -147,15 +185,15 @@ def cache_print_errors(ctx):
 
 
 @click.command()
-@click.argument('wheels', nargs=-1)
+@click.argument('dists', nargs=-1)
 @click.pass_context
-def cache_rm_wheels(ctx, wheels):
-    ctx.obj.cache_rm_wheels(wheels)
+def cache_rm(ctx, dists):
+    ctx.obj.cache_rm(dists)
 
 
 cli.add_command(upload)
 cli.add_command(cache_print_errors)
-cli.add_command(cache_rm_wheels)
+cli.add_command(cache_rm)
 
 
 if __name__ == '__main__':

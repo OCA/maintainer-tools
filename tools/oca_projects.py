@@ -9,7 +9,13 @@ https://odoo-community.org/page/List
 OCA_REPOSITORY_NAMES: list of OCA repository names
 
 """
+from contextlib import contextmanager
+import os
+import shutil
+import subprocess
+import tempfile
 
+import appdirs
 from github_login import login
 
 ALL = ['OCA_PROJECTS', 'OCA_REPOSITORY_NAMES', 'url']
@@ -178,24 +184,48 @@ OCA_PROJECTS = {
 }
 
 
+NOT_ADDONS = {
+    'odoo-community.org',
+    'contribute-md-template',
+    'maintainer-tools',
+    'maintainer-quality-tools',
+    'odoo-sphinx-autodoc',
+    'openupgradelib',
+    'connector-magento-php-extension',
+    'OCB',
+    'OpenUpgrade',
+    'pylint-odoo',
+    'oca-custom',
+}
+
+
+BRANCHES = (
+    '6.1',
+    '7.0',
+    '8.0',
+    '9.0',
+    '10.0',
+    '11.0',
+)
+
+
 def get_repositories():
-    ignored = {
-        'odoo-community.org',
-        'contribute-md-template',
-        'maintainer-tools',
-        'maintainer-quality-tools',
-        'odoo-sphinx-autodoc',
-        'openupgradelib',
-        'connector-magento-php-extension',
-        'OCB',
-        'OpenUpgrade',
-        'pylint-odoo',
-        'oca-custom',
-    }
     gh = login()
     all_repos = [repo.name for repo in gh.iter_user_repos('OCA')
-                 if repo.name not in ignored]
+                 if repo.name not in NOT_ADDONS]
     return all_repos
+
+
+def get_repositories_and_branches(branches=BRANCHES):
+    gh = login()
+    for repo in gh.iter_user_repos('OCA'):
+        if repo.name in NOT_ADDONS:
+            continue
+        for branch in repo.iter_branches():
+            if branches and branch.name not in branches:
+                continue
+            yield repo.name, branch.name
+
 
 try:
     OCA_REPOSITORY_NAMES = get_repositories()
@@ -219,3 +249,53 @@ def url(project_name, protocol='git', org_name='OCA'):
     if project_name not in _OCA_REPOSITORY_NAMES:
         raise ValueError('Unknown project', project_name)
     return _URL_MAPPINGS[protocol] % (org_name, project_name)
+
+
+class BranchNotFoundError(RuntimeError):
+    pass
+
+
+@contextmanager
+def temporary_clone(project_name, branch, protocol='git', org_name='OCA'):
+    """ context manager that clones a git branch and cd to it, with cache """
+    # init cache directory
+    cache_dir = appdirs.user_cache_dir('oca-mqt')
+    repo_cache_dir = os.path.join(
+        cache_dir, 'github.com', org_name.lower(), project_name.lower())
+    if not os.path.isdir(repo_cache_dir):
+        os.makedirs(repo_cache_dir)
+        subprocess.check_call(['git', 'init', '--bare'], cwd=repo_cache_dir)
+    repo_url = url(project_name, protocol, org_name)
+    # fetch all branches into cache
+    fetch_cmd = [
+        'git', 'fetch', '--quiet',
+        repo_url,
+        'refs/heads/*:refs/heads/*',
+    ]
+    subprocess.check_call(fetch_cmd, cwd=repo_cache_dir)
+    # check if branch exist
+    branches = subprocess.check_output(
+        ['git', 'branch'], universal_newlines=True, cwd=repo_cache_dir)
+    branches = [b.strip() for b in branches.split()]
+    if branch not in branches:
+        raise BranchNotFoundError()
+    # clone to temp dir, with --reference to cache
+    tempdir = tempfile.mkdtemp()
+    try:
+        clone_cmd = [
+            'git', 'clone', '--quiet',
+            '--reference', repo_cache_dir,
+            '--branch', branch,
+            '--',
+            repo_url,
+            tempdir,
+        ]
+        subprocess.check_call(clone_cmd)
+        cwd = os.getcwd()
+        os.chdir(tempdir)
+        try:
+            yield
+        finally:
+            os.chdir(cwd)
+    finally:
+        shutil.rmtree(tempdir)

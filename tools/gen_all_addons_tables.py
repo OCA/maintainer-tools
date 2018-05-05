@@ -13,8 +13,7 @@ import os
 import subprocess
 import sys
 
-
-BRANCHES = ['8.0', '9.0', '10.0', '11.0']
+from .oca_projects import get_repositories_and_branches, temporary_clone
 
 
 class FatalError(RuntimeError):
@@ -25,7 +24,8 @@ class NonFatalError(RuntimeError):
     pass
 
 
-def call(cmd, cwd, raise_on_error=True, raise_fatal_error=True, shell=False):
+def call(cmd, cwd='.', raise_on_error=True, raise_fatal_error=True,
+         shell=False):
     r = subprocess.call(cmd, cwd=cwd, shell=shell)
     if r != 0 and raise_on_error:
         if not shell:
@@ -41,30 +41,30 @@ def call(cmd, cwd, raise_on_error=True, raise_fatal_error=True, shell=False):
 
 
 def main():
-    call(['oca-clone-everything', '--remove-old-repos'], cwd='.')
-    for d in sorted(os.listdir('.')):
-        if not os.path.isdir(os.path.join(d, '.git')):
-            continue
-        sys.stderr.write("============> updating addons table in %s\n" % d)
-        for branch in BRANCHES:
+    for repo, branch in get_repositories_and_branches():
+        with temporary_clone(repo, branch):
+            sys.stderr.write(
+                "============> updating addons table in %s@%s\n" %
+                (repo, branch)
+            )
             try:
-                call(['git', 'checkout', branch], cwd=d,
-                     raise_fatal_error=False)
-                call(['git', 'reset', '--hard', 'origin/' + branch], cwd=d)
-                if not os.path.isfile(os.path.join(d, 'README.md')):
+                if not os.path.isfile('README.md'):
                     continue
-                call(['oca-gen-addons-table'], cwd=d,
+                call(['oca-gen-addons-table'],
                      raise_fatal_error=False)
-                r = call(['git', 'diff', '--exit-code', 'README.md'], cwd=d,
+                r = call(['git', 'diff', '--exit-code', 'README.md'],
                          raise_on_error=False)
                 if r != 0:
-                    call(['git', 'commit',
-                          '-m', '[UPD] addons table in README.md',
-                          'README.md'],
-                         cwd=d)
-                    call(['git', 'push', 'origin', branch], cwd=d)
+                    call([
+                        'git', 'commit',
+                        '-m',
+                        '[UPD] addons table in README.md [ci skip]',
+                        'README.md',
+                    ])
+                    call(['git', 'push', 'origin', branch])
             except NonFatalError:
-                logging.exception("Error in %s", d, exc_info=True)
+                logging.exception("Non fatal error in %s", repo,
+                                  exc_info=True)
 
 
 if __name__ == '__main__':
