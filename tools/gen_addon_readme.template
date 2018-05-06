@@ -43,19 +43,22 @@ If you spotted it first, help us smashing it by providing a detailed and welcome
 
 Do not contact contributors directly about support or help with technical issues.
 
+Credits
+=======
+
 {% if authors -%}
 Authors
-=======
+-------
 
 {% for author in authors -%}
 * {{ author }}
 {% endfor %}
 {% endif -%}
 
-{{ fragment('CONTRIBUTORS', 'Contributors') }}
-{{- fragment('CREDITS', 'Credits') -}}
+{{ fragment('CONTRIBUTORS', 'Contributors', sub='-') }}
+{{- fragment('CREDITS', 'Other credits', sub='-') -}}
 Maintainers
-===========
+-----------
 
 This module is maintained by the OCA.
 
