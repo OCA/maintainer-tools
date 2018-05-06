@@ -122,16 +122,28 @@ def gen_one_addon_readme(repo_name, branch, addon_dir, manifest):
 
 
 @click.command()
-@click.option('--repo-name', required=True)
-@click.option('--branch', required=True)
+@click.option('--repo-name', required=True,
+              help="OCA repository name, eg server-tools.")
+@click.option('--branch', required=True,
+              help="Odoo series. eg 11.0.")
 @click.option('--addon-dir', 'addon_dirs',
               type=click.Path(dir_okay=True, file_okay=False, exists=True),
-              multiple=True)
+              multiple=True,
+              help="Directory where addon manifest is located. This option "
+                   "may be repeated.")
 @click.option('--addons-dir',
-              type=click.Path(dir_okay=True, file_okay=False, exists=True))
-@click.option('--commit/--no-commit')
+              type=click.Path(dir_okay=True, file_okay=False, exists=True),
+              help="Directory containing several addons, the README will be "
+                   "generated for all installable addons found there.")
+@click.option('--commit/--no-commit',
+              help="git commit changes to README.rst, if any.")
 def gen_addon_readme(repo_name, branch, addon_dirs, addons_dir, commit):
-    """ Generate README.rst from fragments """
+    """ Generate README.rst from fragments.
+
+    Do nothing if DESCRIPTION.rst is absent, otherwise overwrite
+    existing README.rst with content generated from the template,
+    fragments (DESCRIPTION.rst, USAGE.rst, etc) and the addon manifest.
+    """
     addon_dirs = list(addon_dirs)
     if addons_dir:
         for _, addon_dir, _ in find_addons(addons_dir):
