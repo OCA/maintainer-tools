@@ -1,4 +1,5 @@
-""" Generate addon README.rst from fragments """
+# License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
+# Copyright (c) 2018 ACSONE SA/NV
 import io
 import os
 

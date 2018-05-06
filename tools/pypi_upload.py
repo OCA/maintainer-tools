@@ -1,3 +1,5 @@
+# Copyright (c) 2016-2018 ACSONE SA/NV
+# License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 import contextlib
 import dumbdbm
 import logging
