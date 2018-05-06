@@ -41,6 +41,8 @@ Bugs are tracked on `GitHub Issues <https://github.com/OCA/{{ repo_name }}/issue
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us smashing it by providing a detailed and welcomed feedback.
 
+Do not contact contributors directly about support or help with technical issues.
+
 {% if authors -%}
 Authors
 =======
