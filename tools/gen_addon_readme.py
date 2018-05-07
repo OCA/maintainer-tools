@@ -76,7 +76,7 @@ def make_runbot_badge(runbot_id, branch):
     )
 
 
-def gen_one_addon_readme(repo_name, branch, addon_dir, manifest):
+def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
     fragments = {}
     for fragment_name in FRAGMENTS:
         fragment_filename = os.path.join(addon_dir, fragment_name + '.rst')
@@ -110,6 +110,7 @@ def gen_one_addon_readme(repo_name, branch, addon_dir, manifest):
         template = Template(tf.read())
     with io.open(readme_filename, 'w', encoding='utf8') as rf:
         rf.write(template.render(
+            addon_name=addon_name,
             authors=authors,
             badges=badges,
             branch=branch,
@@ -144,12 +145,15 @@ def gen_addon_readme(repo_name, branch, addon_dirs, addons_dir, commit):
     existing README.rst with content generated from the template,
     fragments (DESCRIPTION.rst, USAGE.rst, etc) and the addon manifest.
     """
-    addon_dirs = list(addon_dirs)
+    addons = []
     if addons_dir:
-        for _, addon_dir, _ in find_addons(addons_dir):
-            addon_dirs.append(addon_dir)
-    readme_filenames = []
+        addons.extend(find_addons(addons_dir))
     for addon_dir in addon_dirs:
+        addon_name = os.path.basename(os.path.abspath(addon_dir))
+        manifest = read_manifest(addon_dir)
+        addons.append((addon_name, addon_dir, manifest))
+    readme_filenames = []
+    for addon_name, addon_dir, manifest in addons:
         try:
             manifest = read_manifest(addon_dir)
         except NoManifestFound:
@@ -157,7 +161,7 @@ def gen_addon_readme(repo_name, branch, addon_dirs, addons_dir, commit):
         if not os.path.exists(os.path.join(addon_dir, 'DESCRIPTION.rst')):
             continue
         readme_filename = gen_one_addon_readme(
-            repo_name, branch, addon_dir, manifest)
+            repo_name, branch, addon_name, addon_dir, manifest)
         readme_filenames.append(readme_filename)
     if commit:
         commit_if_needed(readme_filenames, '[UPD] README.rst')
