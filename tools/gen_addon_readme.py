@@ -25,17 +25,17 @@ FRAGMENTS = (
 
 LICENSE_BADGES = {
     'AGPL-3': (
-        'https://img.shields.io/badge/licence-AGPL--3-blue.svg',
+        'https://img.shields.io/badge/licence-AGPL--3-blue.png',
         'http://www.gnu.org/licenses/agpl-3.0-standalone.html',
         'License: AGPL-3',
     ),
     'LGPL-3': (
-        'https://img.shields.io/badge/licence-LGPL--3-blue.svg',
+        'https://img.shields.io/badge/licence-LGPL--3-blue.png',
         'http://www.gnu.org/licenses/lgpl-3.0-standalone.html',
         'License: LGPL-3',
     ),
     'GPL-3': (
-        'https://img.shields.io/badge/licence-GPL--3-blue.svg',
+        'https://img.shields.io/badge/licence-GPL--3-blue.png',
         'http://www.gnu.org/licenses/gpl-3.0-standalone.html',
         'License: GPL-3',
     ),
@@ -45,22 +45,22 @@ LICENSE_BADGES = {
 
 DEVELOPMENT_STATUS_BADGES = {
     'Mature': (
-        'https://img.shields.io/badge/maturity-Mature-green.svg',
+        'https://img.shields.io/badge/maturity-Mature-green.png',
         None,
         'Mature',
     ),
     'Production/Stable': (
-        'https://img.shields.io/badge/maturity-Production%2FStable-green.svg',
+        'https://img.shields.io/badge/maturity-Production%2FStable-green.png',
         None,
         'Production/Stable',
     ),
     'Beta': (
-        'https://img.shields.io/badge/maturity-Beta-green.svg',
+        'https://img.shields.io/badge/maturity-Beta-green.png',
         None,
         'Beta',
     ),
     'Alpha': (
-        'https://img.shields.io/badge/maturity-Alpha-green.svg',
+        'https://img.shields.io/badge/maturity-Alpha-green.png',
         None,
         'Alpha',
     ),
@@ -69,7 +69,7 @@ DEVELOPMENT_STATUS_BADGES = {
 
 def make_runbot_badge(runbot_id, branch):
     return (
-        'https://img.shields.io/badge/runbot-Try%20me-875A7B.svg',
+        'https://img.shields.io/badge/runbot-Try%20me-875A7B.png',
         'https://runbot.odoo-community.org/runbot/'
         '{runbot_id}/{branch}'.format(**locals()),
         'Try me on Runbot',
