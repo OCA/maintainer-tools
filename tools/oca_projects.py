@@ -34,6 +34,7 @@ OCA_PROJECTS = {
                    'intrastat',
                    'mis-builder',
                    'currency',
+                   'credit-control',
                    ],
     # 'backport': ['OCB',
     #              ],

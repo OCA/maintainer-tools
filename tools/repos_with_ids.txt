@@ -147,3 +147,4 @@
 259|github.com/OCA/currency
 260|github.com/OCA/connector-infor
 261|github.com/OCA/l10n-croatia
+262|github.com/OCA/credit-control
