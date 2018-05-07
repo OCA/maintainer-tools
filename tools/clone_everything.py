@@ -13,7 +13,7 @@ def clone(organization_remotes=None,
         cmd = ['git', 'clone', '--quiet', url(project), project]
         try:
             subprocess.check_call(cmd)
-        except:
+        except Exception:
             cmd = ['git',
                    '--git-dir=' + os.path.join(project, '.git'),
                    'fetch', '--all']
@@ -57,6 +57,7 @@ def main():
     org_remotes = args.org_remotes and args.org_remotes[0] or None
     clone(organization_remotes=org_remotes,
           remove_old_repos=args.remove_old_repos)
+
 
 if __name__ == '__main__':
     main()
