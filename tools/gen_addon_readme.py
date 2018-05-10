@@ -76,6 +76,17 @@ def make_runbot_badge(runbot_id, branch):
     )
 
 
+def make_repo_badge(repo_name, branch, addon_name):
+    badge_repo_name = repo_name.replace('-', '--')
+    return (
+        'https://img.shields.io/badge/github-OCA%2F{badge_repo_name}'
+        '-lightgray.png?logo=github'.format(**locals()),
+        'https://github.com/OCA/{repo_name}/tree/'
+        '{branch}/{addon_name}'.format(**locals()),
+        'OCA/{repo_name}'.format(**locals()),
+    )
+
+
 def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
     fragments = {}
     for fragment_name in FRAGMENTS:
@@ -91,6 +102,7 @@ def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
     development_status = manifest.get('development_status')
     if development_status in DEVELOPMENT_STATUS_BADGES:
         badges.append(DEVELOPMENT_STATUS_BADGES[development_status])
+    badges.append(make_repo_badge(repo_name, branch, addon_name))
     badges.append(make_runbot_badge(runbot_id, branch))
     authors = [
         a.strip()
