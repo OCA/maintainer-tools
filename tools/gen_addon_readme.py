@@ -96,12 +96,12 @@ def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
                 fragments[fragment_name] = f.read()
     runbot_id = get_runbot_ids()[repo_name]
     badges = []
-    license = manifest.get('license')
-    if license in LICENSE_BADGES:
-        badges.append(LICENSE_BADGES[license])
     development_status = manifest.get('development_status')
     if development_status in DEVELOPMENT_STATUS_BADGES:
         badges.append(DEVELOPMENT_STATUS_BADGES[development_status])
+    license = manifest.get('license')
+    if license in LICENSE_BADGES:
+        badges.append(LICENSE_BADGES[license])
     badges.append(make_repo_badge(repo_name, branch, addon_name))
     badges.append(make_runbot_badge(runbot_id, branch))
     authors = [
