@@ -45,7 +45,7 @@ LICENSE_BADGES = {
 
 DEVELOPMENT_STATUS_BADGES = {
     'Mature': (
-        'https://img.shields.io/badge/maturity-Mature-green.png',
+        'https://img.shields.io/badge/maturity-Mature-brightgreen.png',
         None,
         'Mature',
     ),
@@ -55,12 +55,12 @@ DEVELOPMENT_STATUS_BADGES = {
         'Production/Stable',
     ),
     'Beta': (
-        'https://img.shields.io/badge/maturity-Beta-green.png',
+        'https://img.shields.io/badge/maturity-Beta-yellow.png',
         None,
         'Beta',
     ),
     'Alpha': (
-        'https://img.shields.io/badge/maturity-Alpha-green.png',
+        'https://img.shields.io/badge/maturity-Alpha-red.png',
         None,
         'Alpha',
     ),
