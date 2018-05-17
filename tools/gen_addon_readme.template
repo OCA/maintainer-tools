@@ -34,6 +34,7 @@
 {{- fragment('USAGE', 'Usage') }}
 {{- fragment('DEVELOP', 'Development') }}
 {{- fragment('ROADMAP', 'Known issues / Roadmap') -}}
+{{- fragment('HISTORY', 'Changelog') -}}
 Bug Tracker
 ===========
 
@@ -48,17 +49,17 @@ Credits
 
 {% if authors -%}
 Authors
--------
+~~~~~~~
 
 {% for author in authors -%}
 * {{ author }}
 {% endfor %}
 {% endif -%}
 
-{{ fragment('CONTRIBUTORS', 'Contributors', sub='-') }}
-{{- fragment('CREDITS', 'Other credits', sub='-') -}}
+{{ fragment('CONTRIBUTORS', 'Contributors', sub='~') }}
+{{- fragment('CREDITS', 'Other credits', sub='~') -}}
 Maintainers
------------
+~~~~~~~~~~~
 
 This module is maintained by the OCA.
 

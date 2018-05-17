@@ -10,6 +10,7 @@ Please provide content in:
 * **USAGE.rst** (optional, highly recommended)
 * DEVELOP.rst (optional)
 * ROADMAP.rst (optional)
+* HISTORY.rst (optional, recommended)
 * **CONTRIBUTORS.rst** (optional, highly recommended)
 * CREDITS.rst (optional)
 
