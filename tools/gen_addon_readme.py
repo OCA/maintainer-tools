@@ -12,6 +12,8 @@ from .manifest import read_manifest, find_addons, NoManifestFound
 from .runbot_ids import get_runbot_ids
 
 
+FRAGMENTS_DIR = 'readme'
+
 FRAGMENTS = (
     'DESCRIPTION',
     'INSTALL',
@@ -91,7 +93,9 @@ def make_repo_badge(repo_name, branch, addon_name):
 def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
     fragments = {}
     for fragment_name in FRAGMENTS:
-        fragment_filename = os.path.join(addon_dir, fragment_name + '.rst')
+        fragment_filename = os.path.join(
+            addon_dir, FRAGMENTS_DIR, fragment_name + '.rst',
+        )
         if os.path.exists(fragment_filename):
             with io.open(fragment_filename, 'rU', encoding='utf8') as f:
                 fragments[fragment_name] = f.read()
@@ -162,7 +166,7 @@ def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
 def gen_addon_readme(repo_name, branch, addon_dirs, addons_dir, commit):
     """ Generate README.rst from fragments.
 
-    Do nothing if DESCRIPTION.rst is absent, otherwise overwrite
+    Do nothing if readme/DESCRIPTION.rst is absent, otherwise overwrite
     existing README.rst with content generated from the template,
     fragments (DESCRIPTION.rst, USAGE.rst, etc) and the addon manifest.
     """
@@ -179,7 +183,8 @@ def gen_addon_readme(repo_name, branch, addon_dirs, addons_dir, commit):
             manifest = read_manifest(addon_dir)
         except NoManifestFound:
             continue
-        if not os.path.exists(os.path.join(addon_dir, 'DESCRIPTION.rst')):
+        if not os.path.exists(
+                os.path.join(addon_dir, FRAGMENTS_DIR, 'DESCRIPTION.rst')):
             continue
         readme_filename = gen_one_addon_readme(
             repo_name, branch, addon_name, addon_dir, manifest)
