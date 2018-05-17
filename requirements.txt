@@ -15,5 +15,6 @@ twine
 setuptools-odoo>=2.1
 click
 jinja2
+docutils
 # https://github.com/odoo/odoo/pull/15718
 setuptools<31

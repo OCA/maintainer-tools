@@ -2,6 +2,7 @@
 # Copyright (c) 2018 ACSONE SA/NV
 import io
 import os
+import subprocess
 
 import click
 from jinja2 import Template
@@ -131,6 +132,14 @@ def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
             repo_name=repo_name,
             runbot_id=runbot_id,
         ))
+    with open(os.devnull, 'w') as devnull:
+        r = subprocess.call([
+            'rst2html', readme_filename,
+        ], stdout=devnull)
+        if r != 0:
+            raise click.ClickException(
+                "Error validating %s" % (readme_filename, )
+            )
     return readme_filename
 
 
