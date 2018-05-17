@@ -101,7 +101,7 @@ def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
                 fragments[fragment_name] = f.read()
     runbot_id = get_runbot_ids()[repo_name]
     badges = []
-    development_status = manifest.get('development_status')
+    development_status = manifest.get('development_status', 'Beta')
     if development_status in DEVELOPMENT_STATUS_BADGES:
         badges.append(DEVELOPMENT_STATUS_BADGES[development_status])
     license = manifest.get('license')
