@@ -4,7 +4,7 @@
 {
     "name": "Module name",
     "summary": "Module summary",
-    "version": "8.0.1.0.0",
+    "version": "11.0.1.0.0",
     "development_status": "Alpha|Beta|Production/Stable|Mature",
     "category": "Uncategorized",
     "website": "https://github.com/OCA/<repo>" or "https://github.com/OCA/<repo>/tree/<branch>/<addon>",
