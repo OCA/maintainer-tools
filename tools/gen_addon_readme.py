@@ -44,27 +44,25 @@ LICENSE_BADGES = {
     ),
 }
 
-# TODO use better badges from Valeria
-
 DEVELOPMENT_STATUS_BADGES = {
     'Mature': (
         'https://img.shields.io/badge/maturity-Mature-brightgreen.png',
-        None,
+        'https://odoo-community.org/page/development-status',
         'Mature',
     ),
     'Production/Stable': (
         'https://img.shields.io/badge/maturity-Production%2FStable-green.png',
-        None,
+        'https://odoo-community.org/page/development-status',
         'Production/Stable',
     ),
     'Beta': (
         'https://img.shields.io/badge/maturity-Beta-yellow.png',
-        None,
+        'https://odoo-community.org/page/development-status',
         'Beta',
     ),
     'Alpha': (
         'https://img.shields.io/badge/maturity-Alpha-red.png',
-        None,
+        'https://odoo-community.org/page/development-status',
         'Alpha',
     ),
 }

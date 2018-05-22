@@ -78,7 +78,7 @@ promote its widespread use.
     :alt: {{ maintainer}}
 {%- endfor %}
 
-Maintainer{% if manifest.maintainers|length > 1 %}s{% endif %}: 
+Current `maintainer{% if manifest.maintainers|length > 1 %}s{% endif %} <https://odoo-community.org/page/maintainer-role>`_:
 
 {% for maintainer in manifest.maintainers %}|maintainer-{{ maintainer }}| {% endfor -%}
 {% endif %}
