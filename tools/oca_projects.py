@@ -41,7 +41,7 @@ OCA_PROJECTS = {
     'Apps Store': ['apps-store'],
 
     'banking': ['bank-payment',
-                'bank-statement-reconcile',
+                'account-reconcile',
                 'bank-statement-import',
                 'account-payment',
                 ],
