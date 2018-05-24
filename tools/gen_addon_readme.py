@@ -136,7 +136,7 @@ def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
         ))
     with open(os.devnull, 'w') as devnull:
         r = subprocess.call([
-            'rst2html', readme_filename,
+            'rst2html4.py', readme_filename,
         ], stdout=devnull)
         if r != 0:
             raise click.ClickException(
