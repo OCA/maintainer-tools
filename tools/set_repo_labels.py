@@ -3,6 +3,7 @@
 Create and modify labels on github to have same labels and same color
 on all repo
 """
+from __future__ import print_function
 from .github_login import login
 
 REPO_TO_IGNORE = [
@@ -10,7 +11,7 @@ REPO_TO_IGNORE = [
     'community-data-files',
     'contribute-md-template',
     'website',
-    ]
+]
 
 # here is the list of labels we need in each repo
 all_labels = {
@@ -26,7 +27,7 @@ all_labels = {
     'work in progress': '0052cc',
     'wontfix': 'ffffff',
     'migration': 'd4c5f9',
-    }
+}
 
 
 def main():
@@ -52,32 +53,32 @@ def main():
         extra_labels = [l for l in existing_labels if l not in all_labels]
 
         if to_create:
-            print ('Repo %s - Create %s missing labels'
-                   % (repo.name, len(to_create)))
+            print('Repo %s - Create %s missing labels'
+                  % (repo.name, len(to_create)))
 
             for label_name in to_create:
                 success = repo.create_label(label_name, all_labels[label_name])
                 if not success:
-                    print ("Failed to create a label on '%s'!"
-                           " Please check you access right to this repository."
-                           % repo.name)
+                    print("Failed to create a label on '%s'!"
+                          " Please check you access right to this repository."
+                          % repo.name)
 
         if to_change_color:
-            print ('Repo %s - Update %s labels with wrong color'
-                   % (repo.name, len(to_change_color)))
+            print('Repo %s - Update %s labels with wrong color'
+                  % (repo.name, len(to_change_color)))
 
             for label_name in to_change_color:
                 success = repo.update_label(label_name, all_labels[label_name])
                 if not success:
-                    print ("Failed to update a label on '%s'!"
-                           " Please check you access right to this repository."
-                           % repo.name)
+                    print("Failed to update a label on '%s'!"
+                          " Please check you access right to this repository."
+                          % repo.name)
 
         if extra_labels:
-            print ('Repo %s - Found %s extra labels'
-                   % (repo.name, len(extra_labels)))
+            print('Repo %s - Found %s extra labels'
+                  % (repo.name, len(extra_labels)))
             for label_name in extra_labels:
-                print label_name
+                print(label_name)
 
 
 if __name__ == '__main__':

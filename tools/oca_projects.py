@@ -9,6 +9,7 @@ https://odoo-community.org/page/List
 OCA_REPOSITORY_NAMES: list of OCA repository names
 
 """
+from __future__ import print_function
 from contextlib import contextmanager
 import os
 import shutil
@@ -231,7 +232,7 @@ def get_repositories_and_branches(branches=BRANCHES):
 try:
     OCA_REPOSITORY_NAMES = get_repositories()
 except Exception as exc:
-    print exc
+    print(exc)
     OCA_REPOSITORY_NAMES = []
     for repos in OCA_PROJECTS.itervalues():
         OCA_REPOSITORY_NAMES += repos

@@ -1,3 +1,6 @@
+# Copyright (c) 2016-2018 ACSONE SA/NV
+# License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
+from __future__ import print_function
 import contextlib
 import dumbdbm
 import logging
@@ -83,7 +86,7 @@ class OcaPypi(object):
             except subprocess.CalledProcessError as e:
                 if "HTTPError: 400 Client Error" in e.output:
                     return e.output
-                print e.output
+                print(e.output)
                 raise
         else:
             _logger.info("dryrun: %s", cmd)
