@@ -18,6 +18,7 @@ does not matter, will be replaced by the script
 
 from __future__ import print_function
 import ast
+import io
 import os
 import re
 
@@ -47,7 +48,8 @@ def render_markdown_table(header, rows):
 
 
 def replace_in_readme(readme_path, header, rows_available, rows_unported):
-    readme = open(readme_path).read()
+    with io.open(readme_path, encoding='utf8') as f:
+        readme = f.read()
     parts = re.split(MARKERS, readme, flags=re.MULTILINE)
     if len(parts) != 7:
         raise UserError('Addons markers not found or incorrect in %s' %
@@ -73,9 +75,9 @@ def replace_in_readme(readme_path, header, rows_available, rows_unported):
         ])
     addons.append('\n')
     parts[2:5] = addons
-    parts = [p.encode('utf-8') if isinstance(p, unicode) else p for p in parts]
     readme = ''.join(parts)
-    open(readme_path, 'w').write(readme)
+    with io.open(readme_path, 'w', encoding='utf8') as f:
+        f.write(readme)
 
 
 def gen_addons_table():
@@ -91,7 +93,7 @@ def gen_addons_table():
         for addon_path in os.listdir(unported_directory):
             addon_path = os.path.join(unported_directory, addon_path)
             addon_paths.append((addon_path, True))
-    addon_paths = sorted(addon_paths, lambda x, y: cmp(x[0], y[0]))
+    addon_paths = sorted(addon_paths, key=lambda x: x[0])
     # load manifests
     header = ('addon', 'version', 'summary')
     rows_available = []
@@ -103,7 +105,8 @@ def gen_addons_table():
             if has_manifest:
                 break
         if has_manifest:
-            manifest = ast.literal_eval(open(manifest_path).read())
+            with open(manifest_path) as f:
+                manifest = ast.literal_eval(f.read())
             addon_name = os.path.basename(addon_path)
             link = '[%s](%s/)' % (addon_name, addon_path)
             version = manifest.get('version') or ''
