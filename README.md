@@ -135,6 +135,12 @@ egg.
     $ . env/bin/activate
     $ pip install -e .
 
+**Run tests**
+
+    $ tox  # all tests for all python versions
+    $ tox -e py27  # python 2.7
+    $ tox -- -k readme -v  # run tests containing 'readme' in their name, verbose
+
 **Get a token from Github**
 
     $ python -m tools.github_login USERNAME
