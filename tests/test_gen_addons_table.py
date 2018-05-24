@@ -1,27 +1,27 @@
 import os
 import subprocess
-import unittest
+import sys
 
 
-class TestGenAddonsTable(unittest.TestCase):
-
-    def test_1(self):
-        dirname = os.path.dirname(__file__)
-        cwd = os.path.join(dirname, 'test_repo')
-        gen_addons_table = os.path.join(dirname, '..', 'tools',
-                                        'gen_addons_table.py')
-        readme_filename = os.path.join(dirname, 'test_repo',
-                                       'README.md')
-        readme_before = open(readme_filename).read()
-        readme_expected_filename = os.path.join(dirname, 'test_repo',
-                                                'README.md.expected')
-        readme_expected = open(readme_expected_filename).read()
-        try:
-            res = subprocess.call([gen_addons_table], cwd=cwd)
-            self.assertEquals(res, 0, 'gen_addons_table failed')
-            readme_after = open(readme_filename).read()
-            self.assertEquals(readme_after, readme_expected,
-                              'gen_addons_table did not generate '
-                              'expected result')
-        finally:
-            open(readme_filename, 'w').write(readme_before)
+def test_1():
+    dirname = os.path.dirname(__file__)
+    cwd = os.path.join(dirname, 'test_repo')
+    readme_filename = os.path.join(dirname, 'test_repo', 'README.md')
+    with open(readme_filename) as f:
+        readme_before = f.read()
+    readme_expected_filename = os.path.join(
+        dirname, 'test_repo', 'README.md.expected',
+    )
+    with open(readme_expected_filename) as f:
+        readme_expected = f.read()
+    try:
+        res = subprocess.call([
+            sys.executable, '-m', 'tools.gen_addons_table',
+        ], cwd=cwd)
+        assert res == 0
+        with open(readme_filename) as f:
+            readme_after = f.read()
+        assert readme_after == readme_expected
+    finally:
+        with open(readme_filename, 'w') as f:
+            f.write(readme_before)
