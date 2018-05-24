@@ -85,6 +85,7 @@ promote its widespread use.
 To contribute to this module, please visit http://odoo-community.org.
 """
 
+from __future__ import print_function
 import argparse
 import os.path
 import re
@@ -128,7 +129,7 @@ def wrap_tx_call(func, args=None, kwargs=None):
         except (KeyboardInterrupt, SystemExit):
             raise
         except exceptions.HttpClientError:
-            print "WARNING: Transifex API rate limit. Sleeping 300 seconds."
+            print("WARNING: Transifex API rate limit. Sleeping 300 seconds.")
             time.sleep(300)
 
 
@@ -146,19 +147,19 @@ def wrap_gh_call(func, args=None, kwargs=None):
             raise
         except GitHubError as e:
             if e.code == 403:
-                print "WARNING: %s. Sleeping 300 seconds" % e.message
+                print("WARNING: %s. Sleeping 300 seconds" % e.message)
                 time.sleep(300)
             elif e.code == 405:
                 retry += 1
                 if retry < 4:
-                    print "WARNING: Temporary error: %s. Retrying..." % (
+                    print("WARNING: Temporary error: %s. Retrying..." % (
                         e.message
-                    )
+                    ))
                     time.sleep(5)
                 else:
-                    print "WARNING: GitHub error: %s. Aborting..." % (
+                    print("WARNING: GitHub error: %s. Aborting..." % (
                         e.message
-                    )
+                    ))
                     break
             else:
                 raise
@@ -247,13 +248,13 @@ class TransifexPuller(object):
                     )
                     tx_projects.append(tx_project)
                 except exceptions.HttpNotFoundError:
-                    print "ERROR: Transifex project slug '%s' is invalid" % (
+                    print("ERROR: Transifex project slug '%s' is invalid" % (
                         project_slug
-                    )
+                    ))
         else:
             start = 1
             temp_projects = []
-            print "Getting Transifex projects..."
+            print("Getting Transifex projects...")
             while temp_projects or start == 1:
                 temp_projects = wrap_tx_call(
                     self.tx_api.projects().get, kwargs={'start': start},
@@ -265,7 +266,7 @@ class TransifexPuller(object):
                 self._process_project(tx_project)
 
     def _process_project(self, tx_project):
-        print "Processing project '%s'..." % tx_project['name']
+        print("Processing project '%s'..." % tx_project['name'])
         oca_project, oca_branch = self._get_oca_project_info(tx_project)
         # get a reference to the github repo and branch where to push the
         # the translations
@@ -278,7 +279,7 @@ class TransifexPuller(object):
         tx_project_api = self.tx_api.project(tx_project['slug'])
         resources = wrap_tx_call(tx_project_api.resources().get)
         for resource in resources:
-            print "Checking resource %s..." % resource['name']
+            print("Checking resource %s..." % resource['name'])
             tx_resource_api = tx_project_api.resource(resource['slug'])
             stats = wrap_tx_call(tx_resource_api.stats().get)
             for lang in stats.keys():
@@ -312,15 +313,15 @@ class TransifexPuller(object):
                             gh_po_file = polib.pofile(
                                 gh_file.decoded.decode('utf-8'))
                         except IOError:
-                            print "...ERROR reading %s" % gh_file_path
+                            print("...ERROR reading %s" % gh_file_path)
                             continue
                         gh_po_dict = self._load_po_dict(gh_po_file)
                         unmatched_items = (set(gh_po_dict.items()) ^
                                            set(tx_po_dict.items()))
                         if not unmatched_items:
-                            print "...no change in %s" % gh_file_path
+                            print("...no change in %s" % gh_file_path)
                             continue
-                    print '..replacing %s' % gh_file_path
+                    print('..replacing %s' % gh_file_path)
                     new_file_blob = wrap_gh_call(
                         gh_repo.create_blob,
                         args=[tx_lang['content']],
@@ -333,7 +334,7 @@ class TransifexPuller(object):
                         'sha': new_file_blob,
                     })
                 else:
-                    print "ERROR: fetching lang '%s'" % lang
+                    print("ERROR: fetching lang '%s'" % lang)
         if tree_data:
             tree_sha = gh_branch.commit.commit.tree.sha
             tree = wrap_gh_call(
@@ -351,7 +352,7 @@ class TransifexPuller(object):
                         'committer': self.gh_credentials,
                     },
                 )
-                print "Pushing to GitHub"
+                print("Pushing to GitHub")
                 wrap_gh_call(
                     gh_repo.ref('heads/{}'.format(gh_branch.name)).update,
                     args=[commit.sha],

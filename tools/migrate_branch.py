@@ -89,6 +89,7 @@ promote its widespread use.
 To contribute to this module, please visit http://odoo-community.org.
 """
 
+from __future__ import print_function
 import argparse
 import re
 from . import github_login
@@ -314,16 +315,16 @@ class BranchMigrator(object):
             title=title, body=body, milestone=milestone.number, labels=labels)
 
     def _migrate_project(self, project):
-        print "Migrating project %s/%s" % (self.gh_org, project)
+        print("Migrating project %s/%s" % (self.gh_org, project))
         # Create new branch
         repo = self.github.repository(self.gh_org, project)
         source_branch = repo.branch(self.gh_source_branch)
         if not source_branch:
-            print "Source branch non existing. Skipping..."
+            print("Source branch non existing. Skipping...")
             return
         branch = repo.branch(self.gh_target_branch)
         if branch:
-            print "Branch already exists. Skipping..."
+            print("Branch already exists. Skipping...")
             return
         repo.create_ref(
             'refs/heads/%s' % self.gh_target_branch,
