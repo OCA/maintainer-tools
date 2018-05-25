@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #  -*- coding: utf-8 -*-
+# License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 """
 This script replaces markers in the README.md files
 of an OCA repository with the list of addons present

@@ -1,3 +1,4 @@
+# License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 """ Update all addons tables in README.md in all OCA repositories
 
 This script must be run in an initially empty directory.
