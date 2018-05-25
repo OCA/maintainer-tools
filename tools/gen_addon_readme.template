@@ -26,6 +26,8 @@
 {% for _ in badges %}|badge{{ loop.index }}| {% endfor %}
 
 {{ fragments.get('DESCRIPTION', '') }}
+**Table of contents**
+
 .. contents::
    :local:
 
