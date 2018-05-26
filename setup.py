@@ -32,6 +32,7 @@ setuptools.setup(
         'jinja2',
         'PyYAML',
         'polib',
+        'pygments',
         'requests',
         'setuptools-odoo>=2.1',
         'slumber',
