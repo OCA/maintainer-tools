@@ -1,20 +1,17 @@
-# Config file .travis.yml
-
-dist: precise
-
+sudo: false
 language: python
 
 python:
-    - "2.7"
+  - "2.7"
+  - "3.5"
+  - "3.6"
 
 install:
-    - pip install coveralls flake8==2.6.2
-    - pip install -r requirements.txt
+    - pip install tox-travis
+    - pip install coveralls
 
 script:
-    - python setup.py flake8
-    - coverage run setup.py test
-    - python setup.py install
+    - tox
 
 after_success:
-  coveralls
+    - coveralls

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 """
 Data about OCA Projects, with a few helper functions.
 
@@ -201,7 +202,7 @@ NOT_ADDONS = {
 }
 
 
-BRANCHES = (
+MAIN_BRANCHES = (
     '6.1',
     '7.0',
     '8.0',
@@ -218,9 +219,11 @@ def get_repositories():
     return all_repos
 
 
-def get_repositories_and_branches(branches=BRANCHES):
+def get_repositories_and_branches(repos=(), branches=MAIN_BRANCHES):
     gh = login()
     for repo in gh.iter_user_repos('OCA'):
+        if repos and repo.name not in repos:
+            continue
         if repo.name in NOT_ADDONS:
             continue
         for branch in repo.iter_branches():

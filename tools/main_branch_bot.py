@@ -8,7 +8,9 @@ import traceback
 
 import click
 
-from .oca_projects import get_repositories_and_branches, temporary_clone
+from .oca_projects import (
+    get_repositories_and_branches, temporary_clone, MAIN_BRANCHES,
+)
 from .dist_to_simple_index import dist_to_simple_index
 
 
@@ -16,9 +18,13 @@ from .dist_to_simple_index import dist_to_simple_index
 @click.option('--target', required=True,
               type=click.Path(dir_okay=True, file_okay=False, exists=True),
               help="Root of a PEP 503 directory structure.")
+@click.option('--repo',
+              help="Repo to act on (default all OCA addons repos).")
+@click.option('--branch',
+              help="Branch to act on (default all branches from 8.0).")
 @click.option('--push/--no-push',
               help="Git commit and push changes made.")
-def main(target, push):
+def main(target, repo, branch, push):
     """ OCA Git Bot for main addon branches
 
     \b
@@ -30,7 +36,13 @@ def main(target, push):
     """
     exit_code = 0
     target = os.path.abspath(target)
-    for repo, branch in get_repositories_and_branches():
+    repos = ()
+    if repo:
+        repos = (repo, )
+    branches = MAIN_BRANCHES
+    if branch:
+        branches = (branch, )
+    for repo, branch in get_repositories_and_branches(repos, branches):
         if branch in ('6.1', '7.0'):
             continue
         with temporary_clone(repo, branch):
