@@ -2,9 +2,10 @@
 # Copyright (c) 2018 ACSONE SA/NV
 import io
 import os
-import subprocess
 
 import click
+from docutils import ApplicationError
+from docutils.core import publish_file
 from jinja2 import Template
 
 from .gitutils import commit_if_needed
@@ -65,6 +66,34 @@ DEVELOPMENT_STATUS_BADGES = {
         'https://odoo-community.org/page/development-status',
         'Alpha',
     ),
+}
+
+# this comes from pypa/readme_renderer
+RST2HTML_SETTINGS = {
+    # Prevent local files from being included into the rendered output.
+    # This is a security concern because people can insert files
+    # that are part of the system, such as /etc/passwd.
+    "file_insertion_enabled": False,
+
+    # Halt rendering and throw an exception if there was any errors or
+    # warnings from docutils.
+    "halt_level": 2,
+
+    # Output math blocks as LaTeX that can be interpreted by MathJax for
+    # a prettier display of Math formulas.
+    "math_output": "MathJax",
+
+    # Disable raw html as enabling it is a security risk, we do not want
+    # people to be able to include any old HTML in the final output.
+    "raw_enabled": False,
+
+    # Use typographic quotes, and transform --, ---, and ... into their
+    # typographic counterparts.
+    "smart_quotes": True,
+
+    # Use the short form of syntax highlighting so that the generated
+    # Pygments CSS can be used to style the output.
+    "syntax_highlight": "short",
 }
 
 
@@ -150,15 +179,30 @@ def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
             repo_name=repo_name,
             runbot_id=runbot_id,
         ))
-    with open(os.devnull, 'w') as devnull:
-        r = subprocess.call([
-            'rst2html4.py', readme_filename,
-        ], stdout=devnull)
-        if r != 0:
-            raise click.ClickException(
-                "Error validating %s" % (readme_filename, )
-            )
     return readme_filename
+
+
+def gen_one_addon_index(readme_filename):
+    addon_dir = os.path.dirname(readme_filename)
+    index_dir = os.path.join(addon_dir, 'static', 'description')
+    index_filename = os.path.join(index_dir, 'index.html')
+    if os.path.exists(index_filename):
+        with open(index_filename) as f:
+            if 'oca-gen-addon-readme' not in f.read():
+                # index was created manually
+                return
+    try:
+        if not os.path.isdir(index_dir):
+            os.makedirs(index_dir)
+        publish_file(
+            source_path=readme_filename,
+            destination_path=index_filename,
+            writer_name='html4css1',
+            settings_overrides=RST2HTML_SETTINGS,
+        )
+        return index_filename
+    except ApplicationError:
+        raise click.ClickException("Error validating README.rst")
 
 
 @click.command()
@@ -203,6 +247,9 @@ def gen_addon_readme(repo_name, branch, addon_dirs, addons_dir, commit):
         readme_filename = gen_one_addon_readme(
             repo_name, branch, addon_name, addon_dir, manifest)
         readme_filenames.append(readme_filename)
+        index_filename = gen_one_addon_index(readme_filename)
+        if index_filename:
+            readme_filenames.append(index_filename)
     if commit:
         commit_if_needed(readme_filenames, '[UPD] README.rst')
 
