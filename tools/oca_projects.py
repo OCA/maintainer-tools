@@ -37,6 +37,7 @@ OCA_PROJECTS = {
                    'mis-builder',
                    'currency',
                    'credit-control',
+                   'data-protection',
                    ],
     # 'backport': ['OCB',
     #              ],
