@@ -78,6 +78,7 @@ OCA_PROJECTS = {
     'document': ['knowledge'],
     'ecommerce': ['e-commerce'],
     'edi': ['edi'],
+    'field-service': ['field-service'],
     'financial control': ['margin-analysis'],
     'Infrastructure': ['infrastructure-dns'],
     'geospatial': ['geospatial'],
