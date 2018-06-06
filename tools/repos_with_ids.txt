@@ -149,3 +149,4 @@
 261|github.com/OCA/l10n-croatia
 262|github.com/OCA/credit-control
 263|github.com/OCA/data-protection
+264|github.com/OCA/field-service
