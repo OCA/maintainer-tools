@@ -20,7 +20,9 @@ import tempfile
 import appdirs
 from .github_login import login
 
-ALL = ['OCA_PROJECTS', 'OCA_REPOSITORY_NAMES', 'url']
+ALL = ['OCA_USERNAME', 'OCA_PROJECTS', 'OCA_REPOSITORY_NAMES', 'url']
+
+OCA_USERNAME = 'OCA'
 
 OCA_PROJECTS = {
     'accounting': ['account-analytic',
