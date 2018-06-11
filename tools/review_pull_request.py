@@ -29,22 +29,28 @@ def get_contribution_counts():
     return contributions_cache
 
 
-def tag_new_pull_requests(repository_name):
+def tag_new_pull_requests(repository_name, dry_run=False):
     github = login()
     repository = github.repository(OCA_USERNAME, repository_name)
     contributions = get_contribution_counts()
 
     for pull_request in repository.pull_requests():
         if contributions[pull_request.user.id] < 3:
-            pull_request.issue().add_labels('new contributor')
+            if dry_run:
+                print('Pull request "{}" ({}) made by new contributor'.format(
+                    pull_request.title,
+                    pull_request.html_url
+                ))
+            else:
+                pull_request.issue().add_labels('new contributor')
 
 
-def tag_all_new_pull_requests():
+def tag_all_new_pull_requests(dry_run=False):
     for repository_name in OCA_REPOSITORY_NAMES:
-        tag_new_pull_requests(repository_name)
+        tag_new_pull_requests(repository_name, dry_run=dry_run)
 
 
-def close_abandoned_pull_requests(repository_name):
+def close_abandoned_pull_requests(repository_name, dry_run=False):
     github = login()
     repository = github.repository(OCA_USERNAME, repository_name)
 
@@ -55,16 +61,22 @@ def close_abandoned_pull_requests(repository_name):
         pr_is_old = now - pull_request.created_at > timedelta(days=31 * 6)
 
         if pr_is_old and full_pull_request.comments_count == 0:
-            pull_request.create_comment("Please re-open if necessary")
-            pull_request.close()
+            if dry_run:
+                print('Pull request "{}" ({}) abandoned'.format(
+                    pull_request.title,
+                    pull_request.html_url
+                ))
+            else:
+                pull_request.create_comment("Please re-open if necessary")
+                pull_request.close()
 
 
-def close_all_abandoned_pull_requests():
+def close_all_abandoned_pull_requests(dry_run=False):
     for repository_name in OCA_REPOSITORY_NAMES:
-        close_abandoned_pull_requests(repository_name)
+        close_abandoned_pull_requests(repository_name, dry_run=dry_run)
 
 
-def tag_ready_pull_requests(repository_name):
+def tag_ready_pull_requests(repository_name, dry_run=False):
     github = login()
     repository = github.repository(OCA_USERNAME, repository_name)
 
@@ -85,13 +97,19 @@ def tag_ready_pull_requests(repository_name):
             pr_is_old_enough and
             full_pull_request.mergeable
         ):
-            pull_request.issue().add_labels('merge ready')
-            pull_request.create_comment("Ready to merge")
+            if dry_run:
+                print('Pull request "{}" ({}) ready to merge'.format(
+                    pull_request.title,
+                    pull_request.html_url
+                ))
+            else:
+                pull_request.issue().add_labels('merge ready')
+                pull_request.create_comment("Ready to merge")
 
 
-def tag_all_ready_pull_requests():
+def tag_all_ready_pull_requests(dry_run=False):
     for repository_name in OCA_REPOSITORY_NAMES:
-        tag_ready_pull_requests(repository_name)
+        tag_ready_pull_requests(repository_name, dry_run=dry_run)
 
 
 def main():
@@ -142,25 +160,31 @@ def main():
              "repositories.",
         action="store_true"
     )
+    parser.add_argument(
+        "--dry-run",
+        help="Print the actions that this command would run, "
+             "instead of applying them.",
+        action="store_true"
+    )
     args = parser.parse_args()
 
     for repository_name in args.tag_new_pull_requests:
-        tag_new_pull_requests(repository_name)
+        tag_new_pull_requests(repository_name, dry_run=args.dry_run)
 
     if args.tag_all_new_pull_requests:
-        tag_all_new_pull_requests()
+        tag_all_new_pull_requests(dry_run=args.dry_run)
 
     for repository_name in args.close_abandoned_pull_requests:
-        close_abandoned_pull_requests(repository_name)
+        close_abandoned_pull_requests(repository_name, dry_run=args.dry_run)
 
     if args.close_all_abandoned_pull_requests:
-        close_all_abandoned_pull_requests()
+        close_all_abandoned_pull_requests(dry_run=args.dry_run)
 
     for repository_name in args.tag_ready_pull_requests:
-        tag_ready_pull_requests(repository_name)
+        tag_ready_pull_requests(repository_name, dry_run=args.dry_run)
 
     if args.tag_all_ready_pull_requests:
-        tag_all_ready_pull_requests()
+        tag_all_ready_pull_requests(dry_run=args.dry_run)
 
 
 if __name__ == '__main__':
