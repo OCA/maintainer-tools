@@ -5,7 +5,7 @@ import argparse
 from collections import Counter
 from datetime import datetime, timedelta
 
-from github_login import login
+from github_login import login, wrap_github_call
 
 from oca_projects import OCA_USERNAME, OCA_REPOSITORY_NAMES
 
@@ -22,8 +22,11 @@ def get_contribution_counts():
     contributions_cache = Counter()
 
     for repository_name in OCA_REPOSITORY_NAMES:
-        repository = github.repository(OCA_USERNAME, repository_name)
-        for user in repository.contributors():
+        repository = wrap_github_call(
+            github.repository,
+            [OCA_USERNAME, repository_name]
+        )
+        for user in wrap_github_call(repository.contributors):
             contributions_cache[user.id] += user.contributions_count
 
     return contributions_cache
@@ -31,10 +34,13 @@ def get_contribution_counts():
 
 def tag_new_pull_requests(repository_name, dry_run=False):
     github = login()
-    repository = github.repository(OCA_USERNAME, repository_name)
+    repository = wrap_github_call(
+        github.repository,
+        [OCA_USERNAME, repository_name]
+    )
     contributions = get_contribution_counts()
 
-    for pull_request in repository.pull_requests():
+    for pull_request in wrap_github_call(repository.pull_requests):
         if contributions[pull_request.user.id] < 3:
             if dry_run:
                 print('Pull request "{}" ({}) made by new contributor'.format(
@@ -42,7 +48,10 @@ def tag_new_pull_requests(repository_name, dry_run=False):
                     pull_request.html_url
                 ))
             else:
-                pull_request.issue().add_labels('new contributor')
+                wrap_github_call(
+                    pull_request.issue().add_labels,
+                    ['new contributor']
+                )
 
 
 def tag_all_new_pull_requests(dry_run=False):
@@ -52,10 +61,16 @@ def tag_all_new_pull_requests(dry_run=False):
 
 def close_abandoned_pull_requests(repository_name, dry_run=False):
     github = login()
-    repository = github.repository(OCA_USERNAME, repository_name)
+    repository = wrap_github_call(
+        github.repository,
+        [OCA_USERNAME, repository_name]
+    )
 
-    for pull_request in repository.pull_requests():
-        full_pull_request = repository.pull_request(pull_request.number)
+    for pull_request in wrap_github_call(repository.pull_requests):
+        full_pull_request = wrap_github_call(
+            repository.pull_request,
+            [pull_request.number]
+        )
 
         now = datetime.now(pull_request.created_at.tzinfo)
         pr_is_old = now - pull_request.created_at > timedelta(days=31 * 6)
@@ -67,8 +82,11 @@ def close_abandoned_pull_requests(repository_name, dry_run=False):
                     pull_request.html_url
                 ))
             else:
-                pull_request.create_comment("Please re-open if necessary")
-                pull_request.close()
+                wrap_github_call(
+                    pull_request.create_comment,
+                    ["Please re-open if necessary"]
+                )
+                wrap_github_call(pull_request.close)
 
 
 def close_all_abandoned_pull_requests(dry_run=False):
@@ -78,14 +96,20 @@ def close_all_abandoned_pull_requests(dry_run=False):
 
 def tag_ready_pull_requests(repository_name, dry_run=False):
     github = login()
-    repository = github.repository(OCA_USERNAME, repository_name)
+    repository = wrap_github_call(
+        github.repository,
+        [OCA_USERNAME, repository_name]
+    )
 
     for pull_request in repository.pull_requests():
-        full_pull_request = repository.pull_request(pull_request.number)
+        full_pull_request = wrap_github_call(
+            repository.pull_request,
+            [pull_request.number]
+        )
 
         has_enough_reviews = sum(
             1
-            for review in pull_request.reviews()
+            for review in wrap_github_call(pull_request.reviews)
             if review.state == 'APPROVED'
         ) >= 2
 
@@ -103,8 +127,14 @@ def tag_ready_pull_requests(repository_name, dry_run=False):
                     pull_request.html_url
                 ))
             else:
-                pull_request.issue().add_labels('merge ready')
-                pull_request.create_comment("Ready to merge")
+                wrap_github_call(
+                    pull_request.issue().add_labels,
+                    ['merge ready']
+                )
+                wrap_github_call(
+                    pull_request.create_comment,
+                    ["Ready to merge"]
+                )
 
 
 def tag_all_ready_pull_requests(dry_run=False):
