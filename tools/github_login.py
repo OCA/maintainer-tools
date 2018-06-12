@@ -5,8 +5,12 @@ from __future__ import absolute_import, print_function
 import argparse
 import os
 import sys
+import time
 from getpass import getpass
+
 import github3
+from github3.models import GitHubError
+
 from .config import read_config, write_config
 
 
@@ -66,6 +70,38 @@ def authorize_token(user):
     config.set("GitHub", "token", auth.token)
     write_config(config)
     print("Token stored in configuration file")
+
+
+def wrap_github_call(func, args=None, kwargs=None):
+    """Intercept GitHub call to wait when the API rate limit is reached."""
+    retry = 0
+    while True:
+        try:
+            if args is None:
+                args = []
+            if kwargs is None:
+                kwargs = {}
+            return func(*args, **kwargs)
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except GitHubError as e:
+            if e.code == 403:
+                print("WARNING: %s. Sleeping 300 seconds" % e.message)
+                time.sleep(300)
+            elif e.code == 405:
+                retry += 1
+                if retry < 4:
+                    print("WARNING: Temporary error: %s. Retrying..." % (
+                        e.message
+                    ))
+                    time.sleep(5)
+                else:
+                    print("WARNING: GitHub error: %s. Aborting..." % (
+                        e.message
+                    ))
+                    break
+            else:
+                raise
 
 
 def main():
