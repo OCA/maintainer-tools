@@ -205,6 +205,10 @@ NOT_ADDONS = {
     'OpenUpgrade',
     'pylint-odoo',
     'oca-custom',
+    'odoorpc',
+    'oca-decorators',
+    'oca-weblate-deployment',
+    'odoo-sentinel',
 }
 
 
