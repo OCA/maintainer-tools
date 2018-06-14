@@ -275,7 +275,7 @@ def temporary_clone(project_name, branch, protocol='git', org_name='OCA'):
     repo_url = url(project_name, protocol, org_name)
     # fetch all branches into cache
     fetch_cmd = [
-        'git', 'fetch', '--quiet',
+        'git', 'fetch', '--quiet', '--force',
         repo_url,
         'refs/heads/*:refs/heads/*',
     ]
