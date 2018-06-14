@@ -77,6 +77,7 @@ setuptools.setup(
             'oca-update-pre-commit-excluded-addons = '
             'tools.update_pre_commit_excluded_addons:main',
             'oca-fix-manifest-website = tools.fix_manifest_website:main',
+            'oca-configure-travis= tools.configure_travis:main',
         ],
     },
 )
