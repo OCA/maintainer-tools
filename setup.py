@@ -36,7 +36,6 @@ setuptools.setup(
         'pygments',
         'requests',
         'setuptools-odoo>=2.1',
-        'slumber',
         'twine',
         'wheel',
         # We keep setuptools<31 as long as we can, so
