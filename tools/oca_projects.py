@@ -18,7 +18,7 @@ import subprocess
 import tempfile
 
 import appdirs
-from github_login import login
+from .github_login import login
 
 ALL = ['OCA_PROJECTS', 'OCA_REPOSITORY_NAMES', 'url']
 
@@ -239,7 +239,7 @@ try:
 except Exception as exc:
     print(exc)
     OCA_REPOSITORY_NAMES = []
-    for repos in OCA_PROJECTS.itervalues():
+    for repos in OCA_PROJECTS.values():
         OCA_REPOSITORY_NAMES += repos
 
 OCA_REPOSITORY_NAMES.sort()

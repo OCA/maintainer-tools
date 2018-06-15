@@ -25,9 +25,10 @@ setuptools.setup(
         'argparse',
         'autopep8',
         'click',
+        'configparser',  # for python2 compat
         'docutils',
         'ERPpeek',
-        'github3.py',
+        'github3.py<1',
         'inflection',
         'jinja2',
         'PyYAML',

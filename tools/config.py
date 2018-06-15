@@ -2,14 +2,14 @@
 # License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 from __future__ import absolute_import, print_function
 
-import ConfigParser
+import configparser
 import os
 
 CREDENTIALS_FILE = 'oca.cfg'
 
 
 def init_config():
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.add_section("GitHub")
     config.set("GitHub", "username", "")
     config.set("GitHub", "token", "")
@@ -27,7 +27,7 @@ def init_config():
 def read_config():
     if not os.path.exists(CREDENTIALS_FILE):
         init_config()
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(CREDENTIALS_FILE)
     return config
 
