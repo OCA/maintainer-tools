@@ -72,8 +72,8 @@ def close_abandoned_pull_requests(repository_name, dry_run=False):
             [pull_request.number]
         )
 
-        now = datetime.now(pull_request.created_at.tzinfo)
-        pr_is_old = now - pull_request.created_at > timedelta(days=31 * 6)
+        now = datetime.now(pull_request.updated_at.tzinfo)
+        pr_is_old = now - pull_request.updated_at > timedelta(days=31 * 6)
 
         if pr_is_old and full_pull_request.comments_count == 0:
             if dry_run:
