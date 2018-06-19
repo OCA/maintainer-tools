@@ -143,6 +143,7 @@ def copy_users(odoo, team=None, dry_run=False):
         users = psc_users + list(odoo_project.members)
         user_logins = set(['oca-transbot',
                            'OCA-git-bot',
+                           'oca-travis',
                            ])
         psc_user_logins = set()
         for user in users:
