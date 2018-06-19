@@ -150,3 +150,7 @@
 262|github.com/OCA/credit-control
 263|github.com/OCA/data-protection
 264|github.com/OCA/field-service
+265|github.com/OCA/l10n-poland
+266|github.com/OCA/l10n-russia
+267|github.com/OCA/l10n-belarus
+268|github.com/OCA/l10n-estonia
