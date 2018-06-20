@@ -36,7 +36,6 @@ setuptools.setup(
         'pygments',
         'requests',
         'setuptools-odoo>=2.1',
-        'slumber',
         'twine',
         'wheel',
         # We keep setuptools<31 as long as we can, so
@@ -65,7 +64,6 @@ setuptools.setup(
             'oca-odoo-login = tools.odoo_login:main',
             'oca-sync-users = tools.oca_sync_users:main',
             'oca-autopep8 = tools.autopep8_extended:main',
-            'oca-tx-pull = tools.tx_pull:main',
             'oca-gen-addons-table = tools.gen_addons_table:main',
             'oca-gen-all-addons-tables = tools.gen_all_addons_tables:main',
             'oca-migrate-branch = tools.migrate_branch:main',
