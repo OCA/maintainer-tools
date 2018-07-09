@@ -107,7 +107,11 @@ def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
         )
         if os.path.exists(fragment_filename):
             with io.open(fragment_filename, 'rU', encoding='utf8') as f:
-                fragments[fragment_name] = f.read()
+                fragment = f.read()
+                if fragment:
+                    if fragment[-1] != '\n':
+                        fragment += '\n'
+                    fragments[fragment_name] = fragment
     runbot_id = get_runbot_ids()[repo_name]
     badges = []
     development_status = manifest.get('development_status', 'Beta')
