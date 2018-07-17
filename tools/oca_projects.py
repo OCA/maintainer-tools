@@ -173,6 +173,7 @@ OCA_PROJECTS = {
               'community-data-files',
               'webhook',
               'interface-github',
+              'iot',
               ],
     'vertical association': ['vertical-association'],
     'vertical hotel': ['vertical-hotel'],
