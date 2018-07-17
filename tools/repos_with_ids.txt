@@ -155,3 +155,5 @@
 266|github.com/OCA/l10n-russia
 267|github.com/OCA/l10n-belarus
 268|github.com/OCA/l10n-estonia
+269|github.com/OCA/iot
+
