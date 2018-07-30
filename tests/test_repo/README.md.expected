@@ -27,4 +27,4 @@ addon | version | summary
 
 Translation Status
 ------------------
-[![Transifex Status](https://www.transifex.com/projects/p/${ORG_NAME}-${REPO_NAME}-${BRANCH_NAME_WITH_DASH}/chart/image_png)](https://www.transifex.com/projects/p/${ORG_NAME}-${REPO_NAME}-${BRANCH_NAME_WITH_DASH})
+[![Translation status](https://translation.odoo-community.org/widgets/${REPO_NAME}-${BRANCH_NAME_WITH_DASH}/-/multi-auto.svg)](https://translation.odoo-community.org/engage/${REPO_NAME}-${BRANCH_NAME_WITH_DASH}/?utm_source=widget)
