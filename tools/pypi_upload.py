@@ -2,11 +2,18 @@
 # License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 from __future__ import print_function
 import contextlib
-import dumbdbm
+try:
+    import dbm.dumb as dumbdbm
+except ImportError:
+    # python 2
+    import dumbdbm
 import logging
 import os
 import subprocess
-from ConfigParser import RawConfigParser
+try:
+    from configparser import RawConfigParser
+except ImportError:
+    from ConfigParser import RawConfigParser
 
 from wheel.install import WheelFile
 from pkg_resources import parse_version

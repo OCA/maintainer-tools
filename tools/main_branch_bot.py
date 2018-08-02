@@ -14,6 +14,16 @@ from .oca_projects import (
 from .dist_to_simple_index import dist_to_simple_index
 
 
+def _get_python(branch, python2):
+    version = tuple(map(int, branch.split('.')))
+    if version < (11, 0):
+        return python2
+    elif sys.version_info[0] == 3:
+        return sys.executable
+    else:
+        return 'python3'
+
+
 @click.command()
 @click.option('--target', required=True,
               type=click.Path(dir_okay=True, file_okay=False, exists=True),
@@ -24,7 +34,10 @@ from .dist_to_simple_index import dist_to_simple_index
               help="Branch to act on (default all branches from 8.0).")
 @click.option('--push/--no-push',
               help="Git commit and push changes made.")
-def main(target, repo, branch, push):
+@click.option('--python2', default='python2',
+              help="Python 2 executable to use when building python 2 "
+                   "wheels for branches < 11.0")
+def main(target, repo, branch, push, python2):
     """ OCA Git Bot for main addon branches
 
     \b
@@ -91,7 +104,11 @@ def main(target, repo, branch, push):
                     (repo, branch),
                 )
                 setup_dirs = [opj('setup', d) for d in os.listdir('setup')]
-                dist_to_simple_index(target, setup_dirs)
+                dist_to_simple_index(
+                    target, setup_dirs,
+                    # use the right python to generate wheels
+                    python=_get_python(branch, python2),
+                )
             except Exception:
                 exit_code = 1
                 sys.stderr.write(
