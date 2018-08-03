@@ -65,6 +65,7 @@ OCA_PROJECTS = {
     'connector Prestashop': ['connector-prestashop'],
     'connector Sage': ['connector-sage'],
     'connector Salesforce': ['connector-salesforce'],
+    'connector SPSCommerce': ['connector-spscommerce'],
     'connector WooCommerce': ['connector-woocommerce'],
     'crm sales marketing': ['sale-workflow',
                             'crm',
