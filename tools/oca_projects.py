@@ -175,6 +175,7 @@ OCA_PROJECTS = {
               'webhook',
               'interface-github',
               'iot',
+              'rest-framework',
               ],
     'vertical association': ['vertical-association'],
     'vertical hotel': ['vertical-hotel'],
