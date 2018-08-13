@@ -189,7 +189,7 @@ from .hooks import pre_init_hook, post_init_hook, uninstall_hook, post_load
 ...
 ```
 
-For apply monkey patches use post_load hook.
+For applying monkey patches use post_load hook.
 In order to apply them just if the module is installed.
 
 
