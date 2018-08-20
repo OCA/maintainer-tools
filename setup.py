@@ -38,11 +38,6 @@ setuptools.setup(
         'setuptools-odoo>=2.1',
         'twine',
         'wheel',
-        # We keep setuptools<31 as long as we can, so
-        # generated wheel continue to work for Odoo 10
-        # without odoo-autodiscover 2.
-        # https://github.com/odoo/odoo/pull/15718
-        'setuptools<31',
     ],
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*',
     classifiers=[
