@@ -164,7 +164,8 @@ For `static files`, the name pattern is `<module_name>.ext` (i.e.
 image but copy it in our codebase instead.
 
 ### Installation hooks
-When **`pre_init_hook`**, **`post_init_hook`** and **`uninstall_hook`** are
+When **`pre_init_hook`**, **`post_init_hook`**, **`uninstall_hook`**
+and **`post_load`** are
 used, they should be placed in **`hooks.py`** located at the root of module
 directory structure and keys in the manifest file keeps the same as the
 following
@@ -175,6 +176,7 @@ following
     'pre_init_hook': 'pre_init_hook',
     'post_init_hook': 'post_init_hook',
     'uninstall_hook': 'uninstall_hook',
+    'post_load': 'post_load',
     ...
 }
 ```
@@ -183,11 +185,13 @@ Remember to add into the **`__init__.py`** the following imports as
 needed. For example:
 ```python
 ...
-from .hooks import pre_init_hook
-from .hooks import post_init_hook
-from .hooks import uninstall_hook
+from .hooks import pre_init_hook, post_init_hook, uninstall_hook, post_load
 ...
 ```
+
+For applying monkey patches use post_load hook.
+In order to apply them just if the module is installed.
+
 
 The complete tree should look like this:
 
