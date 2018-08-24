@@ -18,6 +18,8 @@ def get_runbot_ids():
     repos_with_ids = requests.get(REPOS_WITH_IDS_URL).text
     for repo_id_line in repos_with_ids.split('\n'):
         repo_id_line = repo_id_line.strip()
+        if not repo_id_line:
+            continue
         mo = REPO_ID_LINE_RE.match(repo_id_line)
         if not mo:
             print("warning: invalid repos_with_ids line:", repo_id_line)
