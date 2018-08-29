@@ -202,12 +202,14 @@ def gen_one_addon_index(readme_filename):
         )
         return index_filename
     except ApplicationError:
-        raise click.ClickException("Error validating README.rst")
+        raise click.ClickException(
+            "Error validating {}".format(readme_filename)
+        )
 
 
 @click.command()
 @click.option('--repo-name', required=True,
-              help="OCA repository name, eg server-tools.")
+              help="OCA repository name, eg. server-tools.")
 @click.option('--branch', required=True,
               help="Odoo series. eg 11.0.")
 @click.option('--addon-dir', 'addon_dirs',
