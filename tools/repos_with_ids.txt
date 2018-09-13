@@ -158,3 +158,4 @@
 269|github.com/OCA/iot
 270|github.com/OCA/connector-spscommerce
 271|github.com/OCA/rest-framework
+272|github.com/OCA/l10n-greece
