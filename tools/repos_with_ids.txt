@@ -42,7 +42,6 @@
 138|github.com/OCA/program
 137|github.com/OCA/product-variant
 132|github.com/OCA/margin-analysis
-97|github.com/OCA/banking
 123|github.com/OCA/l10n-luxemburg
 176|github.com/OCA/l10n-netherlands
 172|github.com/OCA/vertical-agriculture
@@ -67,7 +66,6 @@
 125|github.com/OCA/l10n-switzerland
 120|github.com/OCA/l10n-canada
 104|github.com/OCA/connector-cmis
-98|github.com/OCA/bank-statement-reconcile
 124|github.com/OCA/l10n-brazil
 93|github.com/OCA/account-fiscal-rule
 94|github.com/OCA/account-invoice-reporting
