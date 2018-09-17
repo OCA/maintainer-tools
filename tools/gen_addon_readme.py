@@ -141,7 +141,7 @@ def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
                     if fragment[-1] != '\n':
                         fragment += '\n'
                     fragments[fragment_name] = fragment
-    runbot_id = get_runbot_ids()[repo_name]
+    runbot_id = get_runbot_ids().get(repo_name)
     badges = []
     development_status = manifest.get('development_status', 'Beta')
     if development_status in DEVELOPMENT_STATUS_BADGES:
@@ -151,7 +151,10 @@ def gen_one_addon_readme(repo_name, branch, addon_name, addon_dir, manifest):
         badges.append(LICENSE_BADGES[license])
     badges.append(make_repo_badge(repo_name, branch, addon_name))
     badges.append(make_weblate_badge(repo_name, branch, addon_name))
-    badges.append(make_runbot_badge(runbot_id, branch))
+    if runbot_id:
+        badges.append(make_runbot_badge(runbot_id, branch))
+    else:
+        print("Warning: There isn't a runbot_id for this repo: %s" % repo_name)
     authors = [
         a.strip()
         for a in manifest.get('author', '').split(',')
