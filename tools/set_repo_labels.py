@@ -28,6 +28,7 @@ all_labels = {
     'work in progress': '0052cc',
     'wontfix': 'ffffff',
     'migration': 'd4c5f9',
+    'ready to merge': 'bfdadc',
 }
 
 
