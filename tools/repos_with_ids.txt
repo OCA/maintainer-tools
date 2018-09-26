@@ -125,6 +125,7 @@
 225|github.com/OCA/website-cms
 226|github.com/OCA/edi
 227|github.com/OCA/intrastat
+228|github.com/OCA/connector-telephony
 229|github.com/OCA/interface-github
 230|github.com/OCA/queue
 236|github.com/OCA/l10n-chile
@@ -159,3 +160,4 @@
 270|github.com/OCA/connector-spscommerce
 271|github.com/OCA/rest-framework
 272|github.com/OCA/l10n-greece
+273|github.com/OCA/oca-custom
