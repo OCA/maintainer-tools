@@ -228,14 +228,14 @@ MAIN_BRANCHES = (
 
 def get_repositories():
     gh = login()
-    all_repos = [repo.name for repo in gh.iter_user_repos('OCA')
+    all_repos = [repo.name for repo in gh.repositories_by('OCA')
                  if repo.name not in NOT_ADDONS]
     return all_repos
 
 
 def get_repositories_and_branches(repos=(), branches=MAIN_BRANCHES):
     gh = login()
-    for repo in gh.iter_user_repos('OCA'):
+    for repo in gh.repositories_by('OCA'):
         if repos and repo.name not in repos:
             continue
         if repo.name in NOT_ADDONS:
