@@ -201,6 +201,9 @@ class BranchMigrator(object):
                     ("2.7", "3.5"),
                     (r'(?m)virtualenv:.*\n.*system_site_packages: true\n', ''),
                 ],
+                u'12.0': [
+                    (r'addons:\n', r'addons:\n  postgresql: "9.6"'),
+                ],
             },
             '.gitignore': {
                 None: [],

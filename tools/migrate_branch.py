@@ -278,6 +278,9 @@ class BranchMigrator(object):
                     ("2.7", "3.5"),
                     (r'(?m)virtualenv:.*\n.*system_site_packages: true\n', ''),
                 ],
+                u'12.0': [
+                    (r'addons:\n', r'addons:\n  postgresql: "9.6"'),
+                ],
             },
         }
         for filename in REPLACES:
@@ -290,7 +293,7 @@ class BranchMigrator(object):
                 replaces += REPLACES[filename][version]
             tree_data.append(self._replace_content(repo, filename, replaces))
         self._create_commit(
-            repo, tree_data, "[MIG] Update metafiles")
+            repo, tree_data, "[MIG] Update metafiles\n\n[skip ci]")
 
     def _make_default_branch(self, repo):
         repo.edit(repo.name, default_branch=self.gh_target_branch)
