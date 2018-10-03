@@ -26,7 +26,7 @@ setuptools.setup(
         'autopep8',
         'click',
         'configparser',  # for python2 compat
-        'docutils',
+        'docutils', #Comment
         'ERPpeek',
         'github3.py<1',
         'inflection',
