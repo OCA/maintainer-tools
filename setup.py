@@ -28,7 +28,7 @@ setuptools.setup(
         'configparser',  # for python2 compat
         'docutils',
         'ERPpeek',
-        'github3.py<1',
+        'github3.py',
         'inflection',
         'jinja2',
         'PyYAML',

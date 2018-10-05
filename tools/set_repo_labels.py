@@ -34,7 +34,7 @@ all_labels = {
 def main():
     gh = login()
 
-    all_repos = gh.iter_user_repos('OCA')
+    all_repos = gh.repositories_by('OCA')
 
     for repo in all_repos:
         if repo.name in REPO_TO_IGNORE:

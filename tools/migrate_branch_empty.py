@@ -97,6 +97,7 @@ import re
 from . import github_login
 from . import oca_projects
 from .config import read_config
+from github3.exceptions import NotFoundError
 
 MANIFESTS = ('__openerp__.py', '__manifest__.py')
 
@@ -108,7 +109,7 @@ class BranchMigrator(object):
         self.gh_token = config.get('GitHub', 'token')
         # Connect to GitHub
         self.github = github_login.login()
-        gh_user = self.github.user()
+        gh_user = self.github.me()
         if not gh_user.email and not email:
             raise Exception(
                 'Email required to commit to github. Please provide one on '
@@ -123,8 +124,8 @@ class BranchMigrator(object):
     def _replace_content(self, repo, path, replace_list, gh_file=None):
         if not gh_file:
             # Re-read path for retrieving content
-            gh_file = repo.contents(path, self.gh_source_branch)
-        content = gh_file.decoded
+            gh_file = repo.file_contents(path, self.gh_source_branch)
+        content = gh_file.decoded.decode('utf-8')
         for replace in replace_list:
             content = re.sub(replace[0], replace[1], content, flags=re.DOTALL)
         new_file_blob = repo.create_blob(content, encoding='utf-8')
@@ -132,7 +133,7 @@ class BranchMigrator(object):
             'path': path,
             'mode': '100644',
             'type': 'blob',
-            'sha': new_file_blob
+            'sha': new_file_blob,
         }
 
     def _create_commit(self, repo, tree_data, message, use_sha=True):
@@ -165,15 +166,10 @@ class BranchMigrator(object):
         for root_content in root_contents.values():
             if root_content.type != 'dir':
                 continue
-            module_contents = repo.contents(
-                root_content.path, self.gh_source_branch,
-            )
-            manifest = False
-            for manifest_file in MANIFESTS:
-                manifest = module_contents.get(manifest_file)
-                if manifest:
-                    break
-            if manifest:
+            module_contents = repo.directory_contents(
+                root_content.path, self.gh_source_branch, return_as=dict
+            ).keys()
+            if any(x in module_contents for x in MANIFESTS):
                 modules.append(root_content.path)
         return modules
 
@@ -182,7 +178,7 @@ class BranchMigrator(object):
         branch.
         """
         tree_data = []
-        source_string = self.gh_source_branch.replace('.', '\.')
+        source_string = self.gh_source_branch.replace('.', r'\.')
         target_string = self.gh_target_branch
         source_string_dash = self.gh_source_branch.replace('.', '-')
         target_string_dash = self.gh_target_branch.replace('.', '-')
@@ -191,7 +187,7 @@ class BranchMigrator(object):
                 None: [
                     (source_string, target_string),
                     (source_string_dash, target_string_dash),
-                    ("\[//]: # \(addons\).*\[//]: # \(end addons\)", ""),
+                    (r"\[//]: # \(addons\).*\[//]: # \(end addons\)", ""),
                 ],
             },
             '.travis.yml': {
@@ -204,6 +200,9 @@ class BranchMigrator(object):
                 u'11.0': [
                     ("2.7", "3.5"),
                     (r'(?m)virtualenv:.*\n.*system_site_packages: true\n', ''),
+                ],
+                u'12.0': [
+                    (r'addons:\n', r'addons:\n  postgresql: "9.6"'),
                 ],
             },
             '.gitignore': {
@@ -234,7 +233,7 @@ class BranchMigrator(object):
         repo.edit(repo.name, default_branch=self.gh_target_branch)
 
     def _create_branch_milestone(self, repo):
-        for milestone in repo.iter_milestones():
+        for milestone in repo.milestones():
             if milestone.title == self.gh_target_branch:
                 return milestone
         return repo.create_milestone(self.gh_target_branch)
@@ -242,7 +241,7 @@ class BranchMigrator(object):
     def _create_migration_issue(self, repo, modules, milestone):
         title = "Migration to version %s" % self.gh_target_branch
         # Check first if it already exists
-        for issue in repo.iter_issues(milestone=milestone.number):
+        for issue in repo.issues(milestone=milestone.number):
             if issue.title == title:
                 return issue
         body = ("# Todo\n\nhttps://github.com/OCA/maintainer-tools/wiki/"
@@ -251,7 +250,7 @@ class BranchMigrator(object):
         body += "\n".join(["- [ ] %s" % x for x in modules])
         # Make sure labels exists
         labels = []
-        for label in repo.iter_labels():
+        for label in repo.labels():
             if label.name in ['help wanted', 'work in progress']:
                 labels.append(label.name)
         return repo.create_issue(
@@ -261,21 +260,28 @@ class BranchMigrator(object):
         print("Migrating project %s/%s" % (self.gh_org, project))
         # Create new branch
         repo = self.github.repository(self.gh_org, project)
-        source_branch = repo.branch(self.gh_source_branch)
-        if not source_branch:
+        try:
+            repo.branch(self.gh_source_branch)
+        except NotFoundError:
             print("Source branch non existing. Skipping...")
             return
-        branch = repo.branch(self.gh_target_branch)
-        if branch:
+        try:
+            repo.branch(self.gh_target_branch)
+        except NotFoundError:
+            pass
+        else:
             print("Branch already exists. Skipping...")
             return
-        root_contents = repo.contents('', self.gh_source_branch)
+        root_contents = repo.directory_contents(
+            '', self.gh_source_branch, return_as=dict,
+        )
         modules = self._get_modules_list(repo, root_contents)
         commit = self._create_metafiles(repo, root_contents)
         repo.create_ref(
             'refs/heads/%s' % self.gh_target_branch, commit.sha,
         )
-        self._make_default_branch(repo)
+        # TODO: GitHub is returning 404
+        # self._make_default_branch(repo)
         milestone = self._create_branch_milestone(repo)
         self._create_migration_issue(repo, sorted(modules), milestone)
 
