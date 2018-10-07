@@ -212,7 +212,7 @@ def get_repositories_and_branches(repos=(), branches=MAIN_BRANCHES):
             continue
         if repo.name in NOT_ADDONS:
             continue
-        for branch in repo.iter_branches():
+        for branch in repo.branches():
             if branches and branch.name not in branches:
                 continue
             yield repo.name, branch.name
