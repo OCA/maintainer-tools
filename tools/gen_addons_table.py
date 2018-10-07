@@ -20,6 +20,7 @@ does not matter, will be replaced by the script
 from __future__ import print_function
 import ast
 import io
+import logging
 import os
 import re
 
@@ -27,13 +28,11 @@ import click
 
 from .gitutils import commit_if_needed
 
+_logger = logging.getLogger(__name__)
+
 
 MARKERS = r'(\[//\]: # \(addons\))|(\[//\]: # \(end addons\))'
 MANIFESTS = ('__openerp__.py', '__manifest__.py')
-
-
-class UserError(click.ClickException):
-    pass
 
 
 def sanitize_cell(s):
@@ -56,8 +55,9 @@ def replace_in_readme(readme_path, header, rows_available, rows_unported):
         readme = f.read()
     parts = re.split(MARKERS, readme, flags=re.MULTILINE)
     if len(parts) != 7:
-        raise UserError('Addons markers not found or incorrect in %s' %
+        _logger.warning('Addons markers not found or incorrect in %s',
                         readme_path)
+        return
     addons = []
     if rows_available:
         addons.extend([
@@ -90,7 +90,8 @@ def replace_in_readme(readme_path, header, rows_available, rows_unported):
 def gen_addons_table(commit):
     readme_path = 'README.md'
     if not os.path.isfile(readme_path):
-        raise UserError('%s not found' % readme_path)
+        _logger.warning('%s not found', readme_path)
+        return
     # list addons in . and __unported__
     addon_paths = []  # list of (addon_path, unported)
     for addon_path in os.listdir('.'):
@@ -121,8 +122,9 @@ def gen_addons_table(commit):
             summary = sanitize_cell(summary)
             installable = manifest.get('installable', True)
             if unported and installable:
-                raise UserError('%s is in __unported__ but is marked '
+                _logger.warning('%s is in __unported__ but is marked '
                                 'installable.' % addon_path)
+                installable = False
             if installable:
                 rows_available.append((link, version, summary))
             else:
