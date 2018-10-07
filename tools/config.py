@@ -30,3 +30,33 @@ def read_config():
 def write_config(config):
     with open(CREDENTIALS_FILE, 'w') as fd:
         config.write(fd)
+
+
+NOT_ADDONS = {
+    'odoo-community.org',
+    'contribute-md-template',
+    'maintainer-tools',
+    'maintainer-quality-tools',
+    'odoo-sphinx-autodoc',
+    'openupgradelib',
+    'connector-magento-php-extension',
+    'OCB',
+    'OpenUpgrade',
+    'pylint-odoo',
+    'oca-custom',
+    'odoorpc',
+    'oca-decorators',
+    'oca-weblate-deployment',
+    'odoo-sentinel',
+}
+
+
+MAIN_BRANCHES = (
+    '6.1',
+    '7.0',
+    '8.0',
+    '9.0',
+    '10.0',
+    '11.0',
+    '12.0',
+)
