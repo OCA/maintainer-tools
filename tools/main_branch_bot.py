@@ -60,6 +60,12 @@ def main(target, repo, branch, push, python2):
             continue
         with temporary_clone(repo, branch):
             try:
+                # update addons table in README.md
+                sys.stderr.write(
+                    "============> updating addons table in %s@%s\n" %
+                    (repo, branch)
+                )
+                subprocess.call(['oca-gen-addons-table', '--commit'])
                 # generate README.rst
                 sys.stderr.write(
                     "============> oca-gen-addon-readme in %s@%s\n" %

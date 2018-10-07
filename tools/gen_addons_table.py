@@ -23,14 +23,17 @@ import io
 import os
 import re
 
+import click
+
+from .gitutils import commit_if_needed
+
 
 MARKERS = r'(\[//\]: # \(addons\))|(\[//\]: # \(end addons\))'
 MANIFESTS = ('__openerp__.py', '__manifest__.py')
 
 
-class UserError(Exception):
-    def __init__(self, msg):
-        self.msg = msg
+class UserError(click.ClickException):
+    pass
 
 
 def sanitize_cell(s):
@@ -81,7 +84,10 @@ def replace_in_readme(readme_path, header, rows_available, rows_unported):
         f.write(readme)
 
 
-def gen_addons_table():
+@click.command()
+@click.option('--commit/--no-commit',
+              help="git commit changes to README.rst, if any.")
+def gen_addons_table(commit):
     readme_path = 'README.md'
     if not os.path.isfile(readme_path):
         raise UserError('%s not found' % readme_path)
@@ -123,15 +129,12 @@ def gen_addons_table():
                 rows_unported.append((link, version + ' (unported)', summary))
     # replace table in README.md
     replace_in_readme(readme_path, header, rows_available, rows_unported)
-
-
-def main():
-    try:
-        gen_addons_table()
-    except UserError as e:
-        print(e.msg)
-        exit(1)
+    if commit:
+        commit_if_needed(
+            [readme_path],
+            '[UPD] addons table in README.md [ci skip]',
+        )
 
 
 if __name__ == '__main__':
-    main()
+    gen_addons_table()
