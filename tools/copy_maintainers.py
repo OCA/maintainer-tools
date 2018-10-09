@@ -78,7 +78,7 @@ class GHTeamList(object):
                     print('Added repo %s to team %s -> %s' %
                           (repo_name, team.name,
                            'OK' if status else 'NOK'))
-        print(list(r.name for r in team.iter_repos()))
+            print(list(r.name for r in team.iter_repos()))
         return team
 
     def create_psc_team(self, project, team_name, main_team):
@@ -106,7 +106,7 @@ def copy_users(odoo, team=None, dry_run=False):
 
     # on odoo, the model is a project, but they are teams on GitHub
     Project = odoo.model('project.project')
-    base_domain = [('privacy_visibility = public'),
+    base_domain = [('privacy_visibility', '!=', 'followers'),
                    ]
     if team == 'OCA Contributors':
         projects = [get_cla_project(odoo)]
