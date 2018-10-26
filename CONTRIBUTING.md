@@ -137,22 +137,22 @@ A module is organized in a few directories:
 ### File naming
 
 For `models`, `views` and `data` declarations, split files by the model
-involved, either created or inherited. These files should be named after the
-model. For example, demo data for res.partner should go in a file named
-`demo/res_partner.xml` and a view for partner should go in a file named
-`views/res_partner.xml`. An exception can be made when the model is a
-model intended to be used only as a one2many model nested on the main
-model. In this case, you can include the model definition inside it.
+involved, either created or inherited. When they are XML files, a suffix should
+be included with its category. For example, demo data for res.partner should go
+in a file named `demo/res_partner_demo.xml` and a view for partner should go in
+a file named `views/res_partner_view.xml`. An exception can be made when the
+model is a model intended to be used only as a one2many model nested on the
+main model. In this case, you can include the model definition inside it.
 Example `sale.order.line` model can be together with `sale.order` in
 the file `models/sale_order.py`.
 
 For model named `<main_model>` the following files may be created:
 
 * `models/<main_model>.py`
-* `data/<main_model>.xml`
-* `demo/<main_model>.xml`
-* `templates/<main_model>.xml`
-* `views/<main_model>.xml`
+* `data/<main_model>_data.xml`
+* `demo/<main_model>_demo.xml`
+* `templates/<main_model>_template.xml`
+* `views/<main_model>_view.xml`
 
 For `controller`, if there is only one file it should be named `main.py`.
 If there are several controller classes or functions you can split them into
