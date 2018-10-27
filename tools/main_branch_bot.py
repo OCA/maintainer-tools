@@ -118,7 +118,7 @@ def main(target, repo, branch, push, python2):
             except Exception:
                 exit_code = 1
                 sys.stderr.write(
-                    "/!\ exception in %s@%s\n" %
+                    "/!\\ exception in %s@%s\n" %
                     (repo, branch),
                 )
                 traceback.print_exc()

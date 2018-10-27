@@ -9,7 +9,7 @@ import pdb
 # Runbot urls need the repo id from the table in the runbot server.
 # This file is the output of a select id, name from there.
 for repo_list_line in open('repos_with_ids.txt'):
-    m = re.search('(\d+)\|github.com/OCA/(.*)', repo_list_line)
+    m = re.search(r'(\d+)\|github.com/OCA/(.*)', repo_list_line)
     repo_name = m.group(2)
     repo_id = m.group(1)
     print(repo_name)
