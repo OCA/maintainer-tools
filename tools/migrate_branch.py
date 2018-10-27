@@ -176,7 +176,7 @@ class BranchMigrator(object):
                 )
                 manifest_dict = eval(gh_file.decoded)
                 if manifest_dict.get('installable') is None:
-                    src = ",?\s*}"
+                    src = r",?\s*}"
                     dest = ",\n    'installable': False,\n}"
                 else:
                     src = '["\']installable["\']: *True'
@@ -254,7 +254,7 @@ class BranchMigrator(object):
         the new branch.
         """
         tree_data = []
-        source_string = self.gh_source_branch.replace('.', '\.')
+        source_string = self.gh_source_branch.replace('.', r'\.')
         target_string = self.gh_target_branch
         source_string_dash = self.gh_source_branch.replace('.', '-')
         target_string_dash = self.gh_target_branch.replace('.', '-')
@@ -263,7 +263,7 @@ class BranchMigrator(object):
                 None: [
                     (source_string, target_string),
                     (source_string_dash, target_string_dash),
-                    ("\[//]: # \(addons\).*\[//]: # \(end addons\)",
+                    (r"\[//]: # \(addons\).*\[//]: # \(end addons\)",
                      "[//]: # (addons)\n[//]: # (end addons)"),
                 ],
             },
