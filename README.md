@@ -92,22 +92,20 @@ These tools are meant to be used both by repo maintainers and contributors.
 You can leverage them to give more quality to your modules and to respect OCA guidelines.
 
 
-<<<<<<< HEAD
-=======
 ### README generator
 
 To provide high quality README for our modules we generate them automatically.
 The sections of the final README are organized in fragments.
 They must be put inside a `readme` folder respecting [this structure|./readme].
 
-To generate the final README:
+eg.
+To generate the final README for the module `auth_keycloak`:
 
     $ oca-gen-addon-readme --repo-name=server-auth --branch=10.0 --addon-dir=auth_keycloak
 
-The result will be a fully PyPI compliant README.rst in the root of your module (`auth_keycloak` in this case).
+The result will be a fully PyPI compliant README.rst in the root of your module.
 
 
->>>>>>> 72e2c7f... fixup! Improve repo README
 ### Auto fix pep8 guidelines
 
 To auto fix pep8 guidelines of your code you can run:
