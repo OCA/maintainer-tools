@@ -11,25 +11,35 @@
     $ . env/bin/activate
     $ python setup.py install
 
-## Usage
+## OCA repositories tools
 
-Get a token from Github, you may have to delete the existing one from Account settings -> Applications -> Personnal Access Token
+These tools are mostly for maintenance purpose only.
+They are used by OCA maintainers to address common operations across all repos.
+
+**Prerequisite**
+
+Get a token from Github.
 
     $ oca-github-login USERNAME
 
-**Copy the users from the teams configured on community.odoo.com to the GitHub teams**
+
+NOTE: you may have to delete the existing one from
+"Account settings -> Developer Settings -> Personal Access Tokens".
+
+
+### Sync team users from community.odoo.com to GitHub teams
 
 Goal: members of the teams should never be added directly on GitHub.
 They should be added on https://community.odoo.com. This script will
-sync all the teams from odoo to GitHub.
+sync all the teams from Odoo to GitHub.
 
 Prerequisites:
 
-* Your odoo user must have read accesses to the projects and users.
+* Your odoo user must have read access to the projects and users;
 * The partners on odoo must have their GitHub login set otherwise they won't
-  be added in the GitHub teams.
+  be added in the GitHub teams;
 * Your GitHub user must have owners rights on the OCA organization to be
-  able to add or remove members.
+  able to add or remove members;
 * The odoo project must have the same name than the GitHub teams.
 
 Run the script in "dry-run" mode:
@@ -40,43 +50,19 @@ Apply the changes on GitHub:
 
     $ oca-copy-maintainers
 
-The first time it runs, it will ask you for your odoo's username and
-password. You may store them using the `--store` option, but be warned
-that the password is stored in clear text.
+The first time it runs, it will ask your odoo's username and password.
+You may store them using the `--store` option, but watch out: the password is stored in clear text.
 
 
-**Set labels on OCA repository on GitHub**
+### Set labels on OCA repository on GitHub
 
-Set standardized labels to ease the issue workflow on all repositories with same colors
+Set standardized labels to ease the issue workflow on all repositories with same colors.
 This tools will also warn you what are the specific labels on some repository
 
     $ oca-set-repo-labels
 
 
-**Auto fix pep8 guidelines**
-
-To auto fix pep8 guidelines of your code you can run:
-
-    $ oca-autopep8 -ri PATH
-
-This script overwrite with monkey patch the original script of [autopep8](https://github.com/hhatto/autopep8)
-to support custom code refactoring.
-
-* List of errors added:
-
-    - `CW0001` Class name with snake_case style found, should use CamelCase.
-    - `CW0002` Delete vim comment.
-
-More info of original autopep8 [here](https://pypi.python.org/pypi/autopep8/)
-
-You can rename snake_case to CamelCase with next command:
-    $ oca-autopep8 -ri --select=CW0001 PATH
-
-You can delete vim comment
-    $ oca-autopep8 -ri --select=CW0002,W391 PATH
-
-
-**Clone all OCA repositories**
+### Clone all OCA repositories
 
 The script `oca-clone-everything` can be used to clone all the OCA projects:
 create a fresh directory, use oca-github-login (or copy oca.cfg from a place
@@ -98,6 +84,53 @@ will create two remotes, in addition to the default `origin`, called
 `git@github.com:otherlogin/projectname` and fetch these remotes, for all the
 OCA projects. It does not matter whether the forks exist on github or not, and
 you can create them later.
+
+
+## Quality tools
+
+These tools are meant to be used both by repo maintainers and contributors.
+You can leverage them to give more quality to your modules and to respect OCA guidelines.
+
+
+<<<<<<< HEAD
+=======
+### README generator
+
+To provide high quality README for our modules we generate them automatically.
+The sections of the final README are organized in fragments.
+They must be put inside a `readme` folder respecting [this structure|./readme].
+
+To generate the final README:
+
+    $ oca-gen-addon-readme --repo-name=server-auth --branch=10.0 --addon-dir=auth_keycloak
+
+The result will be a fully PyPI compliant README.rst in the root of your module (`auth_keycloak` in this case).
+
+
+>>>>>>> 72e2c7f... fixup! Improve repo README
+### Auto fix pep8 guidelines
+
+To auto fix pep8 guidelines of your code you can run:
+
+    $ oca-autopep8 -ri PATH
+
+This script overwrite with monkey patch the original script of [autopep8](https://github.com/hhatto/autopep8)
+to support custom code refactoring.
+
+* List of errors added:
+
+    - `CW0001` Class name with snake_case style found, should use CamelCase.
+    - `CW0002` Delete vim comment.
+
+More info of original autopep8 [here](https://pypi.python.org/pypi/autopep8/)
+
+You can rename snake_case to CamelCase with next command:
+
+    $ oca-autopep8 -ri --select=CW0001 PATH
+
+You can delete vim comment
+
+    $ oca-autopep8 -ri --select=CW0002,W391 PATH
 
 
 ## Developers
