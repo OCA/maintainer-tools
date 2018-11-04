@@ -18,7 +18,8 @@ def login():
         token = config.get('GitHub', 'token')
     if not token:
         sys.exit("No token has been generated for this script. "
-                 "Please run 'oca-github-login'.")
+                 "Please run 'oca-github-login' or set the GITHUB_TOKEN "
+                 "environment variable.")
     return github3.login(token=token)
 
 
