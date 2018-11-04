@@ -2,7 +2,6 @@
 # Copyright (c) 2016-2018 ACSONE SA/NV
 import os
 from os.path import join as opj
-import subprocess
 import sys
 import traceback
 
@@ -41,8 +40,6 @@ def main(target, repo, branch, push, python2):
     """ OCA Git Bot for main addon branches
 
     \b
-    - generate README.rst from readme/*.rst fragments
-    - generate default setup.py
     - generate sdists and wheels to a PEP 503 directory
 
     Branches before 8.0 are ignored.
@@ -60,49 +57,6 @@ def main(target, repo, branch, push, python2):
             continue
         with temporary_clone(repo, branch):
             try:
-                # update addons table in README.md
-                sys.stderr.write(
-                    "============> updating addons table in %s@%s\n" %
-                    (repo, branch)
-                )
-                subprocess.check_call(['oca-gen-addons-table', '--commit'])
-                # generate README.rst
-                sys.stderr.write(
-                    "============> oca-gen-addon-readme in %s@%s\n" %
-                    (repo, branch),
-                )
-                gen_addon_readme_cmd = [
-                    'oca-gen-addon-readme',
-                    '--repo-name', repo,
-                    '--branch', branch,
-                    '--addons-dir', '.',
-                ]
-                if push:
-                    gen_addon_readme_cmd.append('--commit')
-                subprocess.check_call(gen_addon_readme_cmd)
-                # generate default setup.py
-                sys.stderr.write(
-                    "============> setuptools-odoo-make-default in %s@%s\n" %
-                    (repo, branch),
-                )
-                make_default_setup_cmd = [
-                    'setuptools-odoo-make-default',
-                    '--addons-dir', '.',
-                    '--metapackage', 'oca-' + repo,
-                    '--clean',
-                ]
-                if push:
-                    make_default_setup_cmd.append('--commit')
-                subprocess.check_call(make_default_setup_cmd)
-                # push changes to git, if any
-                if push:
-                    sys.stderr.write(
-                        "============> git push in %s@%s\n" %
-                        (repo, branch),
-                    )
-                    subprocess.check_call([
-                        'git', 'push', 'origin', branch,
-                    ])
                 # make dists and wheels for each installable addon
                 # and _metapackage
                 sys.stderr.write(
