@@ -8,10 +8,6 @@ from __future__ import print_function
 from .github_login import login
 
 REPO_TO_IGNORE = [
-    'odoo-community.org',
-    'community-data-files',
-    'contribute-md-template',
-    'website',
 ]
 
 # here is the list of labels we need in each repo
