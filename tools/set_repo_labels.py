@@ -39,10 +39,16 @@ def main():
         wanted_labels = all_labels.copy()
         for label in repo.labels():
             if label.name.lower() in wanted_labels:
+                wanted_name = label.name.lower()
                 wanted_color = wanted_labels[label.name.lower()]
-                if label.color != wanted_color:
-                    print("fixing color of label", label.name, "in", repo.name)
-                    label.update(label.name, wanted_color)
+                if label.name != wanted_name or label.color != wanted_color:
+                    print(
+                        "fixing name/color of label",
+                        label.name,
+                        "in",
+                        repo.name,
+                    )
+                    label.update(wanted_name, wanted_color)
                 wanted_labels.pop(label.name.lower())
             else:
                 print("found extra label", label.name, "in", repo.name)
