@@ -35,7 +35,6 @@ setuptools.setup(
         'polib',
         'pygments',
         'requests',
-        'setuptools-odoo>=2.1',
         'twine',
         'wheel',
     ],
