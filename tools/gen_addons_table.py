@@ -134,7 +134,7 @@ def gen_addons_table(commit):
     if commit:
         commit_if_needed(
             [readme_path],
-            '[UPD] addons table in README.md [ci skip]',
+            '[UPD] addons table in README.md',
         )
 
 
