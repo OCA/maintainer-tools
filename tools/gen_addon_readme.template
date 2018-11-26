@@ -40,10 +40,10 @@
 Bug Tracker
 ===========
 
-Bugs are tracked on `GitHub Issues <https://github.com/OCA/{{ repo_name }}/issues>`_.
+Bugs are tracked on `GitHub Issues <https://github.com/{{ org_name }}/{{ repo_name }}/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us smashing it by providing a detailed and welcomed
-`feedback <https://github.com/OCA/{{ repo_name }}/issues/new?body=module:%20{{ addon_name }}%0Aversion:%20{{ branch }}%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/{{ org_name }}/{{ repo_name }}/issues/new?body=module:%20{{ addon_name }}%0Aversion:%20{{ branch }}%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -64,6 +64,7 @@ Authors
 Maintainers
 ~~~~~~~~~~~
 
+{% if org_name == 'OCA' %}
 This module is maintained by the OCA.
 
 .. image:: https://odoo-community.org/logo.png
@@ -73,6 +74,7 @@ This module is maintained by the OCA.
 OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.
+{% endif %}
 
 {%- if manifest.maintainers %}
 {% for maintainer in manifest.maintainers %}
@@ -86,7 +88,6 @@ Current `maintainer{% if manifest.maintainers|length > 1 %}s{% endif %} <https:/
 {% for maintainer in manifest.maintainers %}|maintainer-{{ maintainer }}| {% endfor -%}
 {% endif %}
 
-This module is part of the `OCA/{{ repo_name }} <https://github.com/OCA/{{ repo_name }}/tree/{{ branch }}/{{ addon_name }}>`_ project on GitHub.
+This module is part of the `{{ org_name }}/{{ repo_name }} <https://github.com/{{ org_name }}/{{ repo_name }}/tree/{{ branch }}/{{ addon_name }}>`_ project on GitHub.
 
-You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.
-
+You are welcome to contribute.{% if org_name == 'OCA' %} To learn how please visit https://odoo-community.org/page/Contribute.{% endif %}
