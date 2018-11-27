@@ -138,9 +138,12 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
     module_url = "https://raw.githubusercontent.com/{org_name}/{repo_name}"\
         "/{branch}/{addon_name}/".format(**locals())
     for index, fragment_line in enumerate(fragment_lines):
-        if fragment_line.startswith('.. figure::'):
-            path =\
-                fragment_line.replace('\n', '').replace('.. figure:: ', '')
+        if ('.. figure::' in fragment_line or
+                '.. image::' in fragment_line):
+            path = fragment_line.strip()\
+                .replace('\n', '')\
+                .replace('.. figure:: ', '')\
+                .replace('.. image:: ', '')
             if path.startswith('http'):
                 # It is already an absolute path
                 continue
