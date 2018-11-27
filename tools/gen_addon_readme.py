@@ -2,6 +2,7 @@
 # Copyright (c) 2018 ACSONE SA/NV
 import io
 import os
+import re
 
 import click
 from docutils import ApplicationError
@@ -135,24 +136,24 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
         return False
 
     # Replace relative path by absolute path for figures
+    image_path_re = re.compile(r'\s*\.\. (figure|image)::\s+(?P<path>.*?)\s*$')
     module_url = "https://raw.githubusercontent.com/{org_name}/{repo_name}"\
         "/{branch}/{addon_name}/".format(**locals())
     for index, fragment_line in enumerate(fragment_lines):
-        if ('.. figure::' in fragment_line or
-                '.. image::' in fragment_line):
-            path = fragment_line.strip()\
-                .replace('\n', '')\
-                .replace('.. figure:: ', '')\
-                .replace('.. image:: ', '')
-            if path.startswith('http'):
-                # It is already an absolute path
-                continue
-            else:
-                # remove '../' if exists that make the fragment working
-                # on github interface, in the 'readme' subfolder
-                relative_path = path.replace('../', '')
-                fragment_lines[index] = fragment_line.replace(
-                    path, urljoin(module_url, relative_path))
+        mo = image_path_re.match(fragment_line)
+        if not mo:
+            continue
+        path = mo.group('path')
+
+        if path.startswith('http'):
+            # It is already an absolute path
+            continue
+        else:
+            # remove '../' if exists that make the fragment working
+            # on github interface, in the 'readme' subfolder
+            relative_path = path.replace('../', '')
+            fragment_lines[index] = fragment_line.replace(
+                path, urljoin(module_url, relative_path))
     fragment = ''.join(fragment_lines)
 
     # ensure that there is a new empty line at the end of the fragment
@@ -174,7 +175,9 @@ def gen_one_addon_readme(
                     org_name, repo_name, branch, addon_name, f)
                 if fragment:
                     fragments[fragment_name] = fragment
-    runbot_id = get_runbot_ids().get(repo_name)
+    runbot_id = False
+    if org_name == 'OCA':
+        runbot_id = get_runbot_ids().get(repo_name)
     badges = []
     development_status = manifest.get('development_status', 'Beta')
     if development_status in DEVELOPMENT_STATUS_BADGES:
