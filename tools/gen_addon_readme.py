@@ -7,6 +7,7 @@ import click
 from docutils import ApplicationError
 from docutils.core import publish_file
 from jinja2 import Template
+from urlparse import urljoin
 
 from .gitutils import commit_if_needed
 from .manifest import read_manifest, find_addons, NoManifestFound
@@ -128,6 +129,35 @@ def make_repo_badge(org_name, repo_name, branch, addon_name):
     )
 
 
+def generate_fragment(org_name, repo_name, branch, addon_name, file):
+    fragment_lines = file.readlines()
+    if not fragment_lines:
+        return False
+
+    # Replace relative path by absolute path for figures
+    module_url = "https://raw.githubusercontent.com/{org_name}/{repo_name}"\
+        "/{branch}/{addon_name}/".format(**locals())
+    for index, fragment_line in enumerate(fragment_lines):
+        if fragment_line.startswith('.. figure::'):
+            path =\
+                fragment_line.replace('\n', '').replace('.. figure:: ', '')
+            if path.startswith('http'):
+                # It is already an absolute path
+                continue
+            else:
+                # remove '../' if exists that make the fragment working
+                # on github interface, in the 'readme' subfolder
+                relative_path = path.replace('../', '')
+                fragment_lines[index] = fragment_line.replace(
+                    path, urljoin(module_url, relative_path))
+    fragment = ''.join(fragment_lines)
+
+    # ensure that there is a new empty line at the end of the fragment
+    if fragment[-1] != '\n':
+        fragment += '\n'
+    return fragment
+
+
 def gen_one_addon_readme(
         org_name, repo_name, branch, addon_name, addon_dir, manifest):
     fragments = {}
@@ -137,10 +167,9 @@ def gen_one_addon_readme(
         )
         if os.path.exists(fragment_filename):
             with io.open(fragment_filename, 'rU', encoding='utf8') as f:
-                fragment = f.read()
+                fragment = generate_fragment(
+                    org_name, repo_name, branch, addon_name, f)
                 if fragment:
-                    if fragment[-1] != '\n':
-                        fragment += '\n'
                     fragments[fragment_name] = fragment
     runbot_id = get_runbot_ids().get(repo_name)
     badges = []
