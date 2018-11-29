@@ -266,8 +266,10 @@ def gen_one_addon_index(readme_filename):
                    "generated for all installable addons found there.")
 @click.option('--commit/--no-commit',
               help="git commit changes to README.rst, if any.")
+@click.option('--gen-html/--no-gen-html', default=True,
+              help="Generate index html file.")
 def gen_addon_readme(
-        org_name, repo_name, branch, addon_dirs, addons_dir, commit):
+        org_name, repo_name, branch, addon_dirs, addons_dir, commit, gen_html):
     """ Generate README.rst from fragments.
 
     Do nothing if readme/DESCRIPTION.rst is absent, otherwise overwrite
@@ -293,9 +295,10 @@ def gen_addon_readme(
         readme_filename = gen_one_addon_readme(
             org_name, repo_name, branch, addon_name, addon_dir, manifest)
         readme_filenames.append(readme_filename)
-        index_filename = gen_one_addon_index(readme_filename)
-        if index_filename:
-            readme_filenames.append(index_filename)
+        if gen_html:
+            index_filename = gen_one_addon_index(readme_filename)
+            if index_filename:
+                readme_filenames.append(index_filename)
     if commit:
         commit_if_needed(readme_filenames, '[UPD] README.rst')
 
