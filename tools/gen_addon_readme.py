@@ -5,16 +5,23 @@
 import io
 import os
 import re
+import sys
 
 import click
 from docutils import ApplicationError
 from docutils.core import publish_file
 from jinja2 import Template
-from urllib.parse import urljoin
 
 from .gitutils import commit_if_needed
 from .manifest import read_manifest, find_addons, NoManifestFound
 from .runbot_ids import get_runbot_ids
+
+if sys.version_info[0] < 3:
+    # python 2 import
+    from urlparse import urljoin
+else:
+    # python 3 import
+    from urllib.parse import urljoin
 
 
 FRAGMENTS_DIR = 'readme'
