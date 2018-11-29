@@ -1,5 +1,7 @@
 # License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 # Copyright (c) 2018 ACSONE SA/NV
+# Copyright (c) 2018 GRAP (http://www.grap.coop)
+
 import io
 import os
 import re
