@@ -8,7 +8,7 @@ import click
 from docutils import ApplicationError
 from docutils.core import publish_file
 from jinja2 import Template
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 from .gitutils import commit_if_needed
 from .manifest import read_manifest, find_addons, NoManifestFound
