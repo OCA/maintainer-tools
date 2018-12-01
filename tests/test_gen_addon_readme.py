@@ -41,3 +41,21 @@ def test_gen_addon_readme_oca(addons_dir):
     ]
     subprocess.check_call(cmd, cwd=addons_dir)
     _assert_expected(addons_dir, "oca")
+
+
+def test_gen_addon_readme_acme(addons_dir):
+    cmd = [
+        sys.executable,
+        "-m",
+        "tools.gen_addon_readme",
+        "--addons-dir",
+        ".",
+        "--repo-name",
+        "server-tools",
+        "--branch",
+        "12.0",
+        "--org-name",
+        "acme"
+    ]
+    subprocess.check_call(cmd, cwd=addons_dir)
+    _assert_expected(addons_dir, "acme")
