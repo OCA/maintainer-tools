@@ -83,7 +83,11 @@ promote its widespread use.
     :alt: {{ maintainer}}
 {%- endfor %}
 
+{% if org_name == 'OCA' -%}
 Current `maintainer{% if manifest.maintainers|length > 1 %}s{% endif %} <https://odoo-community.org/page/maintainer-role>`__:
+{%- else -%}
+Current maintainer{% if manifest.maintainers|length > 1 %}s{% endif %}:
+{%- endif %}
 
 {% for maintainer in manifest.maintainers %}|maintainer-{{ maintainer }}| {% endfor -%}
 {% endif %}
