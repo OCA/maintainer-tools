@@ -1,28 +1,29 @@
 # License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 # Copyright (c) 2018 ACSONE SA/NV
 
+import os
 import shutil
 import subprocess
 import sys
 
-import pathlib
 import pytest
 
 
 @pytest.fixture
-def addons_dir(tmp_path):
-    here = pathlib.Path(__file__).parent
-    addons_dir = tmp_path / "addons"
-    shutil.copytree(here / "data" / "readme_tests", addons_dir)
+def addons_dir(tmpdir):
+    here = os.path.dirname(__file__)
+    addons_dir = str(tmpdir / "addons")
+    shutil.copytree(os.path.join(here, "data", "readme_tests"), addons_dir)
     yield addons_dir
 
 
 def _assert_expected(addons_dir, suffix):
-    for addon_dir in addons_dir.iterdir():
-        if not addon_dir.is_dir():
+    for addon_dir in os.listdir(addons_dir):
+        addon_dir = os.path.join(addons_dir, addon_dir)
+        if not os.path.isdir(addon_dir):
             continue
-        actual = addon_dir / "README.rst"
-        expected = addon_dir / ("README.expected-" + suffix)
+        actual = os.path.join(addon_dir, "README.rst")
+        expected = os.path.join(addon_dir, "README.expected-" + suffix)
         with open(actual) as actual_f, open(expected) as expected_f:
             assert actual_f.read() == expected_f.read()
 
@@ -39,7 +40,7 @@ def test_gen_addon_readme_oca(addons_dir):
         "--branch",
         "12.0",
     ]
-    subprocess.check_call(cmd, cwd=addons_dir)
+    subprocess.check_call(cmd, cwd=str(addons_dir))
     _assert_expected(addons_dir, "oca")
 
 
@@ -55,7 +56,7 @@ def test_gen_addon_readme_acme(addons_dir):
         "--branch",
         "12.0",
         "--org-name",
-        "acme"
+        "acme",
     ]
-    subprocess.check_call(cmd, cwd=addons_dir)
+    subprocess.check_call(cmd, cwd=str(addons_dir))
     _assert_expected(addons_dir, "acme")
