@@ -60,3 +60,39 @@ def test_gen_addon_readme_acme(addons_dir):
     ]
     subprocess.check_call(cmd, cwd=str(addons_dir))
     _assert_expected(addons_dir, "acme")
+
+
+def test_rst_error(tmp_path):
+    addon_dir = tmp_path / "addon"
+    addon_dir.mkdir()
+    with (addon_dir / "__manifest__.py").open("w") as f:
+        f.write(u"{'name': 'addon'}")
+    with (addon_dir / "__init__.py").open("w") as f:
+        pass
+    readme_dir = addon_dir / "readme"
+    readme_dir.mkdir()
+    with (readme_dir / "DESCRIPTION.rst").open("w") as f:
+        f.write(u"Some description.")
+    with (readme_dir / "USAGE.rst").open("w") as f:
+        f.write(u"Usage\n-----\n\nblah.\n")
+    cmd = [
+        sys.executable,
+        "-m",
+        "tools.gen_addon_readme",
+        "--addon-dir",
+        str(addon_dir),
+        "--repo-name",
+        "server-tools",
+        "--branch",
+        "12.0",
+    ]
+    opts_list = ([], ["--no-gen-html"])
+    for opts in opts_list:
+        try:
+            subprocess.check_output(
+                cmd + opts, stderr=subprocess.STDOUT, universal_newlines=True
+            )
+        except subprocess.CalledProcessError as e:
+            assert "Title level inconsistent" in e.output
+        else:
+            assert False, "A rst syntax error should have been detected."
