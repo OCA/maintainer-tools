@@ -105,6 +105,9 @@ To generate the final README for the module `auth_keycloak`:
 
 The result will be a fully PyPI compliant README.rst in the root of your module.
 
+You may also use this script for your own repositories by specifying this 
+additional argument `--org-name=myorganisation`
+
 
 ### Auto fix pep8 guidelines
 
