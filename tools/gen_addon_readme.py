@@ -6,9 +6,9 @@ import io
 import os
 import re
 import sys
+import tempfile
 
 import click
-from docutils import ApplicationError
 from docutils.core import publish_file
 from jinja2 import Template
 
@@ -232,6 +232,16 @@ def gen_one_addon_readme(
     return readme_filename
 
 
+def check_rst(readme_filename):
+    with tempfile.NamedTemporaryFile() as f:
+        publish_file(
+            source_path=readme_filename,
+            destination=f,
+            writer_name='html4css1',
+            settings_overrides=RST2HTML_SETTINGS,
+        )
+
+
 def gen_one_addon_index(readme_filename):
     addon_dir = os.path.dirname(readme_filename)
     index_dir = os.path.join(addon_dir, 'static', 'description')
@@ -241,20 +251,15 @@ def gen_one_addon_index(readme_filename):
             if 'oca-gen-addon-readme' not in f.read():
                 # index was created manually
                 return
-    try:
-        if not os.path.isdir(index_dir):
-            os.makedirs(index_dir)
-        publish_file(
-            source_path=readme_filename,
-            destination_path=index_filename,
-            writer_name='html4css1',
-            settings_overrides=RST2HTML_SETTINGS,
-        )
-        return index_filename
-    except ApplicationError:
-        raise click.ClickException(
-            "Error validating {}".format(readme_filename)
-        )
+    if not os.path.isdir(index_dir):
+        os.makedirs(index_dir)
+    publish_file(
+        source_path=readme_filename,
+        destination_path=index_filename,
+        writer_name='html4css1',
+        settings_overrides=RST2HTML_SETTINGS,
+    )
+    return index_filename
 
 
 @click.command()
@@ -303,6 +308,7 @@ def gen_addon_readme(
             continue
         readme_filename = gen_one_addon_readme(
             org_name, repo_name, branch, addon_name, addon_dir, manifest)
+        check_rst(readme_filename)
         readme_filenames.append(readme_filename)
         if gen_html:
             index_filename = gen_one_addon_index(readme_filename)
