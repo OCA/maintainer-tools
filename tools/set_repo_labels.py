@@ -8,10 +8,6 @@ from __future__ import print_function
 from .github_login import login
 
 REPO_TO_IGNORE = [
-    'odoo-community.org',
-    'community-data-files',
-    'contribute-md-template',
-    'website',
 ]
 
 # here is the list of labels we need in each repo
@@ -40,47 +36,25 @@ def main():
     for repo in all_repos:
         if repo.name in REPO_TO_IGNORE:
             continue
-        labels = repo.iter_labels()
-
-        existing_labels = dict((l.name.lower(), l.color) for l in labels)
-
-        to_create = []
-        to_change_color = []
-        for needed_label in all_labels:
-            if needed_label not in existing_labels.keys():
-                to_create.append(needed_label)
-            elif existing_labels[needed_label] != all_labels[needed_label]:
-                to_change_color.append(needed_label)
-
-        extra_labels = [l for l in existing_labels if l not in all_labels]
-
-        if to_create:
-            print('Repo %s - Create %s missing labels'
-                  % (repo.name, len(to_create)))
-
-            for label_name in to_create:
-                success = repo.create_label(label_name, all_labels[label_name])
-                if not success:
-                    print("Failed to create a label on '%s'!"
-                          " Please check you access right to this repository."
-                          % repo.name)
-
-        if to_change_color:
-            print('Repo %s - Update %s labels with wrong color'
-                  % (repo.name, len(to_change_color)))
-
-            for label_name in to_change_color:
-                success = repo.update_label(label_name, all_labels[label_name])
-                if not success:
-                    print("Failed to update a label on '%s'!"
-                          " Please check you access right to this repository."
-                          % repo.name)
-
-        if extra_labels:
-            print('Repo %s - Found %s extra labels'
-                  % (repo.name, len(extra_labels)))
-            for label_name in extra_labels:
-                print(label_name)
+        wanted_labels = all_labels.copy()
+        for label in repo.labels():
+            if label.name.lower() in wanted_labels:
+                wanted_name = label.name.lower()
+                wanted_color = wanted_labels[label.name.lower()]
+                if label.name != wanted_name or label.color != wanted_color:
+                    print(
+                        "fixing name/color of label",
+                        label.name,
+                        "in",
+                        repo.name,
+                    )
+                    label.update(wanted_name, wanted_color)
+                wanted_labels.pop(label.name.lower())
+            else:
+                print("found extra label", label.name, "in", repo.name)
+        for name, color in wanted_labels.items():
+            print("adding label", name, "in", repo.name)
+            repo.create_label(name, color)
 
 
 if __name__ == '__main__':
