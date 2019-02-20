@@ -95,9 +95,9 @@ Current maintainer{% if manifest.maintainers|length > 1 %}s{% endif %}:
 This module is part of the `{{ org_name }}/{{ repo_name }} <https://github.com/{{ org_name }}/{{ repo_name }}/tree/{{ branch }}/{{ addon_name }}>`_ project on GitHub.
 
 {% if org_name == 'OCA' -%}
-Discover all OCA modules in the `Official OCA Apps store <https://odoo-community.org/shop>`_
-
 You are welcome to contribute. To learn how to, please visit https://odoo-community.org/page/Contribute.
+
+Discover all OCA modules in the `Official OCA Apps store <https://odoo-community.org/shop>`_
 
 {%- else -%}
 You are welcome to contribute.
