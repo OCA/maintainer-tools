@@ -161,3 +161,4 @@
 271|github.com/OCA/rest-framework
 272|github.com/OCA/l10n-greece
 273|github.com/OCA/oca-custom
+274|github.com/OCA/l10n-uruguay
