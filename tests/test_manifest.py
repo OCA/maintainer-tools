@@ -18,5 +18,4 @@ def test_manifest_find_addons():
 def test_manifest_find_addons_uninstallable():
     addons = list(manifest.find_addons(TEST_REPO_DIR, installable_only=False))
     assert len(addons) == 2
-    assert addons[0][0] == 'module1'
-    assert addons[1][0] == 'module2'
+    assert set((addons[0][0], addons[1][0])) == set(('module1', 'module2'))
