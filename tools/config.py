@@ -16,6 +16,13 @@ def init_config():
     config.add_section("odoo")
     config.set("odoo", "username", "")
     config.set("odoo", "password", "")
+    config.add_section("apps.odoo.com")
+    config.set("apps.odoo.com", "username", "")
+    config.set("apps.odoo.com", "password", "")
+    config.set(
+        "apps.odoo.com", "chromedriver_path",
+        "/usr/lib/chromium-browser/chromedriver",
+    )
     write_config(config)
 
 
