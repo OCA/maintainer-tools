@@ -59,16 +59,17 @@ def main(target, repo, branch, push, python2):
             try:
                 # make dists and wheels for each installable addon
                 # and _metapackage
-                sys.stderr.write(
-                    "============> dist_to_simple_index in %s@%s\n" %
-                    (repo, branch),
-                )
-                setup_dirs = [opj('setup', d) for d in os.listdir('setup')]
-                dist_to_simple_index(
-                    target, setup_dirs,
-                    # use the right python to generate wheels
-                    python=_get_python(branch, python2),
-                )
+                if os.path.isdir('setup'):
+                    sys.stderr.write(
+                        "============> dist_to_simple_index in %s@%s\n" %
+                        (repo, branch),
+                    )
+                    setup_dirs = [opj('setup', d) for d in os.listdir('setup')]
+                    dist_to_simple_index(
+                        target, setup_dirs,
+                        # use the right python to generate wheels
+                        python=_get_python(branch, python2),
+                    )
             except Exception:
                 exit_code = 1
                 sys.stderr.write(
