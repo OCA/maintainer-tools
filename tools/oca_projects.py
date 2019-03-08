@@ -165,6 +165,8 @@ OCA_PROJECTS = {
                            'connector-jira',
                            ],
     'social': ['social'],
+    'storage': ['storage'],
+    'search-engine': ['search-engine'],
     'tools': ['reporting-engine',
               'report-print-send',
               'webkit-tools',

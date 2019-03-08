@@ -162,3 +162,5 @@
 272|github.com/OCA/l10n-greece
 273|github.com/OCA/oca-custom
 274|github.com/OCA/l10n-uruguay
+275|github.com/OCA/storage
+276|github.com/OCA/search-engine
