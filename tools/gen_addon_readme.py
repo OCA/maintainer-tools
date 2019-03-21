@@ -295,14 +295,13 @@ def gen_addon_readme(
         addons.extend(find_addons(addons_dir))
     for addon_dir in addon_dirs:
         addon_name = os.path.basename(os.path.abspath(addon_dir))
-        manifest = read_manifest(addon_dir)
-        addons.append((addon_name, addon_dir, manifest))
-    readme_filenames = []
-    for addon_name, addon_dir, manifest in addons:
         try:
             manifest = read_manifest(addon_dir)
         except NoManifestFound:
             continue
+        addons.append((addon_name, addon_dir, manifest))
+    readme_filenames = []
+    for addon_name, addon_dir, manifest in addons:
         if not os.path.exists(
                 os.path.join(addon_dir, FRAGMENTS_DIR, 'DESCRIPTION.rst')):
             continue
