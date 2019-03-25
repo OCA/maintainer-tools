@@ -164,3 +164,4 @@
 274|github.com/OCA/l10n-uruguay
 275|github.com/OCA/storage
 276|github.com/OCA/search-engine
+277|github.com/OCA/mis-builder-contrib
