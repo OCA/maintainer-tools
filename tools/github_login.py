@@ -58,7 +58,7 @@ def authorize_token(user):
                 if error['code'] == 'already_exists':
                     msg = ("The 'OCA (odoo community association) Maintainers "
                            "Tools' token already exists. You will find it at "
-                           "https://github.com/settings/applications and can "
+                           "https://github.com/settings/tokens and can "
                            "revoke it or set the token manually in the "
                            "configuration file.")
                     sys.exit(msg)
