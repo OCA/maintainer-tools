@@ -109,6 +109,15 @@ You may also use this script for your own repositories by specifying this
 additional argument `--org-name=myorganisation`
 
 
+### Icon generator
+
+To provide an icon for our modules we generate them automatically.
+
+To generate the icon for the module `auth_keycloak`:
+
+    $ oca-gen-addon-icon --addon-dir=auth_keycloak
+
+
 ### Auto fix pep8 guidelines
 
 To auto fix pep8 guidelines of your code you can run:
