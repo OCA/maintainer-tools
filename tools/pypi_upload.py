@@ -89,7 +89,9 @@ class OcaPypi(object):
                '-r', self.repository, '--skip-existing', distfilename]
         if not self.dryrun:
             try:
-                subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+                subprocess.check_output(
+                    cmd, stderr=subprocess.STDOUT, universal_newlines=True
+                )
             except subprocess.CalledProcessError as e:
                 if "HTTPError: 400 Client Error" in e.output:
                     return e.output
