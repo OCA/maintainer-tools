@@ -27,7 +27,8 @@ def gen_one_addon_icon(icon_dir, filetype=ICON_TYPE):
         if not os.path.exists(icon_dir):
             os.makedirs(icon_dir)
         shutil.copyfile(template_filename, icon_filename)
-    return icon_filename
+        return icon_filename
+    return None
 
 
 @click.command()
@@ -71,8 +72,9 @@ def gen_addon_icon(addon_dirs, addons_dir, commit):
         if exist:
             continue
         icon_filename = gen_one_addon_icon(icon_dir)
-        icon_filenames.append(icon_filename)
-    if commit:
+        if icon_filename:
+            icon_filenames.append(icon_filename)
+    if icon_filenames and commit:
         commit_if_needed(icon_filenames, '[ADD] icon.%s' % ICON_TYPE)
 
 
