@@ -91,6 +91,7 @@ OCA_PROJECTS = {
     'connector-odoo2odoo': ['connector-odoo2odoo'],
     'multi-company': ['multi-company'],
     'l10n-argentina': ['l10n-argentina'],
+    'l10n-austria': ['l10n-austria'],
     'l10n-belarus': ['l10n-belarus'],
     'l10n-belgium': ['l10n-belgium'],
     'l10n-brazil': ['l10n-brazil'],
