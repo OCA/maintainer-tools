@@ -61,6 +61,8 @@ def gen_addon_icon(addon_dirs, addons_dir, commit):
         addons.append((addon_name, addon_dir, manifest))
     icon_filenames = []
     for addon_name, addon_dir, manifest in addons:
+        if not manifest.get('preloadable', True):
+            continue
         icon_dir = os.path.join(addon_dir, ICONS_DIR)
         exist = False
         for icon_type in ICON_TYPES:
