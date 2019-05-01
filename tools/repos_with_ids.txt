@@ -32,7 +32,7 @@
 147|github.com/OCA/sale-financial
 136|github.com/OCA/product-kitting
  91|github.com/OCA/account-financial-reporting
-117|github.com/OCA/hr-timesheet
+117|github.com/OCA/timesheet
 96|github.com/OCA/account-payment
 97|github.com/OCA/bank-payment
 98|github.com/OCA/account-reconcile
