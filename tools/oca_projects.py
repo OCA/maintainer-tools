@@ -84,7 +84,7 @@ OCA_PROJECTS = {
     'financial control': ['margin-analysis'],
     'Infrastructure': ['infrastructure-dns'],
     'geospatial': ['geospatial'],
-    'hr': ['hr-timesheet',
+    'hr': ['timesheet',
            'hr',
            'department',
            ],
