@@ -166,3 +166,4 @@
 276|github.com/OCA/search-engine
 277|github.com/OCA/mis-builder-contrib
 278|github.com/OCA/l10n-austria
+279|github.com/OCA/calendar
