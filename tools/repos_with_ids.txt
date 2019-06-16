@@ -124,7 +124,7 @@
 224|github.com/OCA/infrastructure-dns
 225|github.com/OCA/website-cms
 226|github.com/OCA/edi
-227|github.com/OCA/intrastat
+227|github.com/OCA/intrastat-extrastat
 228|github.com/OCA/connector-telephony
 229|github.com/OCA/interface-github
 230|github.com/OCA/queue
