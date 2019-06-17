@@ -167,3 +167,5 @@
 277|github.com/OCA/mis-builder-contrib
 278|github.com/OCA/l10n-austria
 279|github.com/OCA/calendar
+281|github.com/OCA/payroll
+282|github.com/OCA/helpdesk
