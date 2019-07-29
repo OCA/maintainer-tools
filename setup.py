@@ -26,7 +26,10 @@ setuptools.setup(
         'autopep8',
         'click',
         'configparser',  # for python2 compat
-        'docutils',
+        # We need to pin docutils version, see
+        # https://github.com/OCA/maintainer-tools/issues/423
+        # Consider carefully before changing this.
+        'docutils==0.15.1.post1',
         'ERPpeek',
         'github3.py>=1',
         'inflection',
