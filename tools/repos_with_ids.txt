@@ -34,7 +34,6 @@
 91|github.com/OCA/account-financial-reporting
 117|github.com/OCA/timesheet
 96|github.com/OCA/account-payment
-97|github.com/OCA/bank-payment
 98|github.com/OCA/account-reconcile
 99|github.com/OCA/delivery-carrier
 115|github.com/OCA/geospatial
