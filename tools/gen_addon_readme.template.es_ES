@@ -1,0 +1,102 @@
+﻿{%- macro fragment(name, title, sub='=') %}
+{%- if name in fragments %}
+{{- title }}
+{{ sub * title|length }}
+
+{{ fragments[name] }}
+{% endif %}
+{%- endmacro -%}
+
+{{ '=' * manifest.name|length }}
+{{ manifest.name }}
+{{ '=' * manifest.name|length }}
+
+.. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   !! Este fichero se genera mediante oca-gen-addon-readme !!
+   !! cualquier cambio será sobrescrito.                   !!
+   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+{% for (image, target, alt) in badges -%}
+.. |badge{{ loop.index }}| image:: {{ image }}
+    :target: {{ target or '#' }}
+    {%- if alt %}
+    :alt: {{ alt }}
+    {%- endif %}
+{% endfor %}
+{% for _ in badges %}|badge{{ loop.index }}| {% endfor %}
+
+{{ fragments.get('DESCRIPTION', '') }}
+**Tabla de contenidos**
+
+.. contents::
+   :local:
+
+{{ fragment('INSTALL', 'Instalación') }}
+{{- fragment('CONFIGURE', 'Configuración') }}
+{{- fragment('USAGE', 'Uso') }}
+{{- fragment('DEVELOP', 'Desarrollo') }}
+{{- fragment('ROADMAP', 'Incidencias conocidas / Hoja de ruta') -}}
+{{- fragment('HISTORY', 'Historial de cambios') -}}
+Reporte de errores
+==================
+
+Los errores se pueden seguir en `GitHub Issues <https://github.com/{{ org_name }}/{{ repo_name }}/issues>`_.
+En caso de encontrar alguno, por favor compruebe que no se encuentre publicado antes.
+Si lo encuentra primero, ayúdenos a resolverlo mediante una detallada descripción
+`feedback <https://github.com/{{ org_name }}/{{ repo_name }}/issues/new?body=module:%20{{ addon_name }}%0Aversion:%20{{ branch }}%0A%0A**Pasos%20para%20reproducir**%0A-%20...%0A%0A**Comportamiento%20actual**%0A%0A**Comportamiento%20esperado**>`_.
+
+No contacte a los contribuidores directamente para soporte o ayuda para problemas técnicos.
+
+Créditos
+========
+
+{% if authors -%}
+Autores
+~~~~~~~
+
+{% for author in authors -%}
+* {{ author }}
+{% endfor %}
+{% endif -%}
+
+{{ fragment('CONTRIBUTORS', 'Contribuidores', sub='~') }}
+{{- fragment('CREDITS', 'Otros créditos', sub='~') -}}
+Mantenimiento
+~~~~~~~~~~~~~
+{%- if org_name == 'OCA' %}
+
+Este modulo esta mantenido por la OCA.
+
+.. image:: https://odoo-community.org/logo.png
+   :alt: Odoo Community Association
+   :target: https://odoo-community.org
+
+OCA, o la Odoo Community Association, es una organización sin animo de lucro cuya misión es la de dar soporte mediante el desarrollo colaborativo de funcionalidades Odoo y promover y difundir su uso.
+{%- endif %}
+
+{%- if manifest.maintainers %}
+{% for maintainer in manifest.maintainers %}
+.. |maintainer-{{ maintainer }}| image:: https://github.com/{{ maintainer }}.png?size=40px
+    :target: https://github.com/{{ maintainer }}
+    :alt: {{ maintainer}}
+{%- endfor %}
+
+{% if org_name == 'OCA' -%}
+Actual `mantenedor{% if manifest.maintainers|length > 1 %}es{% endif %} <https://odoo-community.org/page/maintainer-role>`__:
+{%- else -%}
+Actual mantenedor{% if manifest.maintainers|length > 1 %}es{% endif %}:
+{%- endif %}
+
+{% for maintainer in manifest.maintainers %}|maintainer-{{ maintainer }}| {% endfor -%}
+{% endif %}
+
+Este modulo es parte de `{{ org_name }}/{{ repo_name }} <https://github.com/{{ org_name }}/{{ repo_name }}/tree/{{ branch }}/{{ addon_name }}>`_ projecto en GitHub.
+
+{% if org_name == 'OCA' -%}
+Esperamos su ayuda para contribuir. Aprenda como en https://odoo-community.org/page/Contribute.
+
+{%- else -%}
+Esperamos su ayuda para contribuir.
+
+{%- endif %}
+

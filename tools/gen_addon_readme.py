@@ -172,7 +172,8 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
 
 
 def gen_one_addon_readme(
-        org_name, repo_name, branch, addon_name, addon_dir, manifest):
+        org_name, repo_name, branch,
+        addon_name, addon_dir, manifest, code_lang=False):
     fragments = {}
     for fragment_name in FRAGMENTS:
         fragment_filename = os.path.join(
@@ -210,9 +211,14 @@ def gen_one_addon_readme(
         # a real author, but is rather referenced in the
         # maintainers section
     ]
+    if code_lang:
+        template_filename_lang = 'gen_addon_readme.template.{}'.format(
+            code_lang)
+        template_filename = os.path.join(os.path.dirname(__file__), template_filename_lang)
     # generate
-    template_filename = \
-        os.path.join(os.path.dirname(__file__), 'gen_addon_readme.template')
+    if not template_filename:
+        template_filename = \
+            os.path.join(os.path.dirname(__file__), 'gen_addon_readme.template')
     readme_filename = \
         os.path.join(addon_dir, 'README.rst')
     with io.open(template_filename, 'rU', encoding='utf8') as tf:
@@ -301,12 +307,22 @@ def gen_addon_readme(
             continue
         addons.append((addon_name, addon_dir, manifest))
     readme_filenames = []
+    # FRAGMENTS_DIR by default is readme, need check if exist
+    # pattern readme.xx_XX
+    list_dir = os.listdir(os.path.abspath(addon_dir))
+    code_lang = False
+    for idx, item in enumerate(list_dir):
+        if item.find("readme.") != -1:
+            code_lang = list_dir[idx].split(".")[1]
+            FRAGMENTS_DIR = list_dir[idx]
+            break
     for addon_name, addon_dir, manifest in addons:
         if not os.path.exists(
                 os.path.join(addon_dir, FRAGMENTS_DIR, 'DESCRIPTION.rst')):
             continue
         readme_filename = gen_one_addon_readme(
-            org_name, repo_name, branch, addon_name, addon_dir, manifest)
+            org_name, repo_name, branch,
+            addon_name, addon_dir, manifest, code_lang)
         check_rst(readme_filename)
         readme_filenames.append(readme_filename)
         if gen_html:
