@@ -228,7 +228,6 @@ def gen_one_addon_readme(
             org_name=org_name,
             repo_name=repo_name,
             runbot_id=runbot_id,
-            development_status=development_status,
         ))
     return readme_filename
 
