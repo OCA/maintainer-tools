@@ -311,6 +311,8 @@ def gen_addon_readme(
         check_rst(readme_filename)
         readme_filenames.append(readme_filename)
         if gen_html:
+            if not manifest.get('preloadable', True):
+                continue
             index_filename = gen_one_addon_index(readme_filename)
             if index_filename:
                 readme_filenames.append(index_filename)
