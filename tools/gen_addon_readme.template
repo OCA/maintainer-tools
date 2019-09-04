@@ -26,7 +26,7 @@
 {% for _ in badges %}|badge{{ loop.index }}| {% endfor %}
 
 {{ fragments.get('DESCRIPTION', '') }}
-{% if development_status == 'Alpha' -%}
+{% if development_status == 'alpha' -%}
 
 .. IMPORTANT::
    This is an alpha version, the data model and design can change at any time without warning.

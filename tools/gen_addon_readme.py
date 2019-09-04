@@ -57,22 +57,22 @@ LICENSE_BADGES = {
 }
 
 DEVELOPMENT_STATUS_BADGES = {
-    'Mature': (
+    'mature': (
         'https://img.shields.io/badge/maturity-Mature-brightgreen.png',
         'https://odoo-community.org/page/development-status',
         'Mature',
     ),
-    'Production/Stable': (
+    'production/stable': (
         'https://img.shields.io/badge/maturity-Production%2FStable-green.png',
         'https://odoo-community.org/page/development-status',
         'Production/Stable',
     ),
-    'Beta': (
+    'beta': (
         'https://img.shields.io/badge/maturity-Beta-yellow.png',
         'https://odoo-community.org/page/development-status',
         'Beta',
     ),
-    'Alpha': (
+    'alpha': (
         'https://img.shields.io/badge/maturity-Alpha-red.png',
         'https://odoo-community.org/page/development-status',
         'Alpha',
@@ -188,7 +188,7 @@ def gen_one_addon_readme(
     if org_name == 'OCA':
         runbot_id = get_runbot_ids().get(repo_name)
     badges = []
-    development_status = manifest.get('development_status', 'Beta')
+    development_status = manifest.get('development_status', 'Beta').lower()
     if development_status in DEVELOPMENT_STATUS_BADGES:
         badges.append(DEVELOPMENT_STATUS_BADGES[development_status])
     license = manifest.get('license')
