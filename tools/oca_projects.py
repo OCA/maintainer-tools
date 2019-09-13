@@ -144,6 +144,7 @@ OCA_PROJECTS = {
                   'stock-logistics-reporting',
                   'rma',
                   'ddmrp',
+                  'wms',
                   ],
     'manufacturing': ['manufacture',
                       'manufacture-reporting',
