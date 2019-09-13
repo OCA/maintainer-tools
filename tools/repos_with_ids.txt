@@ -170,3 +170,4 @@
 282|github.com/OCA/helpdesk
 283|github.com/OCA/l10n-ukraine
 284|github.com/OCA/brand
+285|github.com/OCA/wms
