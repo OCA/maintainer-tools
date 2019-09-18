@@ -156,6 +156,7 @@ OCA_PROJECTS = {
     'product': ['product-attribute',
                 'product-kitting',
                 'product-variant',
+                'product-pack',
                 ],
     'project / services': ['project-reporting',
                            'project-service',
