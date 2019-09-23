@@ -27,6 +27,10 @@
     "depends": [
         "base",
     ],
+    # this feature is only present for 11.0+
+    "excludes": [
+        "module_name",
+    ],
     "data": [
         "security/some_model_security.xml",
         "security/ir.model.access.csv",
