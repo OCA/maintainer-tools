@@ -62,6 +62,7 @@ This script will perform the following operations for each project:
 Known issues / Roadmap
 ======================
 
+* Pin the migration issue when GitHub API allows it.
 * Issue enumerating the module list contains a list to a Wiki page that should
   be formatted this way:
   https://github.com/OCA/maintainer-tools/wiki/Migration-to-version-{branch}
@@ -248,6 +249,10 @@ class BranchMigrator(object):
                 "Migration-to-version-%s\n\n# Modules to migrate\n\n" %
                 self.gh_target_branch)
         body += "\n".join(["- [ ] %s" % x for x in modules])
+        body += (
+            "\n\nMissing module? Check https://github.com/OCA/maintainer-"
+            "tools/wiki/%5BFAQ%5D-Missing-modules-in-migration-issue-list"
+        )
         # Make sure labels exists
         labels = []
         for label in repo.labels():
