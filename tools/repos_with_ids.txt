@@ -172,3 +172,4 @@
 284|github.com/OCA/brand
 285|github.com/OCA/wms
 286|github.com/OCA/product-pack
+287|github.com/OCA/l10n-macedonia
