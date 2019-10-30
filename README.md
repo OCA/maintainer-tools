@@ -171,3 +171,27 @@ egg.
 You can use the `GITHUB_TOKEN` environment variable to specify the token
 
     $ GITHUB_TOKEN=xxx python -m tools.copy_maintainers
+
+**Install pre-commit**
+
+May be this section should be move to https://github.com/OCA/maintainer-tools/wiki#how-to
+
+To ensure your commits are not made without pre-commit check executing this command,
+you can include it in your computer's git hook:
+
+```
+pip install pre-commit
+git config --global core.hooksPath ~/.git/hooks
+mkdir -p ~/.git/hooks
+touch ~/.git/hooks/pre-commit
+chmod +x ~/.git/hooks/pre-commit
+```
+Create a pre-commit file with the following content:
+```
+#!/bin/sh
+pre-commit run -a
+```
+Now just commit that the validations are executed automatically
+
+Good code!
+and thanks Luis Felipe Miléo for https://github.com/OCA/l10n-brazil/wiki/Pre-commit-hook
