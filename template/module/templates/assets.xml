@@ -2,8 +2,7 @@
 <!-- Copyright <YEAR(S)> <AUTHOR(S)>
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 
-<openerp>
-<data>
+<odoo>
 
 <template id="assets_common" inherit_id="web.assets_common">
     <xpath expr=".">
@@ -47,5 +46,4 @@
     </xpath>
 </template>
 
-</data>
-</openerp>
+</odoo>

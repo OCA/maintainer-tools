@@ -2,8 +2,7 @@
 <!-- Copyright <YEAR(S)> <AUTHOR(S)>
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 
-<openerp>
-<data>
+<odoo>
 
 <record id="wizard_model_view_form" model="ir.ui.view">
     <field name="name">My view description</field>
@@ -32,5 +31,4 @@
     <field name="target">new</field>
 </record>
 
-</data>
-</openerp>
+</odoo>

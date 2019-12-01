@@ -1,8 +1,8 @@
 # Copyright <YEAR(S)> <AUTHOR(S)>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from openerp import api, models
-from openerp.tests.common import SingleTransactionCase
+from odoo import api, models
+from odoo.tests.common import SingleTransactionCase
 
 
 class AbstractSomethingTester(models.Model):
@@ -18,7 +18,7 @@ class TestAbstractSomething(SingleTransactionCase):
         """ It builds a model from model_cls in order to test abstract models
 
         Args:
-            model_cls: (openerp.models.BaseModel) Class of model to initialize
+            model_cls: (odoo.models.BaseModel) Class of model to initialize
         Returns:
             Model instance
         """
