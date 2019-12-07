@@ -173,3 +173,6 @@
 285|github.com/OCA/wms
 286|github.com/OCA/product-pack
 287|github.com/OCA/l10n-macedonia
+288|github.com/OCA/hr-attendance
+289|github.com/OCA/hr-expense
+290|github.com/OCA/hr-holidays
