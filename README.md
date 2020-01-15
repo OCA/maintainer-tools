@@ -105,7 +105,7 @@ To generate the final README for the module `auth_keycloak`:
 
 The result will be a fully PyPI compliant README.rst in the root of your module.
 
-You may also use this script for your own repositories by specifying this 
+You may also use this script for your own repositories by specifying this
 additional argument `--org-name=myorganisation`
 
 
@@ -171,3 +171,32 @@ egg.
 You can use the `GITHUB_TOKEN` environment variable to specify the token
 
     $ GITHUB_TOKEN=xxx python -m tools.copy_maintainers
+
+## Integration with `pre-commit`
+
+In any addons repo, you can use these pre-commit hooks:
+
+```yaml
+# .pre-commit-config.yaml file
+repos:
+  - repo: https://github.com/OCA/maintainer-tools
+    rev: master # This is just an example; you must use a tag/commit instead!
+    hooks:
+      # Use each script's `--help` to understand the args
+      - id: oca-gen-addon-readme
+        args:
+          - --addons-dir=.
+          - --org-name=OCA
+          - --repo-name=server-tools
+          - --branch=13.0
+
+      # This job could easily produce conflicts when it runs on every commit,
+      # so it's added as a manual job. If you automate it, beware.
+      # See https://pre-commit.com/#confining-hooks-to-run-at-certain-stages
+      - id: oca-gen-addons-table
+        stages: [manual]
+
+      - id: oca-gen-addon-icon
+        args:
+          - --addons-dir=.
+```

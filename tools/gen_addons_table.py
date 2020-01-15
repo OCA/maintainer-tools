@@ -2,19 +2,19 @@
 #  -*- coding: utf-8 -*-
 # License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 """
-This script replaces markers in the README.md files
+This script replaces markers in the README.md file
 of an OCA repository with the list of addons present
 in the repository. It preserves the marker so it
 can be run again.
 
-The script must be run from the root of the repository,
-where the README.md file can be found.
-
 Markers in README.md must have the form:
 
+\b
+<!-- prettier-ignore-start -->
 [//]: # (addons)
 does not matter, will be replaced by the script
 [//]: # (end addons)
+<!-- prettier-ignore-end -->
 """
 
 from __future__ import print_function
@@ -59,6 +59,8 @@ def replace_in_readme(readme_path, header, rows_available, rows_unported):
                         readme_path)
         return
     addons = []
+    # TODO Use the same heading styles as Prettier (prefixing the line with
+    # `##` instead of adding all `----------` under it)
     if rows_available:
         addons.extend([
             '\n',
@@ -84,19 +86,25 @@ def replace_in_readme(readme_path, header, rows_available, rows_unported):
         f.write(readme)
 
 
-@click.command()
+@click.command(help=__doc__)
 @click.option('--commit/--no-commit',
               help="git commit changes to README.rst, if any.")
-def gen_addons_table(commit):
-    readme_path = 'README.md'
+@click.option('--readme-path', default="README.md",
+              type=click.Path(dir_okay=False, file_okay=True, exists=True),
+              help="README.md file with addon table markers")
+@click.option('--addons-dir', default=".",
+              type=click.Path(dir_okay=True, file_okay=False, exists=True),
+              help="Directory containing several addons")
+def gen_addons_table(commit, readme_path, addons_dir):
     if not os.path.isfile(readme_path):
         _logger.warning('%s not found', readme_path)
         return
     # list addons in . and __unported__
     addon_paths = []  # list of (addon_path, unported)
-    for addon_path in os.listdir('.'):
+    for addon_path in os.listdir(addons_dir):
         addon_paths.append((addon_path, False))
-    unported_directory = '__unported__'
+    unported_directory = os.path.join(
+        '' if addons_dir == '.' else addons_dir, '__unported__')
     if os.path.isdir(unported_directory):
         for addon_path in os.listdir(unported_directory):
             addon_path = os.path.join(unported_directory, addon_path)
