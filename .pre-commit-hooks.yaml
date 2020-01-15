@@ -1,0 +1,20 @@
+- id: oca-gen-addon-readme
+  name: Generate addons README files from fragments
+  always_run: true
+  entry: oca-gen-addon-readme
+  language: python
+  pass_filenames: false
+
+- id: oca-gen-addons-table
+  name: Generate addons table in README
+  always_run: true
+  entry: oca-gen-addons-table
+  language: python
+  pass_filenames: false
+
+- id: oca-gen-addon-icon
+  name: Generate addons icons
+  always_run: true
+  entry: oca-gen-addon-icon
+  language: python
+  pass_filenames: false
