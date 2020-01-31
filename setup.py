@@ -62,6 +62,7 @@ setuptools.setup(
             'oca-sync-users = tools.oca_sync_users:main',
             'oca-autopep8 = tools.autopep8_extended:main',
             'oca-gen-addons-table = tools.gen_addons_table:gen_addons_table',
+            'oca-massive-change = tools.massive_change:main',
             'oca-migrate-branch = tools.migrate_branch:main',
             'oca-migrate-branch-empty = tools.migrate_branch_empty:main',
             'oca-pypi-upload = tools.pypi_upload:cli',
