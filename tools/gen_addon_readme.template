@@ -23,7 +23,7 @@
     :alt: {{ alt }}
     {%- endif %}
 {% endfor %}
-{% for _ in badges %}|badge{{ loop.index }}| {% endfor %}
+{% for _ in badges %}|badge{{ loop.index }}|{% if loop.index != badges|length %} {% endif %}{% endfor %}
 
 {{ fragments.get('DESCRIPTION', '') }}
 {% if development_status == 'alpha' -%}
