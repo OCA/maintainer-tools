@@ -58,11 +58,20 @@ class GHTeamList(object):
         self._teams = {t.name: t for t in self._org.iter_teams()}
 
     def get_project_team(self, project):
-        return self._teams.get(project.name)
+        team = self._teams.get(project.name)
+        if team:
+            return team
+        team = self._teams.get(project.name + ' Maintainers')
+        if team:
+            return team
+        team = self._teams.get('Local ' + project.name + ' Maintainers')
+        return team
 
     def get_project_psc_team(self, project):
         main_team = self.get_project_team(project)
-        name = project.name + u' PSC Representative'
+        if not main_team:
+            return None
+        name = main_team.name + u' PSC Representative'
         team = self._teams.get(name)
         if team is None and main_team is not None:
             team = self.create_psc_team(project, name, main_team)
