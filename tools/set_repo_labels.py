@@ -25,6 +25,7 @@ all_labels = {
     'wontfix': 'ffffff',
     'migration': 'd4c5f9',
     'ready to merge': 'bfdadc',
+    'stale': '555555',
 }
 
 
