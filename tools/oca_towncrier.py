@@ -12,6 +12,7 @@ import sys
 import click
 import toml
 
+from .gitutils import commit_if_needed
 from .manifest import read_manifest
 
 
@@ -85,12 +86,17 @@ def _prepare_pyproject_toml(addon_dir, org, repo):
 @click.option("--version")
 @click.option("--date")
 @click.option(
-    "--org", default="OCA", help="GitHub organization name", show_default=True
+    "--org", default="OCA", help="GitHub organization name.", show_default=True
 )
 @click.option("--repo", required=True, help="GitHub repository name.")
-def oca_towncrier(addon_dirs, version, date, org, repo):
+@click.option(
+    "--commit/--no-commit",
+    help="git commit changes, if any (a git add is done in any case).",
+)
+def oca_towncrier(addon_dirs, version, date, org, repo, commit):
     if not date:
         date = datetime.date.today().isoformat()
+    paths = []
     for addon_dir in addon_dirs:
         news_dir = os.path.join(addon_dir, "readme", "newsfragments")
         if not os.path.isdir(news_dir):
@@ -112,6 +118,10 @@ def oca_towncrier(addon_dirs, version, date, org, repo):
                 ],
                 cwd=addon_dir,
             )
+        paths.append(news_dir)
+        paths.append(os.path.join(addon_dir, "readme", "HISTORY.rst"))
+    if commit:
+        commit_if_needed(paths, message="[UPD] changelog", add=False)
 
 
 if __name__ == "__main__":
