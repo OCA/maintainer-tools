@@ -109,6 +109,16 @@ You may also use this script for your own repositories by specifying this
 additional argument `--org-name=myorganisation`
 
 
+### Changelog generator using towncrier
+
+To facilitate the generation of the changelog of addons, we have a
+small wrapper around [towncrier](https://pypi.org/project/towncrier/).
+For example, this will update HISTORY.rst for `mis_builder` and `mis_builder_budget`
+with the version found in their manifest:
+
+    $ oca-towncrier --repo=mis-builder --addon-dir=mis_builder --addon_dir=mis_builder_budget --commit
+
+
 ### Icon generator
 
 To provide an icon for our modules we generate them automatically.
