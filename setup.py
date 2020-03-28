@@ -38,6 +38,8 @@ setuptools.setup(
         'polib',
         'pygments',
         'requests',
+        'toml>=0.10.0',  # for oca-towncrier
+        'towncrier>=19.2',  # for oca-towncrier
         'twine',
         'wheel',
     ],
@@ -67,6 +69,7 @@ setuptools.setup(
             'oca-pypi-upload = tools.pypi_upload:cli',
             'oca-gen-addon-readme = tools.gen_addon_readme:gen_addon_readme',
             'oca-gen-addon-icon = tools.gen_addon_icon:gen_addon_icon',
+            'oca-towncrier = tools.oca_towncrier:oca_towncrier',
         ],
     },
 )
