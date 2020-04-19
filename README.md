@@ -7,7 +7,7 @@
 
     $ git clone git@github.com:OCA/maintainers-tools.git
     $ cd maintainers-tools
-    $ virtualenv env
+    $ python3 -m venv env
     $ . env/bin/activate
     $ python setup.py install
 
