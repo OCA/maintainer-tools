@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #  -*- coding: utf-8 -*-
-# License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
+# License AGPLv3 (https://www.gnu.org/licenses/agpl-3.0-standalone.html)
 """
 This script helps to create a new branch for a new Odoo version, catching the
 required metafiles from another existing branch, and making the needed changes

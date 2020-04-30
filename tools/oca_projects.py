@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
+# License AGPLv3 (https://www.gnu.org/licenses/agpl-3.0-standalone.html)
 """
 Data about OCA Projects, with a few helper functions.
 
