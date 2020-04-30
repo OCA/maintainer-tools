@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Copyright (c) 2019 ACSONE SA/NV
-# License AGPLv3 (http://www.gnu.org/licenses/agpl-3.0-standalone.html)
+# License AGPLv3 (https://www.gnu.org/licenses/agpl-3.0-standalone.html)
 
 import contextlib
 import datetime
