@@ -116,7 +116,7 @@ small wrapper around [towncrier](https://pypi.org/project/towncrier/).
 For example, this will update HISTORY.rst for `mis_builder` and `mis_builder_budget`
 with the version found in their manifest:
 
-    $ oca-towncrier --repo=mis-builder --addon-dir=mis_builder --addon_dir=mis_builder_budget --commit
+    $ oca-towncrier --repo=mis-builder --addon-dir=mis_builder --addon-dir=mis_builder_budget --commit
 
 
 ### Icon generator
