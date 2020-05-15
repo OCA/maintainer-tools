@@ -1,12 +1,12 @@
-[![Build Status](https://travis-ci.org/OCA/maintainers-tools.svg?branch=master)](https://travis-ci.org/OCA/maintainers-tools)
-[![Coverage Status](https://img.shields.io/coveralls/OCA/maintainers-tools.svg)](https://coveralls.io/r/OCA/maintainers-tools?branch=master)
+[![Build Status](https://travis-ci.org/OCA/maintainer-tools.svg?branch=master)](https://travis-ci.org/OCA/maintainer-tools)
+[![Coverage Status](https://img.shields.io/coveralls/OCA/maintainer-tools.svg)](https://coveralls.io/r/OCA/maintainer-tools?branch=master)
 
 # OCA Maintainers Tools
 
 ## Installation
 
-    $ git clone git@github.com:OCA/maintainers-tools.git
-    $ cd maintainers-tools
+    $ git clone git@github.com:OCA/maintainer-tools.git
+    $ cd maintainer-tools
     $ virtualenv env
     $ . env/bin/activate
     $ python setup.py install
@@ -158,8 +158,8 @@ You can delete vim comment
 As a developer, you want to launch the scripts without installing the
 egg.
 
-    $ git clone git@github.com:OCA/maintainers-tools.git
-    $ cd maintainers-tools
+    $ git clone git@github.com:OCA/maintainer-tools.git
+    $ cd maintainer-tools
     $ virtualenv env
     $ . env/bin/activate
     $ pip install -e .
