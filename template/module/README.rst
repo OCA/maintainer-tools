@@ -19,3 +19,17 @@ from keys such as name, authors, maintainers, development_status,
 and license.
 
 A good, one sentence summary in the manifest is also highly recommended.
+
+
+Automatic changelog generation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`HISTORY.rst` can be auto generated using `towncrier <https://pypi.org/project/towncrier>`_.
+
+Just put towncrier compatible changelog fragments into `readme/newsfragments`
+and the changelog file will be automatically generated and updated when a new fragment is added.
+
+Please refer to `towncrier` documentation to know more.
+
+NOTE: the changelog will be automatically generated when using `/ocabot merge $option`.
+If you need to run it manually, refer to `OCA/maintainer-tools README <https://github.com/OCA/maintainer-tools>`_.
