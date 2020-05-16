@@ -82,6 +82,7 @@ OCA_PROJECTS = {
     'edi': ['edi'],
     'field-service': ['field-service'],
     'financial control': ['margin-analysis'],
+    'fleet': ['fleet'],
     'Infrastructure': ['infrastructure-dns'],
     'geospatial': ['geospatial'],
     'hr': ['timesheet',

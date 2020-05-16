@@ -176,3 +176,4 @@
 288|github.com/OCA/hr-attendance
 289|github.com/OCA/hr-expense
 290|github.com/OCA/hr-holidays
+291|github.com/OCA/fleet
