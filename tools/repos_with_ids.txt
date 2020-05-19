@@ -177,3 +177,4 @@
 289|github.com/OCA/hr-expense
 290|github.com/OCA/hr-holidays
 291|github.com/OCA/fleet
+292|github.com/OCA/dms

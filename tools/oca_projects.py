@@ -77,7 +77,7 @@ OCA_PROJECTS = {
                             'event',
                             'survey',
                             ],
-    'document': ['knowledge'],
+    'document': ['knowledge', 'dms'],
     'ecommerce': ['e-commerce'],
     'edi': ['edi'],
     'field-service': ['field-service'],
