@@ -86,23 +86,23 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * Acme Inc
 
 Contributors
-~~~~~~~~~~~~
+------------
 
 * contributor1
 * contributor2
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
 This module has been funded by Acme Corp.
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is part of the `acme/server-tools <https://github.com/acme/server-tools/tree/12.0/addon1>`_ project on GitHub.
 

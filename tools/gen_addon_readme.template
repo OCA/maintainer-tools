@@ -61,17 +61,17 @@ Credits
 
 {% if authors -%}
 Authors
-~~~~~~~
+-------
 
 {% for author in authors -%}
 * {{ author }}
 {% endfor %}
 {% endif -%}
 
-{{ fragment('CONTRIBUTORS', 'Contributors', sub='~') }}
-{{- fragment('CREDITS', 'Other credits', sub='~') -}}
+{{ fragment('CONTRIBUTORS', 'Contributors', sub='-') }}
+{{- fragment('CREDITS', 'Other credits', sub='-') -}}
 Maintainers
-~~~~~~~~~~~
+-----------
 {%- if org_name == 'OCA' %}
 
 This module is maintained by the OCA.
