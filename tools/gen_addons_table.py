@@ -90,7 +90,7 @@ def replace_in_readme(readme_path, header, rows_available, rows_unported):
 @click.option('--commit/--no-commit',
               help="git commit changes to README.rst, if any.")
 @click.option('--readme-path', default="README.md",
-              type=click.Path(dir_okay=False, file_okay=True, exists=True),
+              type=click.Path(dir_okay=False, file_okay=True),
               help="README.md file with addon table markers")
 @click.option('--addons-dir', default=".",
               type=click.Path(dir_okay=True, file_okay=False, exists=True),
