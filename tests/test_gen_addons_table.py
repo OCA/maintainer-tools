@@ -27,3 +27,11 @@ def test_1():
     finally:
         with open(readme_filename, 'w') as f:
             f.write(readme_before)
+
+
+def test_absent_readme(tmp_path):
+    """gen_addons_table must not fail if README.md is absent"""
+    res = subprocess.call([
+        sys.executable, "-m", "tools.gen_addons_table"
+    ], cwd=str(tmp_path))
+    assert res == 0
