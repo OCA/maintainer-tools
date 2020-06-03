@@ -73,6 +73,8 @@ setuptools.setup(
             'oca-gen-addon-icon = tools.gen_addon_icon:gen_addon_icon',
             'oca-towncrier = tools.oca_towncrier:oca_towncrier',
             'oca-create-migration-issue = tools.create_migration_issue:main',
+            'oca-update-pre-commit-excluded-addons = '
+            'tools.update_pre_commit_excluded_addons:main',
         ],
     },
 )
