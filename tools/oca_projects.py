@@ -242,6 +242,7 @@ OCA_REPOSITORY_NAMES.sort()
 _OCA_REPOSITORY_NAMES = set(OCA_REPOSITORY_NAMES)
 
 _URL_MAPPINGS = {'git': 'git@github.com:%s/%s.git',
+                 'ssh': 'ssh://git@github.com/%s/%s.git',
                  'https': 'https://github.com/%s/%s.git',
                  }
 
