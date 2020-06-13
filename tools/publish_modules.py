@@ -27,8 +27,7 @@ can do:
 
 `sudo apt-get install chromium-chromedriver`
 
-You would need to enter afterwards the path for this binary field. Installing
-the package above, the path is /usr/lib/chromium-browser/chromedriver.
+The 'chromedriver' executable must be in your PATH.
 
 Configuration
 =============
@@ -38,11 +37,9 @@ storing credentials parameters. You can generate an skeleton config running
 this script for a first time.
 
 The credentials are stored in the section [apps.odoo.com], with the names
-"username", "password" and "chromedriver_path", which are self-explanatory.
+"username" and "password", which are self-explanatory.
 
-If not set, a prompt will ask you to enter user and password. You would also
-need to specify through an environment variable called "CHROMEDRIVER" the
-chromedriver path if not specified in the config file.
+If not set, a prompt will ask you to enter user and password.
 
 Usage
 =====
@@ -64,7 +61,6 @@ Options:
 """
 
 from __future__ import print_function
-import os
 import logging
 from getpass import getpass
 import click
@@ -84,6 +80,7 @@ _logger = logging.getLogger(__name__)
               help="Limit to specific Odoo series. eg 11.0.")
 @click.option('--repository', 'target_repository',
               help="Limit to a repository. eg contract.")
+@click.option('--org', help="GitHub organization (default=OCA)", default="OCA")
 @click.option('--registration/--no-registration', 'do_registration',
               default=True,
               help="Perform the registration of repositories.")
@@ -92,26 +89,15 @@ _logger = logging.getLogger(__name__)
               help="Retrieve the status of bad repositories.")
 @click.option('--force-scan/--no-force-scan', 'force_scan',
               default=False,
-              help="If auto-scan not activated, activate it and perform a "
-                   "scan in that moment.")
+              help="If auto-scan not activated, activate it and request "
+                   "apps.odoo.com to perform a scan in that moment.")
 @click.option('--scan-skip-empty/--scan-no-skip-empty', 'scan_skip_empty',
               default=True,
               help="Skip scan of empty repositories (no matter force scan "
                    "value).")
-def main(target_branch, target_repository, do_registration, do_status,
+def main(target_branch, target_repository, org, do_registration, do_status,
          force_scan, scan_skip_empty):
     config = read_config()
-    chrome = config.get('apps.odoo.com', 'chromedriver_path')
-    if not chrome:
-        chrome = os.getenv('CHROMEDRIVER')
-    if not chrome:
-        print(
-            'Please specify CHROMEDRIVER environment variable or config'
-            ' option pointing to a valid Google Chrome Driver executable file'
-            ' and ensure its location is available via PATH environment'
-            ' variable.\n\nSee http://chromedriver.chromium.org/downloads'
-        )
-        return
     user = config.get('apps.odoo.com', 'username')
     if not user:
         user = input('Odoo.com publisher account:')
@@ -122,7 +108,6 @@ def main(target_branch, target_repository, do_registration, do_status,
     options = Options()
     options.headless = True
     driver = webdriver.Chrome(
-        executable_path=chrome,
         options=options,
     )
     login(driver, user, password)
@@ -144,15 +129,18 @@ def main(target_branch, target_repository, do_registration, do_status,
             register_repository(driver, repository_url)
     # Second pass: check published state and try to publish if not yet done
     if do_status:
-        driver.get('https://apps.odoo.com/apps/dashboard/repos')
         for repository, branch in get_repositories_and_branches():
             if target_branch and branch != target_branch:
                 continue
             if target_repository and target_repository != repository:
                 continue
-            repository_url = url(repository) + '#' + branch
+            # assume this query returns everything we need in one page
+            driver.get(
+                f'https://apps.odoo.com/apps/dashboard/repos?'
+                f'search_in=url&search={org}/{repository}'
+            )
             scan_repository(
-                driver, repository_url, force_scan, scan_skip_empty,
+                driver, org, repository, branch, force_scan, scan_skip_empty,
             )
 
 
@@ -191,28 +179,34 @@ def register_repository(driver, repository):
     submit_button.click()
 
 
-def scan_repository(driver, repository_url, force_scan, scan_skip_empty):
+def scan_repository(driver, org, repository, branch, force_scan, scan_skip_empty):
     wait = WebDriverWait(driver, 300)
-    try:
-        item_container = driver.find_element_by_xpath(
-            './/span[@id="repo_url" and text()="%s"]'
-            '/ancestor::li[1]' % repository_url
-        )
-    except NoSuchElementException:
-        print("WARNING: %s not registered in this account." % repository_url)
+    for protocol in ('https', 'ssh'):
+        repository_url = url(repository, protocol='ssh', org_name=org) + '#' + branch
+        try:
+            item_container = driver.find_element_by_xpath(
+                './/span[@id="repo_url" and text()="%s"]'
+                '/ancestor::li[1]' % repository_url
+            )
+        except NoSuchElementException:
+            pass
+        else:
+            break  # found
+    else:
+        # not found
+        print(f"WARNING: {org}/{repository}#{branch} not registered in this account.")
         return
     try:
         error_item = item_container.find_element_by_xpath(
-            './/div[@id="help_error"]',
+            './/div[@id="help_error"]/div/p',
         )
     except NoSuchElementException:
         error_item = False
     is_empty = False
     if error_item:
-        error_text = error_item.find_element_by_xpath('.//p')
-        is_empty = error_text.text.startswith('No module found in repository')
+        is_empty = error_item.text.startswith('No module found in repository')
         if not is_empty:
-            print("ERROR: %s:\n%s" % (repository_url, error_text.text))
+            print("ERROR: %s:\n%s" % (repository_url, error_item.text))
     if force_scan and not (is_empty and scan_skip_empty):
         print("INFO: Doing the scan on %s" % repository_url)
         auto_scan_checkbox = item_container.find_element_by_xpath(
