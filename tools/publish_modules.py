@@ -182,7 +182,7 @@ def register_repository(driver, repository):
 def scan_repository(driver, org, repository, branch, force_scan, scan_skip_empty):
     wait = WebDriverWait(driver, 300)
     for protocol in ('https', 'ssh'):
-        repository_url = url(repository, protocol='ssh', org_name=org) + '#' + branch
+        repository_url = url(repository, protocol=protocol, org_name=org) + '#' + branch
         try:
             item_container = driver.find_element_by_xpath(
                 './/span[@id="repo_url" and text()="%s"]'
