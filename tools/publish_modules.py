@@ -136,8 +136,10 @@ def main(target_branch, target_repository, org, do_registration, do_status,
                 continue
             # assume this query returns everything we need in one page
             driver.get(
-                f'https://apps.odoo.com/apps/dashboard/repos?'
-                f'search_in=url&search={org}/{repository}'
+                'https://apps.odoo.com/apps/dashboard/repos?'
+                'search_in=url&search={org}/{repository}'.format(
+                    org=org, repository=repository
+                )
             )
             scan_repository(
                 driver, org, repository, branch, force_scan, scan_skip_empty,
@@ -194,7 +196,12 @@ def scan_repository(driver, org, repository, branch, force_scan, scan_skip_empty
             break  # found
     else:
         # not found
-        print(f"WARNING: {org}/{repository}#{branch} not registered in this account.")
+        print(
+            "WARNING: {org}/{repository}#{branch} "
+            "not registered in this account.".format(
+                org=org, repository=repository, branch=branch
+            )
+        )
         return
     try:
         error_item = item_container.find_element_by_xpath(
