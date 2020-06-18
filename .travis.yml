@@ -10,6 +10,23 @@ install:
     - pip install tox-travis
     - pip install coveralls
 
+# stages:
+#  - linting
+#  - test
+#  - test-ocb
+
+#jobs:
+#  include:
+#    - stage: linting
+#      env:
+#        - LINT_CHECK="1"
+#    - stage: test
+#      env:
+#        - TESTS="1" ODOO_REPO="odoo/odoo"
+#    - stage: test-ocb
+#      env:
+#        - TESTS="1" ODOO_REPO="OCA/OCB"
+
 script:
     - tox
 
