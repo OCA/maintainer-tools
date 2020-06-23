@@ -127,6 +127,10 @@ To generate the icon for the module `auth_keycloak`:
 
     $ oca-gen-addon-icon --addon-dir=auth_keycloak
 
+A custom icon can be added using the `--src-icon` argument:
+
+    $ oca-gen-addon-icon --addon-dir=auth_keycloak --src-icon=/path/to/custom/icon.png
+
 
 ### Auto fix pep8 guidelines
 
