@@ -84,7 +84,7 @@ OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.
 
-If you liked this module, please consider supporting the OCA, for that purpose you can go to:
+If you liked this module, please consider supporting the OCA. For more information, check:
 
 * https://github.com/sponsors/OCA
 * https://odoo-community.org/page/become-a-sponsor
@@ -116,4 +116,3 @@ You are welcome to contribute. To learn how please visit https://odoo-community.
 You are welcome to contribute.
 
 {%- endif %}
-
