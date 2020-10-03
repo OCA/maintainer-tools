@@ -55,6 +55,11 @@ NOT_ADDONS = {
     'oca-decorators',
     'oca-weblate-deployment',
     'odoo-sentinel',
+    'oca-addons-repo-template',
+    'odoo-module-migrator',
+    '.github',
+    'ansible-odoo',
+    'oca-github-bot',
 }
 
 
