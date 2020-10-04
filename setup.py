@@ -72,6 +72,7 @@ setuptools.setup(
             'oca-gen-addon-readme = tools.gen_addon_readme:gen_addon_readme',
             'oca-gen-addon-icon = tools.gen_addon_icon:gen_addon_icon',
             'oca-towncrier = tools.oca_towncrier:oca_towncrier',
+            'oca-create-migration-issue = tools.create_migration_issue:main',
         ],
     },
 )

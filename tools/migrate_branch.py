@@ -50,10 +50,6 @@ This script will perform the following operations for each project:
 * Replace in .travis.yml all references to source branch by the target branch.
 * Remove __unported__ dir.
 * Make target branch the default branch in the repository.
-* Create a milestone (if not exist) for new version.
-* Create an issue enumerating the modules to migrate, with the milestone
-  assigned, and with the labels "help wanted" and "work in progress" (if
-  exist).
 
 Known issues / Roadmap
 ======================
@@ -298,34 +294,6 @@ class BranchMigrator(object):
     def _make_default_branch(self, repo):
         repo.edit(repo.name, default_branch=self.gh_target_branch)
 
-    def _create_branch_milestone(self, repo):
-        for milestone in repo.milestones():
-            if milestone.title == self.gh_target_branch:
-                return milestone
-        return repo.create_milestone(self.gh_target_branch)
-
-    def _create_migration_issue(self, repo, modules, milestone):
-        title = "Migration to version %s" % self.gh_target_branch
-        # Check first if it already exists
-        for issue in repo.issues(milestone=milestone.number):
-            if issue.title == title:
-                return issue
-        body = ("# Todo\n\nhttps://github.com/OCA/maintainer-tools/wiki/"
-                "Migration-to-version-%s\n\n# Modules to migrate\n\n" %
-                self.gh_target_branch)
-        body += "\n".join(["- [ ] %s" % x for x in modules])
-        body += (
-            "\n\nMissing module? Check https://github.com/OCA/maintainer-"
-            "tools/wiki/%5BFAQ%5D-Missing-modules-in-migration-issue-list"
-        )
-        # Make sure labels exists
-        labels = []
-        for label in repo.labels():
-            if label.name in ['help wanted', 'work in progress']:
-                labels.append(label.name)
-        return repo.create_issue(
-            title=title, body=body, milestone=milestone.number, labels=labels)
-
     def _migrate_project(self, project):
         print("Migrating project %s/%s" % (self.gh_org, project))
         # Create new branch
@@ -348,7 +316,7 @@ class BranchMigrator(object):
         root_contents = repo.directory_contents(
             '', self.gh_target_branch, return_as=dict,
         )
-        modules = self._mark_modules_uninstallable(repo, root_contents)
+        self._mark_modules_uninstallable(repo, root_contents)
         if self.gh_target_branch == '10.0':
             self._rename_manifests(repo, root_contents)
         self._delete_unported_dir(repo, root_contents)
@@ -357,8 +325,6 @@ class BranchMigrator(object):
         self._update_metafiles(repo, root_contents)
         # TODO: GitHub is returning 404
         # self._make_default_branch(repo)
-        milestone = self._create_branch_milestone(repo)
-        self._create_migration_issue(repo, sorted(modules), milestone)
 
     def do_migration(self, projects=None):
         if not projects:
