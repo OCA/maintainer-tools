@@ -40,21 +40,26 @@ def write_config(config):
 
 
 NOT_ADDONS = {
-    'odoo-community.org',
-    'contribute-md-template',
-    'maintainer-tools',
-    'maintainer-quality-tools',
-    'odoo-sphinx-autodoc',
-    'openupgradelib',
+    '.github',
+    'ansible-odoo',
     'connector-magento-php-extension',
-    'OCB',
-    'OpenUpgrade',
-    'pylint-odoo',
+    'contribute-md-template',
+    'maintainer-quality-tools',
+    'maintainer-tools',
+    'oca-addons-repo-template',
     'oca-custom',
-    'odoorpc',
     'oca-decorators',
+    'oca-github-bot',
     'oca-weblate-deployment',
+    'OCB',
+    'odoo-community.org',
+    'odoo-module-migrator',
     'odoo-sentinel',
+    'odoo-sphinx-autodoc',
+    'odoorpc',
+    'OpenUpgrade',
+    'openupgradelib',
+    'pylint-odoo',
 }
 
 
@@ -67,4 +72,5 @@ MAIN_BRANCHES = (
     '11.0',
     '12.0',
     '13.0',
+    '14.0',
 )
