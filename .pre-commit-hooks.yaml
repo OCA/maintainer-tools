@@ -18,3 +18,11 @@
   entry: oca-gen-addon-icon
   language: python
   pass_filenames: false
+
+- id: oca-update-pre-commit-excluded-addons
+  name: update pre-commit excluded addons
+  entry: oca-update-pre-commit-excluded-addons
+  pass_filenames: false
+  language: python
+  types: [python]
+  files: /(__manifest__|__openerp__|__terp__|)\.py$
