@@ -61,7 +61,8 @@ def main(new_branch, copier_template, copier_template_vcs_ref):
             subprocess.check_call(["git", "add", "."])
             subprocess.call(["pre-commit", "run", "-a"])
             # commit and push
+            subprocess.check_call(["git", "add", "."])
             subprocess.check_call(
-                ["git", "commit", "-am", f"Initialize {new_branch} branch"]
+                ["git", "commit", "-m", f"Initialize {new_branch} branch"]
             )
             subprocess.check_call(["git", "push", "origin", new_branch])
