@@ -50,6 +50,8 @@ def main(new_branch, copier_template, copier_template_vcs_ref):
                 "--data",
                 f"repo_name={repo}",
                 "--data",
+                "repo_description=TODO: add repo description.",
+                "--data",
                 "dependency_installation_mode=PIP",
                 "--force",
             ]
