@@ -24,5 +24,4 @@
   entry: oca-update-pre-commit-excluded-addons
   pass_filenames: false
   language: python
-  types: [python]
-  files: /(__manifest__|__openerp__|__terp__|)\.py$
+  always_run: true
