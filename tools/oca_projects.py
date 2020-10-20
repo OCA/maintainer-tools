@@ -155,6 +155,7 @@ OCA_PROJECTS = {
                       'manufacture-reporting',
                       ],
     'management system': ['management-system'],
+    'pms': ['pms'],
     'purchase': ['purchase-workflow',
                  'purchase-reporting',
                  ],

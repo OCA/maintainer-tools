@@ -178,3 +178,4 @@
 290|github.com/OCA/hr-holidays
 291|github.com/OCA/fleet
 292|github.com/OCA/dms
+293|github.com/OCA/pms
