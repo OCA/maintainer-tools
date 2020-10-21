@@ -20,8 +20,15 @@
   pass_filenames: false
 
 - id: oca-update-pre-commit-excluded-addons
-  name: update pre-commit excluded addons
+  name: Update pre-commit excluded addons
   entry: oca-update-pre-commit-excluded-addons
   pass_filenames: false
   language: python
   always_run: true
+
+- id: oca-fix-manifest-website
+  name: Fix the manifest website key
+  entry: oca-fix-manifest-website
+  pass_filenames: false
+  language: python
+  files: (__manifest__\.py|__openerp__\.py|__terp__\.py)$
