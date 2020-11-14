@@ -34,8 +34,8 @@ for BRANCH in $BRANCHES; do
     git pull --ff-only
     git merge --no-edit odoo/$BRANCH || exit 1
     git push -u origin HEAD:$BRANCH || exit 1
-    cd setup || exit 1
-    python package.py --no-testing --no-debian --no-rpm --no-windows -b $BUILDDIR -p $PUBDIR/$BRANCH || exit 1
-    cd ..
+    # cd setup || exit 1
+    # python package.py --no-testing --no-debian --no-rpm --no-windows -b $BUILDDIR -p $PUBDIR/$BRANCH || exit 1
+    # cd ..
 done
 exit 0
