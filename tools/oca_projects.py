@@ -190,6 +190,7 @@ OCA_PROJECTS = {
               'interface-github',
               'iot',
               'rest-framework',
+              'role-policy',
               ],
     'vertical association': ['vertical-association'],
     'vertical hotel': ['vertical-hotel'],
