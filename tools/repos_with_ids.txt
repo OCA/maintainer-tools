@@ -179,3 +179,4 @@
 291|github.com/OCA/fleet
 292|github.com/OCA/dms
 293|github.com/OCA/pms
+294|github.com/OCA/role-policy
