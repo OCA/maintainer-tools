@@ -261,6 +261,15 @@ def gen_one_addon_index(readme_filename):
         writer_name='html4css1',
         settings_overrides=RST2HTML_SETTINGS,
     )
+    with open(index_filename, "rb") as f:
+        index = f.read()
+    # remove the docutils version from generated html, to avoid
+    # useless changes in the readme
+    index = re.sub(
+        rb'(<meta.*generator.*Docutils)\s*[\d.]+', rb"\1", index, re.MULTILINE
+    )
+    with open(index_filename, "wb") as f:
+        f.write(index)
     return index_filename
 
 
