@@ -3,6 +3,7 @@
 from pathlib import Path
 import os
 import subprocess
+import textwrap
 from typing import Optional
 
 import click
@@ -12,8 +13,11 @@ from .gitutils import commit_if_needed
 from .oca_projects import BranchNotFoundError, get_repositories, temporary_clone
 
 
+ORG = "OCA"
+
+
 def _make_update_dotfiles_branch(branch):
-    return f"{branch}-update-dotfiles"
+    return f"{branch}-ocabot-update-dotfiles"
 
 
 def _make_commit_msg(ci_skip: bool) -> str:
@@ -30,27 +34,58 @@ def _has_rej_file() -> bool:
     return False
 
 
-def _get_update_dotfiles_open_pr(repo: str, branch: str) -> Optional[str]:
+def _get_update_dotfiles_open_pr(org: str, repo: str, branch: str) -> Optional[str]:
     r = requests.get(
         f"https://api.github.com/repos"
-        f"/OCA/{repo}/pulls"
+        f"/{org}/{repo}/pulls"
         f"?base={branch}&head=OCA:{_make_update_dotfiles_branch(branch)}"
     )
     r.raise_for_status()
-    pr = r.json()
+    prs = r.json()
+    if not prs:
+        return None
+    pr = prs[0]
     if pr["state"] == "open":
         return pr["number"]
     return None
 
 
-def _make_update_dotfiles_pr(repo: str, branch: str) -> None:
+def _make_update_dotfiles_pr(org: str, repo: str, branch: str) -> None:
     subprocess.check_call(
         ["git", "checkout", "-B", _make_update_dotfiles_branch(branch)]
     )
     subprocess.check_call(["git", "add", "."])
     subprocess.check_call(["git", "commit", "-m", _make_commit_msg(ci_skip=False)])
-    subprocess.check_call(["git", "push"])
-    # TODO create PR
+    subprocess.check_call(["git", "push", "-f"])
+    if not _get_update_dotfiles_open_pr(org, repo, branch):
+        subprocess.check_call(
+            [
+                "gh",
+                "pr",
+                "create",
+                "--repo",
+                f"{org}/{repo}",
+                "--base",
+                branch,
+                "--title",
+                f"[{branch}] dotfiles update needs manual intervention",
+                "--body",
+                textwrap.dedent(
+                    """\
+                        Dear maintainer,
+
+                        After updating the dotfiles, `pre-commit run -a`
+                        fails in a manner that cannot be resolved automatically.
+
+                        Can you please have a look, fix and merge?
+
+                        Thanks,
+                    """
+                ),
+                "--label",
+                "help wanted",
+            ]
+        )
 
 
 @click.command()
@@ -70,23 +105,13 @@ def main(branch):
                 if not Path(".copier-answers.yml").exists():
                     print(f"Skipping {repo} because it has no .copier-answers.yml")
                     continue
-                r = subprocess.call(
-                    [
-                        "copier",
-                        "-f",
-                        # !!!
-                        "-d",
-                        "generate_requirements_txt=yes",
-                        # !!!
-                        "update",
-                    ]
-                )
+                r = subprocess.call(["copier", "-f", "update"])
                 if r != 0:
                     print("!" * 10, f"copier update failed on {repo}")
                     continue
                 if _has_rej_file():
                     print("!" * 10, f"copier update had a merge failure on {repo}")
-                    # TODO create or update update-dotfiles PR
+                    _make_update_dotfiles_pr(ORG, repo, branch)
                     continue
                 for _ in range(3):
                     r = subprocess.call(["pre-commit", "run", "-a"])
@@ -94,7 +119,7 @@ def main(branch):
                         break
                 if r != 0:
                     print("!" * 10, f"pre-commit failed on {repo}")
-                    # TODO create or update update-dotfiles PR
+                    _make_update_dotfiles_pr(ORG, repo, branch)
                     continue
                 if commit_if_needed(["."], _make_commit_msg(ci_skip=True)):
                     subprocess.check_call(["git", "push"])
