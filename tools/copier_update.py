@@ -1,7 +1,6 @@
 """Run copier update on a branch in all addons repos.
 """
 from pathlib import Path
-import os
 import subprocess
 import textwrap
 from typing import Optional
@@ -25,13 +24,6 @@ def _make_commit_msg(ci_skip: bool) -> str:
     if ci_skip:
         msg += " [ci skip]"
     return msg
-
-
-def _has_rej_file() -> bool:
-    for _, _, filenames in os.walk("."):
-        if any(f.endswith(".rej") for f in filenames):
-            return True
-    return False
 
 
 def _get_update_dotfiles_open_pr(org: str, repo: str, branch: str) -> Optional[str]:
@@ -92,6 +84,8 @@ def _make_update_dotfiles_pr(org: str, repo: str, branch: str) -> None:
 @click.argument("branch")
 def main(branch):
     for repo in get_repositories():
+        if repo not in ("event",):
+            continue
         try:
             with temporary_clone(repo, branch):
                 print("=" * 10, repo, "=" * 10)
@@ -107,18 +101,20 @@ def main(branch):
                     continue
                 r = subprocess.call(["copier", "-f", "update"])
                 if r != 0:
-                    print("!" * 10, f"copier update failed on {repo}")
+                    print("$" * 10, f"copier update failed on {repo}")
                     continue
-                if _has_rej_file():
-                    print("!" * 10, f"copier update had a merge failure on {repo}")
-                    _make_update_dotfiles_pr(ORG, repo, branch)
-                    continue
+                # git add updated files so pre-commit run -a will pick them up
+                # (notably newly created .rej files)
+                subprocess.check_call(["git", "add", "."])
+                # run up to 3 pre-commit passes, in case fixes cause
                 for _ in range(3):
                     r = subprocess.call(["pre-commit", "run", "-a"])
+                    # git add, in case pre-commit created new files
+                    subprocess.check_call(["git", "add", "."])
                     if r == 0:
                         break
                 if r != 0:
-                    print("!" * 10, f"pre-commit failed on {repo}")
+                    print("$" * 10, f"need manual intervention in {repo}")
                     _make_update_dotfiles_pr(ORG, repo, branch)
                     continue
                 if commit_if_needed(["."], _make_commit_msg(ci_skip=True)):
