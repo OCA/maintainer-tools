@@ -15,7 +15,7 @@ from .oca_projects import BranchNotFoundError, get_repositories, temporary_clone
 ORG = "OCA"
 
 
-def _make_update_dotfiles_branch(branch):
+def _make_update_dotfiles_branch(branch: str) -> str:
     return f"{branch}-ocabot-update-dotfiles"
 
 
@@ -82,10 +82,8 @@ def _make_update_dotfiles_pr(org: str, repo: str, branch: str) -> None:
 
 @click.command()
 @click.argument("branch")
-def main(branch):
+def main(branch: str) -> None:
     for repo in get_repositories():
-        if repo not in ("event",):
-            continue
         try:
             with temporary_clone(repo, branch):
                 print("=" * 10, repo, "=" * 10)
@@ -106,7 +104,9 @@ def main(branch):
                 # git add updated files so pre-commit run -a will pick them up
                 # (notably newly created .rej files)
                 subprocess.check_call(["git", "add", "."])
-                # run up to 3 pre-commit passes, in case fixes cause
+                # run up to 3 pre-commit passes, in case autofixers
+                # (which cause pre-commit to fail when they change files)
+                # resolve issues
                 for _ in range(3):
                     r = subprocess.call(["pre-commit", "run", "-a"])
                     # git add, in case pre-commit created new files
