@@ -2,20 +2,12 @@
 # License AGPLv3 (https://www.gnu.org/licenses/agpl-3.0-standalone.html)
 from __future__ import print_function
 import contextlib
-try:
-    import dbm.dumb as dumbdbm
-except ImportError:
-    # python 2
-    import dumbdbm
+import dbm.dumb as dumbdbm
 import logging
 import os
 import subprocess
-try:
-    from configparser import RawConfigParser
-except ImportError:
-    from ConfigParser import RawConfigParser
+from configparser import RawConfigParser
 
-from wheel.install import WheelFile
 from pkg_resources import parse_version
 
 import click
@@ -45,9 +37,7 @@ def _split_filename(filename):
     """
     basename = os.path.basename(filename)
     if basename.endswith('.whl'):
-        wheelfile = WheelFile(basename)
-        package_name = wheelfile.parsed_filename.group('name')
-        package_ver = wheelfile.parsed_filename.group('ver')
+        package_name, package_ver, _ = basename.split("-", 2)
     elif basename.endswith('.tar.gz'):
         package_ver = basename.split('-')[-1][:-7]
         package_name = basename[:-(len(package_ver) + 8)]
