@@ -2,18 +2,11 @@
 # License AGPLv3 (https://www.gnu.org/licenses/agpl-3.0-standalone.html)
 from __future__ import print_function
 import contextlib
-try:
-    import dbm.dumb as dumbdbm
-except ImportError:
-    # python 2
-    import dumbdbm
+import dbm.dumb as dumbdbm
 import logging
 import os
 import subprocess
-try:
-    from configparser import RawConfigParser
-except ImportError:
-    from ConfigParser import RawConfigParser
+from configparser import RawConfigParser
 
 from pkg_resources import parse_version
 
