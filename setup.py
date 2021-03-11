@@ -43,6 +43,7 @@ setuptools.setup(
         'selenium',
         'twine',
         'wheel',
+        'pyppeteer', # to generate icons with oca-gen-addon-icon
     ],
     python_requires='>=3.6',
     classifiers=[
