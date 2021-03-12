@@ -63,7 +63,7 @@ class GHTeamList(object):
         self.dry_run = dry_run
 
     def _load_teams(self):
-        self._teams = {t.name: t for t in self._org.iter_teams()}
+        self._teams = {t.name: t for t in self._org.teams()}
 
     def get_project_team(self, project):
         team = self._teams.get(project.name)
@@ -85,25 +85,25 @@ class GHTeamList(object):
             team = self.create_psc_team(project, name, main_team)
         # sync repositories
         if team:
-            for repo in main_team.iter_repos():
+            for repo in main_team.repositories():
                 repo_name = '%s/%s' % (repo.owner.login, repo.name)
-                if not team.has_repo(repo_name):
+                if not team.has_repository(repo_name):
                     if not self.dry_run:
-                        status = team.add_repo(repo_name)
+                        status = team.add_repository(repo_name)
                     else:
                         status = False
                     print('Added repo %s to team %s -> %s' %
                           (repo_name, team.name,
                            'OK' if status else 'NOK'))
         if team:
-            print(list(r.name for r in team.iter_repos()))
+            print(list(r.name for r in team.repositories()))
         else:
             print('no team found for project %', project)
         return team
 
     def create_psc_team(self, project, team_name, main_team):
         repo_names = ['%s/%s' % (r.owner.login, r.name)
-                      for r in main_team.iter_repos()]
+                      for r in main_team.repositories()]
         if not self.dry_run:
             self._org.create_team(
                 name=team_name,
@@ -206,8 +206,7 @@ def copy_users(odoo, team=None, dry_run=False):
         print()
         print(u'Following users miss GitHub login:')
         print(colors.FAIL +
-              '\n'.join(user.encode('utf-8')
-                        for user in no_github_login) +
+              '\n'.join(no_github_login) +
               colors.ENDC)
 
     if not_found:
@@ -219,7 +218,7 @@ def copy_users(odoo, team=None, dry_run=False):
 
 def sync_team(team, logins, dry_run=False):
     print(team.name)
-    current_logins = set(user.login for user in team.iter_members())
+    current_logins = set(user.login for user in team.members())
 
     keep_logins = logins.intersection(current_logins)
     remove_logins = current_logins - logins
