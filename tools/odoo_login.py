@@ -11,7 +11,7 @@ from . config import read_config, write_config
 
 
 ODOO_URL = os.environ.get('ODOO_URL', 'https://odoo-community.org')
-ODOO_DB = os.environ.get('ODOO_DB', 'odoo_community_v11')
+ODOO_DB = os.environ.get('ODOO_DB', 'odoo_community_prod')
 
 
 def login(username, store):
