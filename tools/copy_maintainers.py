@@ -11,11 +11,19 @@ GitHub teams
 """
 
 import argparse
+import errno
+import os
 import sys
 from operator import attrgetter
 from . import github_login
 from . import odoo_login
 from . import colors
+
+
+COPY_USERS_BLACKLIST = os.environ.get(
+    "COPY_USERS_BLACKLIST",
+    "~/.config/oca-copy-maintainers/copy_users_blacklist.txt"
+)
 
 
 class FakeProject(object):
@@ -55,7 +63,7 @@ class GHTeamList(object):
         self.dry_run = dry_run
 
     def _load_teams(self):
-        self._teams = {t.name: t for t in self._org.iter_teams()}
+        self._teams = {t.name: t for t in self._org.teams()}
 
     def get_project_team(self, project):
         team = self._teams.get(project.name)
@@ -77,22 +85,25 @@ class GHTeamList(object):
             team = self.create_psc_team(project, name, main_team)
         # sync repositories
         if team:
-            for repo in main_team.iter_repos():
+            for repo in main_team.repositories():
                 repo_name = '%s/%s' % (repo.owner.login, repo.name)
-                if not team.has_repo(repo_name):
+                if not team.has_repository(repo_name):
                     if not self.dry_run:
-                        status = team.add_repo(repo_name)
+                        status = team.add_repository(repo_name)
                     else:
                         status = False
                     print('Added repo %s to team %s -> %s' %
                           (repo_name, team.name,
                            'OK' if status else 'NOK'))
-            print(list(r.name for r in team.iter_repos()))
+        if team:
+            print(list(r.name for r in team.repositories()))
+        else:
+            print('no team found for project %', project)
         return team
 
     def create_psc_team(self, project, team_name, main_team):
         repo_names = ['%s/%s' % (r.owner.login, r.name)
-                      for r in main_team.iter_repos()]
+                      for r in main_team.repositories()]
         if not self.dry_run:
             self._org.create_team(
                 name=team_name,
@@ -110,6 +121,27 @@ def get_members_project(odoo):
     return FakeProject('OCA Members', members)
 
 
+def get_copy_users_blacklist(filename=COPY_USERS_BLACKLIST):
+    """read the blacklist file, if it exists (tries to create one if none).
+    File format 1 github login per line, comments begin with # until end of line
+    """
+    try:
+        fobj = open(filename)
+    except IOError as exc:
+        if exc.errno == errno.ENOENT:  # no such file or directories
+            os.makedirs(os.path.dirname(filename))
+            fobj = open(filename, 'w')
+            fobj.close()
+            fobj = open(filename)
+        else:
+            raise
+    blacklist = set()
+    for line in fobj:
+        login = line.split('#', 1)[0].strip().lower()
+        blacklist.add(login)
+    return blacklist
+
+
 def copy_users(odoo, team=None, dry_run=False):
     gh = github_login.login()
 
@@ -125,7 +157,7 @@ def copy_users(odoo, team=None, dry_run=False):
         domain = [('name', '=', team)] + base_domain
         projects = Project.browse(domain)
         if not projects:
-            sys.exit('Project %s not found.' % team)
+            sys.exit('Project %s not found. (%s)' % (team, domain))
     else:
         projects = list(Project.browse(base_domain))
         projects.append(get_cla_project(odoo))
@@ -144,6 +176,8 @@ def copy_users(odoo, team=None, dry_run=False):
         else:
             not_found.append(odoo_project)
 
+    black_list = get_copy_users_blacklist()
+
     no_github_login = set()
     for odoo_project, github_team, psc_team in valid:
         print()
@@ -157,11 +191,12 @@ def copy_users(odoo, team=None, dry_run=False):
         psc_user_logins = set()
         for user in users:
             if user.github_login:
-                user_logins.add(user.github_login)
+                if user.github_login.lower() not in black_list:
+                    user_logins.add(user.github_login)
             else:
                 no_github_login.add("%s (%s)" % (user.name, user.login))
         for user in psc_users:
-            if user.github_login:
+            if user.github_login and user.github_login not in black_list:
                 psc_user_logins.add(user.github_login)
         sync_team(github_team, user_logins, dry_run)
         if psc_team:
@@ -171,8 +206,7 @@ def copy_users(odoo, team=None, dry_run=False):
         print()
         print(u'Following users miss GitHub login:')
         print(colors.FAIL +
-              '\n'.join(user.encode('utf-8')
-                        for user in no_github_login) +
+              '\n'.join(no_github_login) +
               colors.ENDC)
 
     if not_found:
@@ -184,7 +218,7 @@ def copy_users(odoo, team=None, dry_run=False):
 
 def sync_team(team, logins, dry_run=False):
     print(team.name)
-    current_logins = set(user.login for user in team.iter_members())
+    current_logins = set(user.login for user in team.members())
 
     keep_logins = logins.intersection(current_logins)
     remove_logins = current_logins - logins
