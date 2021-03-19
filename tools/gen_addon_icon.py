@@ -17,16 +17,20 @@ ICON_TYPE = 'png'
 ICON_TYPES = ['png', 'svg']
 
 
-def gen_one_addon_icon(icon_dir, filetype=ICON_TYPE):
+def gen_one_addon_icon(icon_dir, src_icon=None, filetype=ICON_TYPE):
     icon_filename = os.path.join(icon_dir, 'icon.%s' % filetype)
-    template_filename = \
-        os.path.join(os.path.dirname(__file__).rpartition('tools')[0],
-                     'template', 'module',
-                     ICONS_DIR, 'icon.%s' % filetype)
-    if os.path.exists(template_filename):
+    if not src_icon:
+        src_icon = os.path.join(
+            os.path.dirname(__file__).rpartition('tools')[0],
+            'template',
+            'module',
+            ICONS_DIR,
+            'icon.%s' % filetype,
+        )
+    if os.path.exists(src_icon):
         if not os.path.exists(icon_dir):
             os.makedirs(icon_dir)
-        shutil.copyfile(template_filename, icon_filename)
+        shutil.copyfile(src_icon, icon_filename)
         return icon_filename
     return None
 
@@ -41,9 +45,13 @@ def gen_one_addon_icon(icon_dir, filetype=ICON_TYPE):
               type=click.Path(dir_okay=True, file_okay=False, exists=True),
               help="Directory containing several addons, the icon will be "
                    "put for all installable addons found there.")
+@click.option('--src-icon',
+              type=click.Path(dir_okay=False, file_okay=True, exists=True),
+              help="Path to a custom icon.png file. If not set, it'll use the "
+                   "OCA template icon.")
 @click.option('--commit/--no-commit',
               help="git commit icon, if not any.")
-def gen_addon_icon(addon_dirs, addons_dir, commit):
+def gen_addon_icon(addon_dirs, addons_dir, src_icon, commit):
     """ Put default OCA icon of type ICON_TYPE.
 
     Do nothing if the icon already exists in ICONS_DIR, otherwise put
@@ -73,7 +81,7 @@ def gen_addon_icon(addon_dirs, addons_dir, commit):
                 break
         if exist:
             continue
-        icon_filename = gen_one_addon_icon(icon_dir)
+        icon_filename = gen_one_addon_icon(icon_dir, src_icon=src_icon)
         if icon_filename:
             icon_filenames.append(icon_filename)
     if icon_filenames and commit:
