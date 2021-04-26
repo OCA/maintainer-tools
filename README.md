@@ -10,9 +10,9 @@
     $ virtualenv env
     $ . env/bin/activate
     $ python setup.py install
-    
+
 Alternatively if using pipx.
-    
+
     $ git clone git@github.com:OCA/maintainer-tools.git
     $ pipx install ./maintainer-tools
 
