@@ -253,8 +253,6 @@ _URL_MAPPINGS = {'git': 'git@github.com:%s/%s.git',
 
 def url(project_name, protocol='git', org_name='OCA'):
     """get the URL for an OCA project repository"""
-    if project_name not in _OCA_REPOSITORY_NAMES:
-        raise ValueError('Unknown project', project_name)
     return _URL_MAPPINGS[protocol] % (org_name, project_name)
 
 

@@ -1,18 +1,15 @@
 """Run copier update on a branch in all addons repos.
 """
-from pathlib import Path
 import subprocess
 import textwrap
-from typing import Optional
+from pathlib import Path
+from typing import Iterable, Optional, Tuple
 
 import click
 import requests
 
 from .gitutils import commit_if_needed
-from .oca_projects import BranchNotFoundError, get_repositories, temporary_clone
-
-
-ORG = "OCA"
+from .oca_projects import BranchNotFoundError, temporary_clone
 
 
 def _make_update_dotfiles_branch(branch: str) -> str:
@@ -30,7 +27,7 @@ def _get_update_dotfiles_open_pr(org: str, repo: str, branch: str) -> Optional[s
     r = requests.get(
         f"https://api.github.com/repos"
         f"/{org}/{repo}/pulls"
-        f"?base={branch}&head=OCA:{_make_update_dotfiles_branch(branch)}"
+        f"?base={branch}&head={org}:{_make_update_dotfiles_branch(branch)}"
     )
     r.raise_for_status()
     prs = r.json()
@@ -80,20 +77,45 @@ def _make_update_dotfiles_pr(org: str, repo: str, branch: str) -> None:
         )
 
 
+def _iterate_repos_and_branches(repos: str, branches: str) -> Iterable[Tuple[str, str]]:
+    for repo in repos.split(","):
+        repo = repo.strip()
+        if not repo:
+            continue
+        for branch in branches.split(","):
+            branch = branch.strip()
+            if not branch:
+                continue
+            yield repo, branch
+
+
 @click.command()
-@click.argument("branch")
-def main(branch: str) -> None:
-    for repo in get_repositories():
+@click.option("--org", default="OCA")
+@click.option("--repos", required=True)
+@click.option("--branches", required=True)
+@click.option("--git-user-name")
+@click.option("--git-user-email")
+@click.option("--skip-ci/--no-skip-ci", default=False)
+def main(
+    org: str,
+    repos: str,
+    branches: str,
+    git_user_name: str,
+    git_user_email: str,
+    skip_ci: bool,
+) -> None:
+    for repo, branch in _iterate_repos_and_branches(repos, branches):
         try:
-            with temporary_clone(repo, branch):
-                print("=" * 10, repo, "=" * 10)
-                # set git user/email
-                subprocess.check_call(
-                    ["git", "config", "user.name", "oca-git-bot"],
-                )
-                subprocess.check_call(
-                    ["git", "config", "user.email", "oca-git-bot@odoo-community.org"],
-                )
+            with temporary_clone(org_name=org, project_name=repo, branch=branch):
+                print("=" * 10, repo, branch, "=" * 10)
+                if git_user_name:
+                    subprocess.check_call(
+                        ["git", "config", "user.name", git_user_name],
+                    )
+                if git_user_email:
+                    subprocess.check_call(
+                        ["git", "config", "user.email", git_user_email],
+                    )
                 if not Path(".copier-answers.yml").exists():
                     print(f"Skipping {repo} because it has no .copier-answers.yml")
                     continue
@@ -115,9 +137,9 @@ def main(branch: str) -> None:
                         break
                 if r != 0:
                     print("$" * 10, f"need manual intervention in {repo}")
-                    _make_update_dotfiles_pr(ORG, repo, branch)
+                    _make_update_dotfiles_pr(org, repo, branch)
                     continue
-                if commit_if_needed(["."], _make_commit_msg(ci_skip=True)):
+                if commit_if_needed(["."], _make_commit_msg(ci_skip=skip_ci)):
                     subprocess.check_call(["git", "push"])
         except BranchNotFoundError:
             pass
