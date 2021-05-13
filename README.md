@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/OCA/maintainer-tools.svg?branch=master)](https://travis-ci.org/OCA/maintainer-tools)
+[![CI](https://github.com/OCA/maintainer-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/OCA/maintainer-tools/actions/workflows/ci.yml)
 [![Coverage Status](https://img.shields.io/coveralls/OCA/maintainer-tools.svg)](https://coveralls.io/r/OCA/maintainer-tools?branch=master)
 
 # OCA Maintainers Tools
@@ -10,9 +10,9 @@
     $ virtualenv env
     $ . env/bin/activate
     $ python setup.py install
-    
+
 Alternatively if using pipx.
-    
+
     $ git clone git@github.com:OCA/maintainer-tools.git
     $ pipx install ./maintainer-tools
 
