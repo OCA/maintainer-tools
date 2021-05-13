@@ -28,10 +28,6 @@ class SomethingCase(TransactionCase):
 
 
 class UICase(HttpCase):
-
-    post_install = True
-    at_install = False
-
     def test_ui_web(self):
         """Test backend tests."""
         self.phantom_js(
@@ -41,10 +37,25 @@ class UICase(HttpCase):
         )
 
     def test_ui_website(self):
-        """Test frontend tour."""
+        """Test frontend tour (v13)."""
+        self.start_tour("/shop", "tour_name", login="admin")
+
+    def test_ui_website(self):
+        """Test frontend tour (v12)."""
+        tour = "tour_name"
+        self.browser_js(
+            url_path="/shop",
+            code="odoo.__DEBUG__.services['web_tour.tour'].run('%s')" % tour,
+            ready="odoo.__DEBUG__.services['web_tour.tour'].tours.%s.ready" % tour,
+            login="admin",
+        )
+    
+    def test_ui_website(self):
+        """Test frontend tour (v11)."""
+        tour = "tour_name"
         self.phantom_js(
-            url_path="/?debug=assets",
+            url_path="/",
             code="odoo.__DEBUG__.services['web.Tour']"
-                 ".run('test_module_name', 'test')",
-            ready="odoo.__DEBUG__.services['web.Tour'].tours.test_module_name",
+                 ".run('%s', 'test')" % tour,
+            ready="odoo.__DEBUG__.services['web.Tour'].tours.%s" % tour,
             login="admin")
