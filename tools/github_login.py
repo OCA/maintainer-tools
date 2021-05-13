@@ -10,6 +10,10 @@ import github3
 from .config import read_config, write_config
 
 
+class GitHubLoginError(RuntimeError):
+    pass
+
+
 def login():
     if os.environ.get('GITHUB_TOKEN'):
         token = os.environ['GITHUB_TOKEN']
@@ -17,9 +21,11 @@ def login():
         config = read_config()
         token = config.get('GitHub', 'token')
     if not token:
-        sys.exit("No token has been generated for this script. "
-                 "Please run 'oca-github-login' or set the GITHUB_TOKEN "
-                 "environment variable.")
+        raise GitHubLoginError(
+            "No token has been generated for this script. "
+            "Please run 'oca-github-login' or set the GITHUB_TOKEN "
+            "environment variable."
+        )
     return github3.login(token=token)
 
 
