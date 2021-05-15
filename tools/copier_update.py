@@ -9,7 +9,9 @@ import click
 import requests
 
 from .gitutils import commit_if_needed
-from .oca_projects import BranchNotFoundError, temporary_clone
+from .oca_projects import BranchNotFoundError, temporary_clone, get_repositories
+
+IGNORED_REJ_FILES = ["oca_dependencies.txt.rej"]
 
 
 def _make_update_dotfiles_branch(branch: str) -> str:
@@ -78,7 +80,11 @@ def _make_update_dotfiles_pr(org: str, repo: str, branch: str) -> None:
 
 
 def _iterate_repos_and_branches(repos: str, branches: str) -> Iterable[Tuple[str, str]]:
-    for repo in repos.split(","):
+    if repos == ":all:":
+        all_repos = get_repositories()
+    else:
+        all_repos = repos.split(",")
+    for repo in all_repos:
         repo = repo.strip()
         if not repo:
             continue
@@ -123,6 +129,7 @@ def main(
                 if r != 0:
                     print("$" * 10, f"copier update failed on {repo}")
                     continue
+                subprocess.check_call(["rm", "-f"] + IGNORED_REJ_FILES)
                 # git add updated files so pre-commit run -a will pick them up
                 # (notably newly created .rej files)
                 subprocess.check_call(["git", "add", "."])
