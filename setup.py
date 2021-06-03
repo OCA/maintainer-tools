@@ -13,7 +13,7 @@ setuptools.setup(
     author='Odoo Community Association (OCA)',
     description='Set of tools to help managing Odoo Community projects',
     long_description=long_description,
-    license='APGL3',
+    license='AGPL3',
     packages=['tools'],
     include_package_data=True,
     zip_safe=False,
