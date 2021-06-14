@@ -233,7 +233,7 @@ def sync_team(team, logins, dry_run=False):
     if not dry_run:
         for login in add_logins:
             try:
-                team.invite(login)
+                team.add_or_update_membership(login)
             except Exception as exc:
                 print('Failed to invite %s: %s' % (login, exc))
         for login in remove_logins:
