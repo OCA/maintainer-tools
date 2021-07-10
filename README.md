@@ -13,8 +13,7 @@
 
 Alternatively if using pipx.
 
-    $ git clone git@github.com:OCA/maintainer-tools.git
-    $ pipx install ./maintainer-tools
+    $ pipx install oca-maintainers-tools@git+https://github.com/OCA/maintainer-tools.git
 
 ## OCA repositories tools
 
