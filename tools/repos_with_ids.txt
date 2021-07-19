@@ -181,3 +181,4 @@
 293|github.com/OCA/pms
 294|github.com/OCA/role-policy
 295|github.com/OCA/odoo-pim
+296|github.com/OCA/sale-promotion

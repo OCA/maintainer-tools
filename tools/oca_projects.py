@@ -72,6 +72,7 @@ OCA_PROJECTS = {
                             'crm',
                             'partner-contact',
                             'sale-financial',
+                            'sale-promotion',
                             'sale-reporting',
                             'commission',
                             'event',
