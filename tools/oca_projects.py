@@ -204,6 +204,7 @@ OCA_PROJECTS = {
                      ],
     'vertical construction': ['vertical-construction'],
     'vertical real state': ['vertical-realstate'],
+    'vertical rental': ['vertical-rental'],
     'vertical travel': ['vertical-travel'],
     'web': ['web'],
     'website': ['website',
