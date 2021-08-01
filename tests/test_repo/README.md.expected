@@ -11,17 +11,17 @@ ${REPO_DESCRIPTION}
 
 Available addons
 ----------------
-addon | version | summary
---- | --- | ---
-[module1](module1/) | 8.0.1.0.0 | Module 1 summary
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[module1](module1/) | 8.0.1.0.0 [![Production/Stable](https://img.shields.io/badge/maturity-Production%2FStable-green.png)](https://odoo-community.org/page/development-status) | [![sbidoul](https://github.com/sbidoul.png?size=30px)](https://github.com/sbidoul) | Module 1 summary
 
 
 Unported addons
 ---------------
-addon | version | summary
---- | --- | ---
-[module3](__unported__/module3/) | 8.0.1.0.0 (unported) | Module 3 summary
-[module2](module2/) | 8.0.1.0.0 (unported) | Module 2 summary
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[module3](__unported__/module3/) | 8.0.1.0.0 (unported) [![Beta](https://img.shields.io/badge/maturity-Beta-yellow.png)](https://odoo-community.org/page/development-status) | | Module 3 summary
+[module2](module2/) | 8.0.1.0.0 (unported) [![Beta](https://img.shields.io/badge/maturity-Beta-yellow.png)](https://odoo-community.org/page/development-status) | | Module 2 summary
 
 [//]: # (end addons)
 

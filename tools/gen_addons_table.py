@@ -156,7 +156,7 @@ def gen_addons_table(commit, readme_path, addons_dir):
             if installable:
                 rows_available.append((
                     link,
-                    version + render_status(manifest),
+                    version + " " + render_status(manifest),
                     render_maintainers(manifest),
                     summary))
             else:
