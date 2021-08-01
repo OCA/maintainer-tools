@@ -28,6 +28,8 @@ import click
 
 from .gitutils import commit_if_needed
 
+from .gen_addon_readme import DEVELOPMENT_STATUS_BADGES
+
 _logger = logging.getLogger(__name__)
 
 
@@ -48,6 +50,24 @@ def render_markdown_table(header, rows):
     for row in rows:
         table.append(' | '.join(row))
     return '\n'.join(table)
+
+
+def render_status(manifest):
+    development_status = manifest.get('development_status') or 'beta'
+    data = DEVELOPMENT_STATUS_BADGES.get(development_status.lower(), False)
+    return data and "[![{alt_text}]({image_url})]({url})".format(
+        alt_text=data[2],
+        image_url=data[0],
+        url=data[1]) or ""
+
+
+def render_maintainers(manifest):
+    maintainers = manifest.get('maintainers') or []
+    return " ".join([
+        "[![{maintainer}]"
+        "(https://github.com/{maintainer}.png?size=30px)]"
+        "(https://github.com/{maintainer})".format(maintainer=x)
+        for x in maintainers])
 
 
 def replace_in_readme(readme_path, header, rows_available, rows_unported):
@@ -111,7 +131,7 @@ def gen_addons_table(commit, readme_path, addons_dir):
             addon_paths.append((addon_path, True))
     addon_paths = sorted(addon_paths, key=lambda x: x[0])
     # load manifests
-    header = ('addon', 'version', 'summary')
+    header = ('addon', 'version', 'maintainers', 'summary')
     rows_available = []
     rows_unported = []
     for addon_path, unported in addon_paths:
@@ -134,7 +154,11 @@ def gen_addons_table(commit, readme_path, addons_dir):
                                 'installable.' % addon_path)
                 installable = False
             if installable:
-                rows_available.append((link, version, summary))
+                rows_available.append((
+                    link,
+                    version + render_status(manifest),
+                    render_maintainers(manifest),
+                    summary))
             else:
                 rows_unported.append((link, version + ' (unported)', summary))
     # replace table in README.md
