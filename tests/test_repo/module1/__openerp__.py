@@ -8,6 +8,7 @@
     "category": "Uncategorized",
     "website": "https://odoo-community.org/",
     "author": "<AUTHOR(S)>, Odoo Community Association (OCA)",
+    "maintainers": ["sbidoul"],
     "license": "AGPL-3",
     "application": False,
     "installable": True,
