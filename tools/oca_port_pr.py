@@ -103,7 +103,6 @@ class Commit():
         "author_name",
         "author_email",
         "authored_datetime",
-        "summary",
         "message",
     )
     other_equality_attrs = (
@@ -125,6 +124,18 @@ class Commit():
             ]
         )
 
+    def _lazy_eq_message(self, other):
+        """Compare commit messages."""
+        # If the subject has been put on two lines, 'git-am' won't preserve it
+        # if '--keep-cr' option is not set, this generates false-positive.
+        # Replace all carriage returns and double spaces by one space character
+        # when performing the comparison.
+        self_value = self.message.replace("\n", " ").replace("  ", " ")
+        other_value = other.message.replace("\n", " ").replace("  ", " ")
+        # 'git am' without '--keep' option removes text in '[]' brackets
+        # generating false-positive.
+        return clean_text(self_value) == clean_text(other_value)
+
     def __eq__(self, other):
         """Consider a commit equal to another if some of its keys are the same."""
         if not isinstance(other, Commit):
@@ -139,10 +150,8 @@ class Commit():
         else:
             checks = [
                 (
-                    # 'git am' without '--keep' option removes text in '[]'
-                    # brackets generating false-positive when comparing commits.
-                    clean_text(getattr(self, attr)) == clean_text(getattr(other, attr))
-                    if attr in ("summary", "message")
+                    self._lazy_eq_message(other)
+                    if attr == "message"
                     else getattr(self, attr) == getattr(other, attr)
                 )
                 for attr in self._get_equality_attrs()
