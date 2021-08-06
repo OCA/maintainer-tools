@@ -48,25 +48,26 @@ MANIFEST_FILES = {
 
 
 @click.command()
-@click.option("--org-name", default="OCA",
-              help="Organization name, eg. OCA.")
+@click.argument("from_branch", required=True)
+@click.argument("to_branch", required=True)
+@click.option("--upstream-org", default="OCA", show_default=True,
+              help="Upstream organization name.")
+@click.option("--upstream", default="origin", show_default=True, required=True,
+              help="Git remote from which source and target branches are fetched.")
 @click.option("--repo-name", help="Repository name, eg. server-tools.")
 @click.option("--addon", required=True, help="Module name to port.")
-@click.option("--from", "from_branch", required=True, help="Odoo series. eg 13.0.")
-@click.option("--to", "to_branch", required=True, help="Odoo series. eg 14.0.")
-@click.option("--upstream", default="origin", required=True,
-              help="Git remote from which source and target branches are fetched.")
 @click.option("--fork",
               help="Git remote on which branches containing ported commits are pushed.")
+@click.option("--user-org", show_default="--fork", help="User organization name.")
 @click.option("--verbose", is_flag=True,
               help="List the commits of Pull Requests.")
 def main(
-        org_name, repo_name, addon, from_branch, to_branch, upstream, fork, verbose
+        from_branch, to_branch, upstream_org, upstream, repo_name, addon,
+        fork, user_org, verbose
         ):
-    """List Pull Requests to port from `from_branch` to `to_branch`.
+    """List Pull Requests to port from FROM_BRANCH to TO_BRANCH.
 
-    The PRs are found from source branch commits that do not exist in the
-    target branch.
+    The PRs are found from source branch commits that do not exist in the target branch.
 
     If the option `--fork` is set, one branche per PR will be created with
     missing commits and will be pushed to the indicated fork on GitHub.
@@ -76,17 +77,21 @@ def main(
         raise click.ClickException("changes not committed detected in this repository.")
     if fork and fork not in repo.remotes:
         raise click.ClickException(f"No remote '{fork}' in the current repository.")
+    if not user_org:
+        # Assume that the fork remote has the same name than the user organization
+        user_org = fork
     repo_name = repo_name or os.path.basename(os.getcwd())
     _fetch_branches(repo, upstream, from_branch, to_branch)
     diff = BranchesDiff(
-        repo, org_name, repo_name, addon,
+        repo, upstream_org, repo_name, addon,
         f"{upstream}/{from_branch}", f"{upstream}/{to_branch}"
     )
     diff.print_diff(verbose)
     if fork:
         print()
         _port_pull_requests(
-            diff, org_name, repo_name, upstream, from_branch, to_branch, fork
+            diff, upstream_org, repo_name, upstream, from_branch, to_branch,
+            fork, user_org
         )
 
 
@@ -316,9 +321,9 @@ def _request_github(url, method="get", params=None, json=None):
 
 class BranchesDiff():
     """Helper to compare easily commits (and related PRs) between two branches."""
-    def __init__(self, repo, org_name, repo_name, path, from_branch, to_branch):
+    def __init__(self, repo, upstream_org, repo_name, path, from_branch, to_branch):
         self.repo = repo
-        self.org_name = org_name
+        self.upstream_org = upstream_org
         self.repo_name = repo_name
         self.path = path
         self.from_branch, self.to_branch = from_branch, to_branch
@@ -373,10 +378,10 @@ class BranchesDiff():
             # Get related Pull Request if any
             if any("github.com" in remote.url for remote in self.repo.remotes):
                 gh_commit_pulls = _request_github(
-                    f"repos/{self.org_name}/{self.repo_name}"
+                    f"repos/{self.upstream_org}/{self.repo_name}"
                     f"/commits/{commit.hexsha}/pulls"
                 )
-                full_repo_name = f"{self.org_name}/{self.repo_name}"
+                full_repo_name = f"{self.upstream_org}/{self.repo_name}"
                 gh_commit_pull = [
                     data for data in gh_commit_pulls
                     if data["base"]["repo"]["full_name"] == full_repo_name
@@ -388,7 +393,7 @@ class BranchesDiff():
                     # Get all commits of the related PR as they could update
                     # others addons than the one the user is interested in
                     gh_pr_commits = _request_github(
-                        f"repos/{self.org_name}/{self.repo_name}"
+                        f"repos/{self.upstream_org}/{self.repo_name}"
                         f"/pulls/{pr.number}/commits"
                     )
                     for gh_pr_commit in gh_pr_commits:
@@ -457,7 +462,7 @@ class BranchesDiff():
 
 
 def _port_pull_requests(
-        diff, org_name, repo_name, upstream, from_branch, to_branch, fork
+        diff, upstream_org, repo_name, upstream, from_branch, to_branch, fork, user_org
         ):
     """Open new Pull Requests (if it doesn't exist) on the GitHub repository."""
     repo = diff.repo
@@ -471,13 +476,15 @@ def _port_pull_requests(
             if not is_pushed:
                 continue
             pr_data = _prepare_pull_request_data(
-                org_name, repo_name, from_branch, to_branch, pr, pr_branch, fork
+                upstream_org, repo_name, from_branch, to_branch, pr, pr_branch, user_org
             )
-            pr_url = _search_pull_request(org_name, repo_name, pr_data)
+            pr_url = _search_pull_request(upstream_org, repo_name, pr_data)
             if pr_url:
                 print(f"\tExisting PR has been refreshed => {pr_url}")
             else:
-                _create_pull_request(org_name, repo_name, to_branch, pr_branch, pr_data)
+                _create_pull_request(
+                    upstream_org, repo_name, to_branch, pr_branch, pr_data
+                )
 
 
 def _port_pr_in_branch(repo, pr, commits, upstream, from_branch, to_branch, base_ref):
@@ -585,35 +592,37 @@ def _push_branch_to_remote(repo, branch, remote):
 
 
 def _prepare_pull_request_data(
-        org_name, repo_name, from_branch, to_branch, pr, pr_branch, fork
+        upstream_org, repo_name, from_branch, to_branch, pr, pr_branch, user_org
         ):
     title = f"[{to_branch}][FW] {pr.title}"
     return {
         "draft": True,
         "title": title,
-        # FIXME assume that the fork remote has the same name than the owner
-        "head": f"{fork}:{pr_branch}",
+        "head": f"{user_org}:{pr_branch}",
         "base": to_branch,
         "body": f"Port of #{pr.number} from {from_branch} to {to_branch}.",
     }
 
 
-def _search_pull_request(org_name, repo_name, pr_data):
+def _search_pull_request(upstream_org, repo_name, pr_data):
     params = {
-        "q": f"is:pr repo:{org_name}/{repo_name} state:open {pr_data['title']} in:title"
+        "q": (
+            f"is:pr repo:{upstream_org}/{repo_name} "
+            f"state:open {pr_data['title']} in:title"
+        ),
     }
     response = _request_github("search/issues", params=params)
     if response["items"]:
         return response["items"][0]["html_url"]
 
 
-def _create_pull_request(org_name, repo_name, to_branch, pr_branch, pr_data):
+def _create_pull_request(upstream_org, repo_name, to_branch, pr_branch, pr_data):
     if click.confirm(
             f"\tCreate a draft PR from '{pr_branch}' to '{to_branch}' "
-            f"against {org_name}/{repo_name}?"
+            f"against {upstream_org}/{repo_name}?"
             ):
         response = _request_github(
-            f"repos/{org_name}/{repo_name}/pulls",
+            f"repos/{upstream_org}/{repo_name}/pulls",
             method="post",
             json=pr_data
         )
