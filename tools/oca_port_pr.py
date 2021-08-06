@@ -201,8 +201,8 @@ def no_strict_commit_equality():
 
 
 def clean_text(text):
-    """Clean text by removing patterns like '[13.0]' or '[IMP]'."""
-    return re.sub(r"\[.*\]", "", text).strip()
+    """Clean text by removing patterns like '13.0', '[13.0]' or '[IMP]'."""
+    return re.sub(r"\[.*\]|\d+\.\d+", "", text).strip()
 
 
 def _fetch_branches(repo, remote, *branches):
@@ -587,9 +587,7 @@ def _push_branch_to_remote(repo, branch, remote):
 def _prepare_pull_request_data(
         org_name, repo_name, from_branch, to_branch, pr, pr_branch, fork
         ):
-    # Clean PR title by removing patterns like '[13.0]' or '[IMP]'
-    pr_title = clean_text(pr.title)
-    title = f"[{from_branch}->{to_branch}][oca-port-pr-#{pr.number}] {pr_title}"
+    title = f"[{to_branch}][FW] {pr.title}"
     return {
         "draft": True,
         "title": title,
