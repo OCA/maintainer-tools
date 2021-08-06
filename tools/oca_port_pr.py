@@ -15,6 +15,10 @@ To create new branches and push them to your fork, use the `--fork` option:
 
 The tool will also ask you if you also want to open draft pull requests against
 the upstream repository.
+
+If there are several Pull Requests to port, it will ask if you want to base
+the next PR on the previous one, allowing you to cumulate ported PRs in one
+branch and creating a draft PR against the upstream repository with all of them.
 """
 from collections import abc, defaultdict
 import contextlib
@@ -91,7 +95,7 @@ def main(
         print()
         _port_pull_requests(
             diff, upstream_org, repo_name, upstream, from_branch, to_branch,
-            fork, user_org
+            fork, user_org, addon
         )
 
 
@@ -471,62 +475,88 @@ class BranchesDiff():
 
 
 def _port_pull_requests(
-        diff, upstream_org, repo_name, upstream, from_branch, to_branch, fork, user_org
+        diff, upstream_org, repo_name, upstream, from_branch, to_branch,
+        fork, user_org, addon
         ):
     """Open new Pull Requests (if it doesn't exist) on the GitHub repository."""
     repo = diff.repo
     base_ref = diff.to_branch   # e.g. 'origin/14.0'
+    previous_pr = previous_pr_branch = None
+    processed_prs = []
+    last_pr = list(diff.commits_diff.keys())[-1]
     for pr, commits in diff.commits_diff.items():
-        pr_branch = _port_pr_in_branch(
+        pr_branch, based_on_previous = _port_pr_in_branch(
             repo, pr, commits, upstream, from_branch, to_branch, base_ref,
+            previous_pr, previous_pr_branch
         )
         if pr_branch:
+            previous_pr = pr
+            previous_pr_branch = pr_branch
+            if based_on_previous:
+                processed_prs.append(pr)
+            else:
+                processed_prs = [pr]
+            if pr == last_pr:
+                print("\t🎉 Last PR processed! 🎉")
             is_pushed = _push_branch_to_remote(repo, pr_branch, fork)
             if not is_pushed:
                 continue
             pr_data = _prepare_pull_request_data(
-                upstream_org, repo_name, from_branch, to_branch, pr, pr_branch, user_org
+                upstream_org, repo_name, from_branch, to_branch,
+                processed_prs, pr_branch, user_org, addon
             )
             pr_url = _search_pull_request(upstream_org, repo_name, pr_data)
             if pr_url:
                 print(f"\tExisting PR has been refreshed => {pr_url}")
             else:
                 _create_pull_request(
-                    upstream_org, repo_name, to_branch, pr_branch, pr_data
+                    upstream_org, repo_name, to_branch, pr_branch, pr_data,
+                    processed_prs
                 )
 
 
-def _port_pr_in_branch(repo, pr, commits, upstream, from_branch, to_branch, base_ref):
-    """Cherry-pick commits of a Pull Request in a new branch."""
+def _port_pr_in_branch(
+        repo, pr, commits, upstream, from_branch, to_branch, base_ref,
+        previous_pr=None, previous_pr_branch=None
+        ):
+    """Port commits of a Pull Request in a new branch."""
     if pr.number:
         print(f"- Port PR #{pr.number} ({pr.url}) {pr.title}...")
     else:
         print("- Port commits w/o PR...")
+    based_on_previous = False
     # Ensure to not start to work from a working branch
     remote_to_branch = f"{upstream}/{to_branch}"
     if to_branch in repo.heads:
         repo.heads[to_branch].checkout()
     else:
         repo.git.checkout("-b", to_branch, remote_to_branch)
+    if not click.confirm("\tPort it?"):
+        return None, based_on_previous
     # Create a local branch based on last `{remote}/{to_branch}`
     branch_name = (
         f"oca-port-pr-{pr.number}-from-{from_branch}-to-{to_branch}"
     )
     if branch_name in repo.heads:
+        # If the local branch already exists, ask the user if he wants to recreate it
+        # + check if this existing branch is based on the previous PR branch
+        if previous_pr_branch:
+            based_on_previous = repo.is_ancestor(previous_pr_branch, branch_name)
         confirm = (
             f"\tBranch {branch_name} already exists, recreate it? "
             "\n\t(WARNING: you will lose the existing branch)"
         )
         if not click.confirm(confirm):
-            return branch_name
+            return branch_name, based_on_previous
         repo.delete_head(branch_name, "-f")
-    elif not click.confirm("\tPort it?"):
-        return
-    print(f"\tCreate branch {branch_name}...")
+    if previous_pr and click.confirm(
+            f"\tUse the previous PR #{previous_pr.number} branch as base?"
+            ):
+        base_ref = previous_pr_branch
+        based_on_previous = True
+    print(f"\tCreate branch {branch_name} from {base_ref}...")
     branch = repo.create_head(branch_name, base_ref)
     branch.checkout()
-    # Get commits from this branch (in case it's the 2nd time we run this)
-    branch_commits = _get_branch_commits(repo, branch_name)
 
     def accept_diff(repo, branch_name, diff, diff_path):
         if diff.change_type == "A":
@@ -546,9 +576,6 @@ def _port_pr_in_branch(repo, pr, commits, upstream, from_branch, to_branch, base
     # Cherry-pick commits of the source PR
     for commit in commits:
         print(f"\t\tApply {commit.hexsha} {commit.summary}...")
-        # Skip it if it has already been included in the dev branch
-        if commit in branch_commits:
-            continue
         # Port only relevant diffs/paths from the commit
         #   - no need to port a diff related to an addon/file that does not
         #     exist on the target branch
@@ -590,7 +617,7 @@ def _port_pr_in_branch(repo, pr, commits, upstream, from_branch, to_branch, base
                     ):
                 repo.git.am("--abort")
                 continue
-    return branch_name
+    return branch_name, based_on_previous
 
 
 def _push_branch_to_remote(repo, branch, remote):
@@ -601,19 +628,31 @@ def _push_branch_to_remote(repo, branch, remote):
 
 
 def _prepare_pull_request_data(
-        upstream_org, repo_name, from_branch, to_branch, pr, pr_branch, user_org
+        upstream_org, repo_name, from_branch, to_branch,
+        processed_prs, pr_branch, user_org, addon
         ):
-    title = f"[{to_branch}][FW] {pr.title}"
+    if len(processed_prs) > 1:
+        title = f"[{to_branch}][FW] {addon}: multiple ports from {from_branch}"
+        lines = [f"- #{pr.number}" for pr in processed_prs]
+        body = "\n".join(
+            [f"Port of the following PRs from {from_branch} to {to_branch}:"]
+            + lines
+        )
+    else:
+        pr = processed_prs[0]
+        title = f"[{to_branch}][FW] {pr.title}"
+        body = f"Port of #{pr.number} from {from_branch} to {to_branch}."
     return {
         "draft": True,
         "title": title,
         "head": f"{user_org}:{pr_branch}",
         "base": to_branch,
-        "body": f"Port of #{pr.number} from {from_branch} to {to_branch}.",
+        "body": body,
     }
 
 
 def _search_pull_request(upstream_org, repo_name, pr_data):
+    # FIXME search on PR branch too
     params = {
         "q": (
             f"is:pr repo:{upstream_org}/{repo_name} "
@@ -625,7 +664,13 @@ def _search_pull_request(upstream_org, repo_name, pr_data):
         return response["items"][0]["html_url"]
 
 
-def _create_pull_request(upstream_org, repo_name, to_branch, pr_branch, pr_data):
+def _create_pull_request(
+        upstream_org, repo_name, to_branch, pr_branch, pr_data, processed_prs
+        ):
+    print(
+        "\tPR(s) ported locally:",
+        ", ".join([f"#{pr.number}" for pr in processed_prs])
+    )
     if click.confirm(
             f"\tCreate a draft PR from '{pr_branch}' to '{to_branch}' "
             f"against {upstream_org}/{repo_name}?"
