@@ -50,6 +50,15 @@ def render_markdown_table(header, rows):
     return '\n'.join(table)
 
 
+def render_maintainers(manifest):
+    maintainers = manifest.get('maintainers') or []
+    return " ".join([
+        "[![{maintainer}]"
+        "(https://github.com/{maintainer}.png?size=30px)]"
+        "(https://github.com/{maintainer})".format(maintainer=x)
+        for x in maintainers])
+
+
 def replace_in_readme(readme_path, header, rows_available, rows_unported):
     with io.open(readme_path, encoding='utf8') as f:
         readme = f.read()
@@ -111,7 +120,7 @@ def gen_addons_table(commit, readme_path, addons_dir):
             addon_paths.append((addon_path, True))
     addon_paths = sorted(addon_paths, key=lambda x: x[0])
     # load manifests
-    header = ('addon', 'version', 'summary')
+    header = ('addon', 'version', 'maintainers', 'summary')
     rows_available = []
     rows_unported = []
     for addon_path, unported in addon_paths:
@@ -134,9 +143,18 @@ def gen_addons_table(commit, readme_path, addons_dir):
                                 'installable.' % addon_path)
                 installable = False
             if installable:
-                rows_available.append((link, version, summary))
+                rows_available.append((
+                    link,
+                    version,
+                    render_maintainers(manifest),
+                    summary))
             else:
-                rows_unported.append((link, version + ' (unported)', summary))
+                rows_unported.append((
+                    link,
+                    version + ' (unported)',
+                    render_maintainers(manifest),
+                    summary
+                ))
     # replace table in README.md
     replace_in_readme(readme_path, header, rows_available, rows_unported)
     if commit:
