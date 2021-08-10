@@ -483,9 +483,9 @@ def _port_pull_requests(
     base_ref = diff.to_branch   # e.g. 'origin/14.0'
     previous_pr = previous_pr_branch = None
     processed_prs = []
-    last_pr = list(diff.commits_diff.keys())[-1]
+    last_pr = list(diff.commits_diff.keys())[-1] if diff.commits_diff else None
     for pr, commits in diff.commits_diff.items():
-        pr_branch, based_on_previous = _port_pr_in_branch(
+        pr_branch, based_on_previous = _port_pull_request_commits(
             repo, pr, commits, upstream, from_branch, to_branch, base_ref,
             previous_pr, previous_pr_branch
         )
@@ -517,7 +517,7 @@ def _port_pull_requests(
                 )
 
 
-def _port_pr_in_branch(
+def _port_pull_request_commits(
         repo, pr, commits, upstream, from_branch, to_branch, base_ref,
         previous_pr=None, previous_pr_branch=None
         ):
