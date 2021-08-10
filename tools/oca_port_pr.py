@@ -31,7 +31,7 @@ import click
 import git
 import requests
 
-from .manifest import MANIFEST_NAMES
+from .manifest import MANIFEST_NAMES, get_manifest_path
 
 
 GITHUB_API_URL = "https://api.github.com"
@@ -46,6 +46,12 @@ SUMMARY_TERMS_TO_SKIP = [
     "Translated using Weblate",
     "Added translation using Weblate",
 ]
+
+PR_BRANCH_NAME = (
+    "oca-port-pr-{pr_number}-from-{from_branch}-to-{to_branch}"
+)
+
+PO_FILE_REGEX = re.compile(r".*i18n/.+\.pot?$")
 
 
 @click.command()
@@ -112,6 +118,7 @@ class Commit():
     eq_strict = True
 
     def __init__(self, **kwargs):
+        self.ported_commits = []
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -164,11 +171,35 @@ class Commit():
         return f"{self.__class__.__name__}({attrs})"
 
     @property
-    def addon_created(self):
+    def addons_created(self):
+        """Returns the list of addons created by this commit."""
+        addons = set()
         for diff in self.diffs:
-            if any(manifest in diff.b_path for manifest in MANIFEST_NAMES):
-                return True
-        return False
+            if (
+                    any(manifest in diff.b_path for manifest in MANIFEST_NAMES)
+                    and diff.change_type == "A"
+                    ):
+                addons.add(diff.b_path.split("/", maxsplit=1)[0])
+        return addons
+
+    @property
+    def paths_to_port(self):
+        """Return the list of file paths to port."""
+        current_paths = {
+            diff.a_path for diff in self.diffs
+            if _keep_diff_path(diff, diff.a_path)
+        }.union(
+            {
+                diff.b_path for diff in self.diffs
+                if _keep_diff_path(diff, diff.b_path)
+            }
+        )
+        ported_paths = set()
+        for ported_commit in self.ported_commits:
+            for diff in ported_commit.diffs:
+                ported_paths.add(diff.a_path)
+                ported_paths.add(diff.b_path)
+        return current_paths - ported_paths
 
 
 class PullRequest(abc.Hashable):
@@ -286,6 +317,54 @@ def _skip_commit(commit):
         or commit.author_email in AUTHOR_EMAILS_TO_SKIP
         or any([term in commit.summary for term in SUMMARY_TERMS_TO_SKIP])
     )
+
+
+def _skip_diff(commit, diff):
+    """Check if a commit diff should be skipped or not.
+
+    A skipped diff won't have its file path ported through 'git format-path'.
+
+    Return a tuple `(bool, message)` if the diff is skipped.
+    """
+    if diff.deleted_file:
+        if diff.a_path not in commit.paths_to_port:
+            return True, ""
+    if diff.b_path not in commit.paths_to_port:
+        return True, ""
+    if diff.renamed:
+        return False, ""
+    diff_path = diff.b_path.split("/", maxsplit=1)[0]
+    # Do not accept diff on unported addons
+    if not get_manifest_path(diff_path) and diff_path not in commit.addons_created:
+        return (
+            True,
+            (
+                f"SKIP: '{diff.change_type} {diff.b_path}' diff relates to an "
+                "unported addon"
+            )
+        )
+    if diff.change_type in ("M", "D"):
+        # Do not accept update and deletion on non-existing files
+        if not os.path.exists(diff.b_path):
+            return (
+                True,
+                (
+                    f"SKIP: '{diff.change_type} {diff.b_path}' diff relates "
+                    "to a non-existing file"
+                )
+            )
+    return False, ""
+
+
+def _keep_diff_path(diff, path):
+    """Check if a file path should be ported."""
+    # Ignore 'setup' files
+    if path.startswith("setup"):
+        return False
+    # Ignore changes on po/pot files
+    if PO_FILE_REGEX.match(path):
+        return False
+    return True
 
 
 def _get_branch_commits(repo, branch, path="."):
@@ -432,6 +511,7 @@ class BranchesDiff():
                                     index = to_branch_all_commits.index(pr_commit)
                                     ported_commit = to_branch_all_commits.pop(index)
                                     pr.ported_paths.update(ported_commit.paths)
+                                    pr_commit.ported_commits.append(ported_commit)
                                     paths -= ported_commit.paths
                                     if not paths:
                                         # The ported commits have already updated
@@ -533,8 +613,10 @@ def _port_pull_request_commits(
     if not click.confirm("\tPort it?"):
         return None, based_on_previous
     # Create a local branch based on last `{remote}/{to_branch}`
-    branch_name = (
-        f"oca-port-pr-{pr.number}-from-{from_branch}-to-{to_branch}"
+    branch_name = PR_BRANCH_NAME.format(
+        pr_number=pr.number,
+        from_branch=from_branch,
+        to_branch=to_branch,
     )
     if branch_name in repo.heads:
         # If the local branch already exists, ask the user if he wants to recreate it
@@ -557,43 +639,22 @@ def _port_pull_request_commits(
     branch = repo.create_head(branch_name, base_ref)
     branch.checkout()
 
-    def accept_diff(repo, branch_name, diff, diff_path):
-        if diff.change_type == "A":
-            # Accept creation of files in existing addons
-            if diff_path in repo.commit(branch_name).tree:
-                return True
-        elif diff.change_type == "M":
-            # Accept updates on existing files
-            if os.path.exists(diff.b_path):
-                return True
-        elif diff.change_type == "D":
-            # Accept deletion of existing files
-            if os.path.exists(diff.b_path):
-                return True
-        return False
-
     # Cherry-pick commits of the source PR
     for commit in commits:
         print(f"\t\tApply {commit.hexsha} {commit.summary}...")
         # Port only relevant diffs/paths from the commit
-        #   - no need to port a diff related to an addon/file that does not
-        #     exist on the target branch
-        #   - unless the diff is related to the creation of the addon
-        paths_to_port = set(pr.paths_not_ported)
-        if not commit.addon_created:
-            for diff in commit.diffs:
-                diff_path = diff.b_path.split("/", maxsplit=1)[0]
-                if diff_path not in paths_to_port:
-                    # Nothing to port from this diff, already ported
-                    continue
-                # Accept creation of addons
-                if not accept_diff(repo, branch_name, diff, diff_path):
-                    paths_to_port.remove(diff_path)
-                    print(
-                        f"\t\t\tWARNING: diff related to '{diff_path}' has been "
-                        f"skipped (relates to unported file/module)"
-                    )
-        if not commit.paths & paths_to_port:
+        paths_to_port = set(commit.paths_to_port)
+        for diff in commit.diffs:
+            skip, message = _skip_diff(commit, diff)
+            if skip:
+                if message:
+                    print(f"\t\t\t{message}")
+                if diff.a_path in paths_to_port:
+                    paths_to_port.remove(diff.a_path)
+                if diff.b_path in paths_to_port:
+                    paths_to_port.remove(diff.b_path)
+                continue
+        if not paths_to_port:
             print("\t\t\tWARNING: Nothing to port from this commit, skipping")
             continue
         try:
