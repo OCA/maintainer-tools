@@ -31,6 +31,8 @@ import click
 import git
 import requests
 
+from .manifest import MANIFEST_NAMES
+
 
 GITHUB_API_URL = "https://api.github.com"
 
@@ -44,11 +46,6 @@ SUMMARY_TERMS_TO_SKIP = [
     "Translated using Weblate",
     "Added translation using Weblate",
 ]
-
-MANIFEST_FILES = {
-    "__openerp__.py",
-    "__manifest__.py",
-}
 
 
 @click.command()
@@ -169,7 +166,7 @@ class Commit():
     @property
     def addon_created(self):
         for diff in self.diffs:
-            if any(manifest in diff.b_path for manifest in MANIFEST_FILES):
+            if any(manifest in diff.b_path for manifest in MANIFEST_NAMES):
                 return True
         return False
 
