@@ -532,7 +532,7 @@ def _port_pull_request_commits(
     if to_branch in repo.heads:
         repo.heads[to_branch].checkout()
     else:
-        repo.git.checkout("-b", to_branch, remote_to_branch)
+        repo.git.checkout("--no-track", "-b", to_branch, remote_to_branch)
     if not click.confirm("\tPort it?"):
         return None, based_on_previous
     # Create a local branch based on last `{remote}/{to_branch}`
