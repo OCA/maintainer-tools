@@ -505,7 +505,9 @@ def _port_pull_requests(
                 upstream_org, repo_name, from_branch, to_branch,
                 processed_prs, pr_branch, user_org, addon
             )
-            pr_url = _search_pull_request(upstream_org, repo_name, pr_data)
+            pr_url = _search_pull_request(
+                upstream_org, repo_name, pr_data["base"], pr_data["title"]
+            )
             if pr_url:
                 print(f"\tExisting PR has been refreshed => {pr_url}")
             else:
@@ -651,12 +653,11 @@ def _prepare_pull_request_data(
     }
 
 
-def _search_pull_request(upstream_org, repo_name, pr_data):
-    # FIXME search on PR branch too
+def _search_pull_request(upstream_org, repo_name, base_branch, title):
     params = {
         "q": (
-            f"is:pr repo:{upstream_org}/{repo_name} "
-            f"state:open {pr_data['title']} in:title"
+            f"is:pr repo:{upstream_org}/{repo_name} base:{base_branch} "
+            f"state:open {title} in:title"
         ),
     }
     response = _request_github("search/issues", params=params)
