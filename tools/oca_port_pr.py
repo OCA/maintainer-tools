@@ -7,11 +7,11 @@ commits if they were not yet (fully) ported.
 
 To get an output of eligible commits to port:
 
-    $ oca-port-pr --from 13.0 --to 14.0 --addon shopfloor_packing_info --verbose
+    $ oca-port-pr --from 13.0 --to 14.0 --addon shopfloor --verbose
 
 To create new branches and push them to your fork, use the `--fork` option:
 
-    $ oca-port-pr --from 13.0 --to 14.0 --addon shopfloor_packing_info --fork sebalix
+    $ oca-port-pr --from 13.0 --to 14.0 --addon shopfloor --fork sebalix
 
 The tool will also ask you if you also want to open draft pull requests against
 the upstream repository.
@@ -54,6 +54,21 @@ PR_BRANCH_NAME = (
 PO_FILE_REGEX = re.compile(r".*i18n/.+\.pot?$")
 
 
+class bcolors:
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKCYAN = '\033[96m'
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[39m"
+    BOLD = "\033[1m"
+    DIM = "\033[2m"
+    ENDD = "\033[22m"
+    UNDERLINE = "\033[4m"
+    END = "\033[0m"
+
+
 @click.command()
 @click.argument("from_branch", required=True)
 @click.argument("to_branch", required=True)
@@ -88,7 +103,7 @@ def main(
         # Assume that the fork remote has the same name than the user organization
         user_org = fork
     repo_name = repo_name or os.path.basename(os.getcwd())
-    _fetch_branches(repo, upstream, from_branch, to_branch)
+    _fetch_branches(repo, upstream, from_branch, to_branch, verbose=verbose)
     diff = BranchesDiff(
         repo, upstream_org, repo_name, addon,
         f"{upstream}/{from_branch}", f"{upstream}/{to_branch}"
@@ -251,7 +266,7 @@ def clean_text(text):
     return re.sub(r"\[.*\]|\d+\.\d+", "", text).strip()
 
 
-def _fetch_branches(repo, remote, *branches):
+def _fetch_branches(repo, remote, *branches, verbose=False):
     """Fetch `branches` of the given repository.
 
     The way a branch is spelled defines the remote from which it is fetched:
@@ -260,7 +275,10 @@ def _fetch_branches(repo, remote, *branches):
     """
     for branch in branches:
         remote_url = repo.remotes[remote].url
-        print(f"Fetch {remote}/{branch} from {remote_url}")
+        if verbose:
+            print(
+                f"Fetch {bcolors.BOLD}{remote}/{branch}{bcolors.END} from {remote_url}"
+            )
         repo.remotes[remote].fetch(branch)
 
 
@@ -339,8 +357,9 @@ def _skip_diff(commit, diff):
         return (
             True,
             (
-                f"SKIP: '{diff.change_type} {diff.b_path}' diff relates to an "
-                "unported addon"
+                f"{bcolors.WARNING}SKIP diff "
+                f"{bcolors.BOLD}{diff.change_type} {diff.b_path}{bcolors.END}: "
+                "relates to an unported addon"
             )
         )
     if diff.change_type in ("M", "D"):
@@ -425,31 +444,48 @@ class BranchesDiff():
         self.commits_diff = self.get_commits_diff()
 
     def print_diff(self, verbose=False):
-        lines_to_print = ["", ""]
+        lines_to_print = [""]
         counter = 0
         for pr in self.commits_diff:
             counter += 1
             if pr.number:
                 lines_to_print.append(
-                    f"- PR #{pr.number} ({pr.url or 'w/o PR'}) {pr.title}:"
+                    f"- {bcolors.BOLD}{bcolors.OKBLUE}PR #{pr.number}{bcolors.END} "
+                    f"({pr.url or 'w/o PR'}) {bcolors.OKBLUE}{pr.title}{bcolors.ENDC}:"
                 )
             else:
                 lines_to_print.append("- w/o PR:")
             lines_to_print.append(f"\tBy {pr.author}, merged at {pr.merged_at}")
             if verbose:
-                lines_to_print.append(f"\t=> Updates: {list(pr.paths)}")
-            lines_to_print.append(f"\t=> Not ported: {pr.paths_not_ported}")
+                pr_paths = ", ".join(
+                    [f"{bcolors.DIM}{path}{bcolors.ENDD}" for path in pr.paths]
+                )
+                lines_to_print.append(
+                    f"\t=> Updates: {pr_paths}"
+                )
+            pr_paths_not_ported = ", ".join(
+                [
+                    f"{bcolors.OKBLUE}{path}{bcolors.ENDC}"
+                    for path in pr.paths_not_ported
+                ]
+            )
             lines_to_print.append(
-                f"\t=> {len(self.commits_diff[pr])} commit(s) not (fully) ported"
+                f"\t=> Not ported: {pr_paths_not_ported}"
+            )
+            lines_to_print.append(
+                f"\t=> {bcolors.BOLD}{bcolors.OKBLUE}{len(self.commits_diff[pr])} "
+                f"commit(s){bcolors.END} not (fully) ported"
             )
             if verbose:
                 for commit in self.commits_diff[pr]:
                     lines_to_print.append(
-                        f"\t\t{commit.hexsha} {commit.summary}"
+                        f"\t\t{bcolors.DIM}{commit.hexsha} "
+                        f"{commit.summary}{bcolors.ENDD}"
                     )
         lines_to_print.insert(
-            1,
-            f"{counter} pull request(s) related to '{self.path}' to port from "
+            0,
+            f"{bcolors.BOLD}{bcolors.OKBLUE}{counter} pull request(s){bcolors.END} "
+            f"related to '{bcolors.OKBLUE}{self.path}{bcolors.ENDC}' to port from "
             f"{self.from_branch} to {self.to_branch}"
         )
         print("\n".join(lines_to_print))
@@ -569,7 +605,7 @@ def _port_pull_requests(
         if pr_branch:
             # Check if commits have been ported
             if repo.commit(pr_branch) == repo.commit(to_branch):
-                print("\t⚠️  Nothing has been ported, skipping")
+                print("\tℹ️  Nothing has been ported, skipping")
                 continue
             previous_pr = pr
             previous_pr_branch = pr_branch
@@ -604,7 +640,10 @@ def _port_pull_request_commits(
         ):
     """Port commits of a Pull Request in a new branch."""
     if pr.number:
-        print(f"- Port PR #{pr.number} ({pr.url}) {pr.title}...")
+        print(
+            f"- {bcolors.BOLD}{bcolors.OKCYAN}Port PR #{pr.number}{bcolors.END} "
+            f"({pr.url}) {bcolors.OKCYAN}{pr.title}{bcolors.ENDC}..."
+        )
     else:
         print("- Port commits w/o PR...")
     based_on_previous = False
@@ -628,24 +667,30 @@ def _port_pull_request_commits(
         if previous_pr_branch:
             based_on_previous = repo.is_ancestor(previous_pr_branch, branch_name)
         confirm = (
-            f"\tBranch {branch_name} already exists, recreate it? "
-            "\n\t(WARNING: you will lose the existing branch)"
+            f"\tBranch {bcolors.BOLD}{branch_name}{bcolors.END} already exists, "
+            "recreate it?\n\t(⚠️  you will lose the existing branch)"
         )
         if not click.confirm(confirm):
             return branch_name, based_on_previous
         repo.delete_head(branch_name, "-f")
     if previous_pr and click.confirm(
-            f"\tUse the previous PR #{previous_pr.number} branch as base?"
+            f"\tUse the previous {bcolors.BOLD}PR #{previous_pr.number}{bcolors.END} "
+            "branch as base?"
             ):
         base_ref = previous_pr_branch
         based_on_previous = True
-    print(f"\tCreate branch {branch_name} from {base_ref}...")
+    print(
+        f"\tCreate branch {bcolors.BOLD}{branch_name}{bcolors.END} from {base_ref}..."
+    )
     branch = repo.create_head(branch_name, base_ref)
     branch.checkout()
 
     # Cherry-pick commits of the source PR
     for commit in commits:
-        print(f"\t\tApply {commit.hexsha} {commit.summary}...")
+        print(
+            f"\t\tApply {bcolors.OKCYAN}{commit.hexsha}{bcolors.ENDC} "
+            f"{commit.summary}..."
+        )
         # Port only relevant diffs/paths from the commit
         paths_to_port = set(commit.paths_to_port)
         for diff in commit.diffs:
@@ -659,7 +704,9 @@ def _port_pull_request_commits(
                     paths_to_port.remove(diff.b_path)
                 continue
         if not paths_to_port:
-            print("\t\t\tWARNING: Nothing to port from this commit, skipping")
+            print(
+                "\t\t\tℹ️  Nothing to port from this commit, skipping"
+            )
             continue
         try:
             patches_dir = tempfile.mkdtemp()
@@ -673,10 +720,10 @@ def _port_pull_request_commits(
             repo.git.am("-3", "--keep", *patches)
             shutil.rmtree(patches_dir)
         except git.exc.GitCommandError as exc:
-            print(f"\n{exc}\n")
+            print(f"{bcolors.FAIL}ERROR:{bcolors.ENDC}\n{exc}\n")
             # High chance a conflict occurs, ask the user to resolve it
             if not click.confirm(
-                    "A conflict occurs, please resolve it and "
+                    "⚠️  A conflict occurs, please resolve it and "
                     "confirm to continue the process (y) or skip this commit (N)."
                     ):
                 repo.git.am("--abort")
@@ -686,7 +733,11 @@ def _port_pull_request_commits(
 
 def _push_branch_to_remote(repo, branch, remote):
     """Force push the local branch to remote."""
-    if click.confirm(f"\tPush branch '{branch}' to remote '{remote}'?"):
+    confirm = (
+        f"\tPush branch '{bcolors.BOLD}{branch}{bcolors.END}' "
+        f"to remote '{bcolors.BOLD}{remote}{bcolors.END}'?"
+    )
+    if click.confirm(confirm):
         repo.git.push(remote, branch, "--force-with-lease")
         return True
 
@@ -730,13 +781,17 @@ def _search_pull_request(upstream_org, repo_name, base_branch, title):
 def _create_pull_request(
         upstream_org, repo_name, to_branch, pr_branch, pr_data, processed_prs
         ):
-    print(
-        "\tPR(s) ported locally:",
-        ", ".join([f"#{pr.number}" for pr in processed_prs])
-    )
+    if len(processed_prs) > 1:
+        print(
+            "\tPR(s) ported locally:",
+            ", ".join(
+                [f"{bcolors.OKCYAN}#{pr.number}{bcolors.ENDC}" for pr in processed_prs]
+            )
+        )
     if click.confirm(
-            f"\tCreate a draft PR from '{pr_branch}' to '{to_branch}' "
-            f"against {upstream_org}/{repo_name}?"
+            f"\tCreate a draft PR from '{bcolors.BOLD}{pr_branch}{bcolors.END}' "
+            f"to '{bcolors.BOLD}{to_branch}{bcolors.END}' "
+            f"against {bcolors.BOLD}{upstream_org}/{repo_name}{bcolors.END}?"
             ):
         response = _request_github(
             f"repos/{upstream_org}/{repo_name}/pulls",
@@ -744,7 +799,10 @@ def _create_pull_request(
             json=pr_data
         )
         pr_url = response["html_url"]
-        print(f"\t\tPR created => {pr_url}")
+        print(
+            f"\t\t{bcolors.BOLD}{bcolors.OKCYAN}PR created =>"
+            f"{bcolors.ENDC} {pr_url}{bcolors.END}"
+        )
         return pr_url
 
 
