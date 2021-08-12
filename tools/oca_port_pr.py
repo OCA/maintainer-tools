@@ -445,16 +445,14 @@ class BranchesDiff():
 
     def print_diff(self, verbose=False):
         lines_to_print = [""]
-        counter = 0
-        for pr in self.commits_diff:
-            counter += 1
+        for i, pr in enumerate(self.commits_diff, 1):
             if pr.number:
                 lines_to_print.append(
-                    f"- {bcolors.BOLD}{bcolors.OKBLUE}PR #{pr.number}{bcolors.END} "
+                    f"{i}) {bcolors.BOLD}{bcolors.OKBLUE}PR #{pr.number}{bcolors.END} "
                     f"({pr.url or 'w/o PR'}) {bcolors.OKBLUE}{pr.title}{bcolors.ENDC}:"
                 )
             else:
-                lines_to_print.append("- w/o PR:")
+                lines_to_print.append("{i}) w/o PR:")
             lines_to_print.append(f"\tBy {pr.author}, merged at {pr.merged_at}")
             if verbose:
                 pr_paths = ", ".join(
@@ -479,12 +477,12 @@ class BranchesDiff():
             if verbose:
                 for commit in self.commits_diff[pr]:
                     lines_to_print.append(
-                        f"\t\t{bcolors.DIM}{commit.hexsha} "
+                        f"\t\t{bcolors.DIM}{commit.hexsha[:8]} "
                         f"{commit.summary}{bcolors.ENDD}"
                     )
         lines_to_print.insert(
             0,
-            f"{bcolors.BOLD}{bcolors.OKBLUE}{counter} pull request(s){bcolors.END} "
+            f"{bcolors.BOLD}{bcolors.OKBLUE}{i} pull request(s){bcolors.END} "
             f"related to '{bcolors.OKBLUE}{self.path}{bcolors.ENDC}' to port from "
             f"{self.from_branch} to {self.to_branch}"
         )
@@ -688,7 +686,7 @@ def _port_pull_request_commits(
     # Cherry-pick commits of the source PR
     for commit in commits:
         print(
-            f"\t\tApply {bcolors.OKCYAN}{commit.hexsha}{bcolors.ENDC} "
+            f"\t\tApply {bcolors.OKCYAN}{commit.hexsha[:8]}{bcolors.ENDC} "
             f"{commit.summary}..."
         )
         # Port only relevant diffs/paths from the commit
