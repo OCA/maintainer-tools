@@ -567,6 +567,10 @@ def _port_pull_requests(
             previous_pr, previous_pr_branch
         )
         if pr_branch:
+            # Check if commits have been ported
+            if repo.commit(pr_branch) == repo.commit(to_branch):
+                print("\t⚠️  Nothing has been ported, skipping")
+                continue
             previous_pr = pr
             previous_pr_branch = pr_branch
             if based_on_previous:
