@@ -1,37 +1,72 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 # Copyright 2021 Camptocamp SA
-"""Tool helping to port missing commits between two branches for an addon.
+"""Tool helping to port an addon or missing commits of an addon from one branch
+to another.
 
-If a Pull Request exists for a missing commit, it will be ported with all its
-commits if they were not yet (fully) ported.
+If the addon does not exist on the target branch, it will assist the user
+in the migration, following the OCA migration guide.
 
-To get an output of eligible commits to port:
+If the addon already exists on the target branch, it will retrieve missing
+commits to port. If a Pull Request exists for a missing commit, it will be
+ported with all its commits if they were not yet (fully) ported.
 
-    $ oca-port-pr --from 13.0 --to 14.0 --addon shopfloor --verbose
+To check if an addon could be migrated or to get eligible commits to port:
 
-To create new branches and push them to your fork, use the `--fork` option:
+    $ export GITHUB_TOKEN=<token>
+    $ oca-port 13.0 14.0 shopfloor --verbose
 
-    $ oca-port-pr --from 13.0 --to 14.0 --addon shopfloor --fork sebalix
+To effectively migrate the addon or port its commits, use the `--fork` option:
 
-The tool will also ask you if you also want to open draft pull requests against
+    $ oca-port 13.0 14.0 shopfloor --fork camptocamp
+
+
+Migration of addon
+------------------
+
+The tool follows the usual OCA migration guide to port commits of an addon,
+and will invite the user to fullfill the mentionned steps that can't be
+performed automatically.
+
+Port of commits/Pull Requests
+-----------------------------
+
+The tool will ask the user if he wants to open draft pull requests against
 the upstream repository.
 
-If there are several Pull Requests to port, it will ask if you want to base
-the next PR on the previous one, allowing you to cumulate ported PRs in one
-branch and creating a draft PR against the upstream repository with all of them.
+If there are several Pull Requests to port, it will ask the user if he wants to
+base the next PR on the previous one, allowing the user to cumulate ported PRs
+in one branch and creating a draft PR against the upstream repository with all
+of them.
 """
 from collections import abc, defaultdict
 import contextlib
 import os
 import re
 import shutil
+import subprocess
 import tempfile
+import urllib.parse
 
 import click
 import git
 import requests
 
 from .manifest import MANIFEST_NAMES, get_manifest_path
+
+
+class bcolors:
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKCYAN = '\033[96m'
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[39m"
+    BOLD = "\033[1m"
+    DIM = "\033[2m"
+    ENDD = "\033[22m"
+    UNDERLINE = "\033[4m"
+    END = "\033[0m"
 
 
 GITHUB_API_URL = "https://api.github.com"
@@ -51,43 +86,66 @@ PR_BRANCH_NAME = (
     "oca-port-pr-{pr_number}-from-{from_branch}-to-{to_branch}"
 )
 
+
 PO_FILE_REGEX = re.compile(r".*i18n/.+\.pot?$")
 
-
-class bcolors:
-    HEADER = "\033[95m"
-    OKBLUE = "\033[94m"
-    OKCYAN = '\033[96m'
-    OKGREEN = "\033[92m"
-    WARNING = "\033[93m"
-    FAIL = "\033[91m"
-    ENDC = "\033[39m"
-    BOLD = "\033[1m"
-    DIM = "\033[2m"
-    ENDD = "\033[22m"
-    UNDERLINE = "\033[4m"
-    END = "\033[0m"
+MIG_BRANCH_NAME = (
+    "{branch}-mig-{addon}"
+)
+MIG_MERGE_COMMITS_URL = (
+    "https://github.com/OCA/maintainer-tools/wiki/Merge-commits-in-pull-requests"
+)
+MIG_TASKS_URL = (
+    "https://github.com/OCA/maintainer-tools/wiki/Migration-to-version-{branch}"
+    "#tasks-to-do-in-the-migration"
+)
+MIG_NEW_PR_TITLE = "[{to_branch}][MIG] {addon}"
+MIG_NEW_PR_URL = (
+    "https://github.com/{upstream_org}/{repo_name}/compare/"
+    "{to_branch}...{user_org}:{mig_branch}?expand=1&title={title}"
+)
+MIG_TIPS = "\n".join([
+    f"\n{bcolors.BOLD}{bcolors.OKCYAN}The next steps are:{bcolors.END}",
+    (
+        "\t1) Reduce the number of commits "
+        f"('{bcolors.DIM}OCA Transbot...{bcolors.END}'):"
+    ),
+    f"\t\t=> {bcolors.BOLD}{MIG_MERGE_COMMITS_URL}{bcolors.END}",
+    "\t2) Adapt the module to the {to_branch} version:",
+    f"\t\t=> {bcolors.BOLD}" "{mig_tasks_url}" f"{bcolors.END}",
+    (
+        "\t3) On a shell command, type this for uploading the content to GitHub:\n"
+        f"{bcolors.DIM}"
+        "\t\t$ git add --all\n"
+        "\t\t$ git commit -m \"[MIG] {addon}: Migration to {to_branch}\"\n"
+        "\t\t$ git push {fork} {mig_branch} --set-upstream"
+        f"{bcolors.END}"
+    ),
+    "\t4) Create the PR against {upstream_org}/{repo_name}:",
+    f"\t\t=> {bcolors.BOLD}" "{new_pr_url}" f"{bcolors.END}",
+])
 
 
 @click.command()
 @click.argument("from_branch", required=True)
 @click.argument("to_branch", required=True)
+@click.argument("addon", required=True)
 @click.option("--upstream-org", default="OCA", show_default=True,
               help="Upstream organization name.")
 @click.option("--upstream", default="origin", show_default=True, required=True,
               help="Git remote from which source and target branches are fetched.")
 @click.option("--repo-name", help="Repository name, eg. server-tools.")
-@click.option("--addon", required=True, help="Module name to port.")
 @click.option("--fork",
               help="Git remote on which branches containing ported commits are pushed.")
 @click.option("--user-org", show_default="--fork", help="User organization name.")
 @click.option("--verbose", is_flag=True,
               help="List the commits of Pull Requests.")
 def main(
-        from_branch, to_branch, upstream_org, upstream, repo_name, addon,
+        from_branch, to_branch, addon, upstream_org, upstream, repo_name,
         fork, user_org, verbose
         ):
-    """List Pull Requests to port from FROM_BRANCH to TO_BRANCH.
+    """Migrate ADDON from FROM_BRANCH to TO_BRANCH or list Pull Requests to port
+    if ADDON already exists on TO_BRANCH.
 
     The PRs are found from source branch commits that do not exist in the target branch.
 
@@ -97,24 +155,196 @@ def main(
     repo = git.Repo()
     if repo.is_dirty():
         raise click.ClickException("changes not committed detected in this repository.")
-    if fork and fork not in repo.remotes:
-        raise click.ClickException(f"No remote '{fork}' in the current repository.")
+    repo_name = repo_name or os.path.basename(os.getcwd())
     if not user_org:
         # Assume that the fork remote has the same name than the user organization
         user_org = fork
-    repo_name = repo_name or os.path.basename(os.getcwd())
+    if fork and fork not in repo.remotes:
+        raise click.ClickException(
+            f"No remote {bcolors.FAIL}{fork}{bcolors.END} in the current repository.\n"
+            "To add it:\n"
+            f"\t{bcolors.DIM}$ git remote add {fork} "
+            f"git@github.com:{user_org}/{repo_name}.git{bcolors.END} "
+            "# This mode requires an SSH key in the GitHub account\n"
+            "Or:\n"
+            f"\t{bcolors.DIM}$ git remote add {fork} "
+            f"https://github.com/{user_org}/{repo_name}.git{bcolors.END} "
+            "# This will require to enter user/password each time\n"
+            "\nYou can change the GitHub organization with the "
+            f"{bcolors.DIM}--user-org{bcolors.END} option."
+        )
     _fetch_branches(repo, upstream, from_branch, to_branch, verbose=verbose)
-    diff = BranchesDiff(
+    _check_addon(repo, addon, upstream, from_branch, raise_exc=True)
+    # Check if the addon (folder) exists on the target branch
+    #   - if it already exists, check if some PRs could be ported
+    if _check_addon(repo, addon, upstream, to_branch):
+        port_addon_pull_requests(
+            repo, upstream_org, repo_name, upstream,
+            from_branch, to_branch, fork, user_org, addon, verbose=verbose
+        )
+    #   - if not, migrate it
+    else:
+        MigrateAddon(
+            repo, upstream_org, repo_name, upstream, from_branch, to_branch,
+            fork, user_org, addon
+        ).run()
+
+
+def _check_addon(repo, addon, upstream, branch, raise_exc=False):
+    """Check that `addon` exists on `upstream/branch`."""
+    remote_branch = f"{upstream}/{branch}"
+    branch_addons = [t.path for t in repo.commit(remote_branch).tree.trees]
+    if addon not in branch_addons:
+        if not raise_exc:
+            return False
+        raise click.ClickException(
+            f"{bcolors.FAIL}{addon}{bcolors.ENDC} does not exist on {remote_branch}"
+        )
+    return True
+
+
+def port_addon_pull_requests(
+        repo, upstream_org, repo_name, upstream,
+        from_branch, to_branch, fork, user_org, addon, verbose=False
+        ):
+    """Port pull requests of `addon`."""
+    print(
+        f"{bcolors.BOLD}{addon}{bcolors.END} already exists "
+        f"on {bcolors.BOLD}{to_branch}{bcolors.END}, checking PRs to port..."
+    )
+    branches_diff = BranchesDiff(
         repo, upstream_org, repo_name, addon,
         f"{upstream}/{from_branch}", f"{upstream}/{to_branch}"
     )
-    diff.print_diff(verbose)
+    branches_diff.print_diff(verbose)
     if fork:
         print()
         _port_pull_requests(
-            diff, upstream_org, repo_name, upstream, from_branch, to_branch,
-            fork, user_org, addon
+            branches_diff, upstream_org, repo_name,
+            upstream, from_branch, to_branch, fork, user_org, addon
         )
+
+
+class MigrateAddon():
+    def __init__(
+            self, repo, upstream_org, repo_name, upstream, from_branch, to_branch,
+            fork, user_org, addon
+            ):
+        self.repo = repo
+        self.upstream_org = upstream_org
+        self.repo_name = repo_name
+        self.upstream = upstream
+        self.from_branch = from_branch
+        self.to_branch = to_branch
+        self.fork = fork
+        self.user_org = user_org
+        self.addon = addon
+        self.remote_from_branch = f"{upstream}/{from_branch}"
+        self.remote_to_branch = f"{upstream}/{to_branch}"
+        self.mig_branch = MIG_BRANCH_NAME.format(branch=to_branch, addon=addon)
+
+    def run(self):
+        confirm = (
+            f"Migrate {bcolors.BOLD}{self.addon}{bcolors.END} "
+            f"from {bcolors.BOLD}{self.from_branch}{bcolors.END} "
+            f"to {bcolors.BOLD}{self.to_branch}{bcolors.END}?"
+        )
+        if not click.confirm(confirm):
+            return
+        # Check if a migration PR already exists
+        # TODO
+        if not self.fork:
+            raise click.UsageError("Please set the '--fork' option")
+        if self.repo.untracked_files:
+            raise click.ClickException("Untracked files detected, abort")
+        self._checkout_base_branch()
+        if self._create_mig_branch():
+            with tempfile.TemporaryDirectory() as patches_dir:
+                self._generate_patches(patches_dir)
+                self._apply_patches(patches_dir)
+            self._run_pre_commit()
+        self._print_tips()
+
+    def _checkout_base_branch(self):
+        # Ensure to not start to work from a working branch
+        if self.to_branch in self.repo.heads:
+            self.repo.heads[self.to_branch].checkout()
+        else:
+            self.repo.git.checkout(
+                "--no-track", "-b", self.to_branch, self.remote_to_branch
+            )
+
+    def _create_mig_branch(self):
+        create_branch = True
+        if self.mig_branch in self.repo.heads:
+            confirm = (
+                f"Branch {bcolors.BOLD}{self.mig_branch}{bcolors.END} already exists, "
+                "recreate it?\n(⚠️  you will lose the existing branch)"
+            )
+            if click.confirm(confirm):
+                self.repo.delete_head(self.mig_branch, "-f")
+            else:
+                create_branch = False
+        if create_branch:
+            # Create branch
+            print(
+                f"\tCreate branch {bcolors.BOLD}{self.mig_branch}{bcolors.END} "
+                f"from {self.remote_to_branch}..."
+            )
+            self.repo.git.checkout(
+                "--no-track", "-b", self.mig_branch, self.remote_to_branch
+            )
+        return create_branch
+
+    def _generate_patches(self, patches_dir):
+        print("\tGenerate patches...")
+        self.repo.git.format_patch(
+            "--keep-subject", "-o", patches_dir,
+            f"{self.remote_to_branch}..{self.remote_from_branch}",
+            "--", self.addon
+        )
+
+    def _apply_patches(self, patches_dir):
+        patches = [
+            os.path.join(patches_dir, f) for f in sorted(os.listdir(patches_dir))
+        ]
+        # Apply patches with git-am
+        print(f"\tApply {len(patches)} patches...")
+        self.repo.git.am("-3", "--keep", *patches)
+        print(
+            f"\t\tCommits history of {bcolors.BOLD}{self.addon}{bcolors.END} "
+            f"has been migrated."
+        )
+
+    def _run_pre_commit(self):
+        # Run pre-commit
+        print(
+            f"\tRun {bcolors.BOLD}pre-commit{bcolors.END} and commit changes if any..."
+        )
+        subprocess.check_call(f"pre-commit run --files {self.addon}", shell=True)
+        if self.repo.untracked_files or self.repo.is_dirty():
+            self.repo.git.add("-A")
+            self.repo.git.commit(
+                "-m", f"[IMP] {self.addon}: black, isort, prettier", "--no-verify"
+            )
+
+    def _print_tips(self):
+        mig_tasks_url = MIG_TASKS_URL.format(branch=self.to_branch)
+        pr_title_encoded = urllib.parse.quote(
+            MIG_NEW_PR_TITLE.format(to_branch=self.to_branch, addon=self.addon)
+        )
+        new_pr_url = MIG_NEW_PR_URL.format(
+            upstream_org=self.upstream_org, repo_name=self.repo_name,
+            to_branch=self.to_branch, user_org=self.user_org,
+            mig_branch=self.mig_branch, title=pr_title_encoded
+        )
+        tips = MIG_TIPS.format(
+            upstream_org=self.upstream_org, repo_name=self.repo_name,
+            addon=self.addon, to_branch=self.to_branch, fork=self.fork,
+            mig_branch=self.mig_branch, mig_tasks_url=mig_tasks_url,
+            new_pr_url=new_pr_url
+        )
+        print(tips)
 
 
 class Commit():
@@ -586,16 +816,19 @@ class BranchesDiff():
 
 
 def _port_pull_requests(
-        diff, upstream_org, repo_name, upstream, from_branch, to_branch,
+        branches_diff, upstream_org, repo_name, upstream, from_branch, to_branch,
         fork, user_org, addon
         ):
     """Open new Pull Requests (if it doesn't exist) on the GitHub repository."""
-    repo = diff.repo
-    base_ref = diff.to_branch   # e.g. 'origin/14.0'
+    repo = branches_diff.repo
+    base_ref = branches_diff.to_branch   # e.g. 'origin/14.0'
     previous_pr = previous_pr_branch = None
     processed_prs = []
-    last_pr = list(diff.commits_diff.keys())[-1] if diff.commits_diff else None
-    for pr, commits in diff.commits_diff.items():
+    last_pr = (
+        list(branches_diff.commits_diff.keys())[-1]
+        if branches_diff.commits_diff else None
+    )
+    for pr, commits in branches_diff.commits_diff.items():
         pr_branch, based_on_previous = _port_pull_request_commits(
             repo, pr, commits, upstream, from_branch, to_branch, base_ref,
             previous_pr, previous_pr_branch
@@ -680,8 +913,7 @@ def _port_pull_request_commits(
     print(
         f"\tCreate branch {bcolors.BOLD}{branch_name}{bcolors.END} from {base_ref}..."
     )
-    branch = repo.create_head(branch_name, base_ref)
-    branch.checkout()
+    repo.git.checkout("--no-track", "-b", branch_name, base_ref)
 
     # Cherry-pick commits of the source PR
     for commit in commits:
