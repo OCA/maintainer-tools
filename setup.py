@@ -77,7 +77,7 @@ setuptools.setup(
             'oca-fix-manifest-website = tools.fix_manifest_website:main',
             'oca-configure-travis= tools.configure_travis:main',
             'oca-create-branch = tools.create_branch:main',
-            'oca-port-pr = tools.oca_port_pr:main',
+            'oca-port = tools.oca_port:main',
         ],
     },
 )
