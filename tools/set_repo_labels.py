@@ -50,7 +50,7 @@ def main():
             for label in repo.labels()
         }
         target_labels = set(ALL_LABELS.keys())
-        existing_labels = set(label.name.lower() for label in repo_labels)
+        existing_labels = set(repo_labels.keys())
         labels_to_update = target_labels & existing_labels
         labels_to_create = target_labels - existing_labels
         # Report if extra labels are found, nothing to do though
