@@ -40,6 +40,7 @@ of them.
 """
 from collections import abc, defaultdict
 import contextlib
+import functools
 import os
 import re
 import shutil
@@ -362,10 +363,22 @@ class Commit():
     )
     eq_strict = True
 
-    def __init__(self, **kwargs):
+    def __init__(self, commit):
+        """Initializes a new Commit instance from a GitPython Commit object."""
+        self.raw_commit = commit
+        self.author_name = commit.author.name
+        self.author_email = commit.author.email
+        self.authored_datetime = commit.authored_datetime.replace(
+            tzinfo=None
+        ).isoformat()
+        self.summary = commit.summary
+        self.message = commit.message
+        self.hexsha = commit.hexsha
+        self.committed_datetime = commit.committed_datetime.replace(tzinfo=None)
+        self.parents = [parent.hexsha for parent in commit.parents]
+        self.files = {f for f in set(commit.stats.files.keys()) if "=>" not in f}
+        self.paths = {f.split("/", maxsplit=1)[0] for f in self.files}
         self.ported_commits = []
-        for key, value in kwargs.items():
-            setattr(self, key, value)
 
     def _get_equality_attrs(self):
         return (
@@ -446,6 +459,12 @@ class Commit():
                 ported_paths.add(diff.b_path)
         return current_paths - ported_paths
 
+    @property
+    def diffs(self):
+        if self.raw_commit.parents:
+            return self.raw_commit.diff(self.raw_commit.parents[0], R=True)
+        return self.raw_commit.diff(git.NULL_TREE)
+
 
 class PullRequest(abc.Hashable):
     eq_attrs = ("number", "url", "author", "title", "body", "merged_at")
@@ -510,28 +529,6 @@ def _fetch_branches(repo, remote, *branches, verbose=False):
                 f"Fetch {bcolors.BOLD}{remote}/{branch}{bcolors.END} from {remote_url}"
             )
         repo.remotes[remote].fetch(branch)
-
-
-def _new_commit_from_local_repo_data(commit):
-    """Create a new Commit instance from local repository data."""
-    files = {f for f in set(commit.stats.files.keys()) if "=>" not in f}
-    if commit.parents:
-        diffs = commit.diff(commit.parents[0], R=True)
-    else:
-        diffs = commit.diff(git.NULL_TREE)
-    return Commit(
-        author_name=commit.author.name,
-        author_email=commit.author.email,
-        authored_datetime=commit.authored_datetime.replace(tzinfo=None).isoformat(),
-        summary=commit.summary,
-        message=commit.message,
-        hexsha=commit.hexsha,
-        committed_datetime=commit.committed_datetime.replace(tzinfo=None),
-        parents=[parent.hexsha for parent in commit.parents],
-        files=files,
-        paths={f.split("/", maxsplit=1)[0] for f in files},
-        diffs=diffs,
-    )
 
 
 def _new_pull_request_from_github_data(data, paths=None, ported_paths=None):
@@ -631,7 +628,7 @@ def _get_branch_commits(repo, branch, path="."):
     commits_list = []
     commits_by_sha = {}
     for commit in commits:
-        com = _new_commit_from_local_repo_data(commit)
+        com = Commit(commit)
         if _skip_commit(com):
             continue
         commits_list.append(com)
@@ -639,6 +636,7 @@ def _get_branch_commits(repo, branch, path="."):
     return commits_list, commits_by_sha
 
 
+@functools.lru_cache()
 def _request_github(url, method="get", params=None, json=None):
     """Request GitHub API."""
     headers = {"Accept": "application/vnd.github.groot-preview+json"}
@@ -751,7 +749,7 @@ class BranchesDiff():
                     )
                     for gh_pr_commit in gh_pr_commits:
                         raw_commit = self.repo.commit(gh_pr_commit["sha"])
-                        pr_commit = _new_commit_from_local_repo_data(raw_commit)
+                        pr_commit = Commit(raw_commit)
                         pr.paths.update(pr_commit.paths)
                         if _skip_commit(pr_commit):
                             continue
