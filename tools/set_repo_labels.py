@@ -10,51 +10,69 @@ from .github_login import login
 REPO_TO_IGNORE = [
 ]
 
-# here is the list of labels we need in each repo
-all_labels = {
-    'bug': 'fc2929',
-    'duplicate': 'cccccc',
-    'enhancement': '84b6eb',
-    'help wanted': '159818',
-    'invalid': 'e6e6e6',
-    'question': 'cc317c',
-    'needs fixing': 'eb6420',
-    'needs review': 'fbca04',
-    'approved': '045509',
-    'work in progress': '0052cc',
-    'wontfix': 'ffffff',
-    'migration': 'd4c5f9',
-    'ready to merge': 'bfdadc',
+# List of labels to sync on all repositories
+# {name: (color, description)}
+ALL_LABELS = {
+    "bug": ("fc2929", None),
+    "duplicate": ("cccccc", None),
+    "enhancement": ("84b6eb", None),
+    "help wanted": ("159818", None),
+    "invalid": ("e6e6e6", None),
+    "question": ("cc317c", None),
+    "needs fixing": ("eb6420", None),
+    "needs review": ("fbca04", None),
+    "needs more information": ("eb6420", None),
+    "approved": ("045509", None),
+    "work in progress": ("0052cc", None),
+    "wontfix": ("ffffff", None),
+    "migration": ("d4c5f9", None),
+    "ready to merge": ("bfdadc", None),
+    # Labels related to actions/stale github workflow
+    "no stale": (
+        "524D44",
+        "Use this label to prevent the automated stale action "
+        "from closing this PR/Issue."
+    ),
+    "stale": (
+        "006B75",
+        "PR/Issue without recent activity, it'll be soon closed automatically."
+    )
 }
 
 
 def main():
     gh = login()
-
-    all_repos = gh.repositories_by('OCA')
-
-    for repo in all_repos:
+    for repo in gh.repositories_by("OCA"):
         if repo.name in REPO_TO_IGNORE:
             continue
-        wanted_labels = all_labels.copy()
-        for label in repo.labels():
-            if label.name.lower() in wanted_labels:
-                wanted_name = label.name.lower()
-                wanted_color = wanted_labels[label.name.lower()]
-                if label.name != wanted_name or label.color != wanted_color:
-                    print(
-                        "fixing name/color of label",
-                        label.name,
-                        "in",
-                        repo.name,
-                    )
-                    label.update(wanted_name, wanted_color)
-                wanted_labels.pop(label.name.lower())
-            else:
-                print("found extra label", label.name, "in", repo.name)
-        for name, color in wanted_labels.items():
-            print("adding label", name, "in", repo.name)
-            repo.create_label(name, color)
+        repo_labels = {
+            label.name.lower(): label
+            for label in repo.labels()
+        }
+        target_labels = set(ALL_LABELS.keys())
+        existing_labels = set(label.name.lower() for label in repo_labels)
+        labels_to_update = target_labels & existing_labels
+        labels_to_create = target_labels - existing_labels
+        # Report if extra labels are found, nothing to do though
+        extra_labels = existing_labels - target_labels
+        for label_name in extra_labels:
+            print(f"Found extra label '{repo_labels[label_name].name}' in {repo.name}")
+        # Check existing labels
+        for label_name in labels_to_update:
+            label_color, label_description = ALL_LABELS[label_name]
+            repo_label = repo_labels[label_name]
+            if (
+                repo_label.name != label_name
+                or repo_label.color != label_color
+                or repo_label.description != label_description
+            ):
+                print(f"Updating label '{label_name}' in {repo.name}")
+                repo_label.update(label_name, label_color, label_description)
+        # Create labels
+        for label_name in labels_to_create:
+            label_color, label_description = ALL_LABELS[label_name]
+            print(f"Creating label '{label_name}' in {repo.name}")
+            repo.create_label(label_name, label_color, label_description)
 
 
 if __name__ == '__main__':
