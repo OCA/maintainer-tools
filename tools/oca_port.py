@@ -76,6 +76,8 @@ AUTHOR_EMAILS_TO_SKIP = [
     "transbot@odoo-community.org",
     "oca-git-bot@odoo-community.org",
     "oca+oca-travis@odoo-community.org",
+    "oca-ci@odoo-community.org",
+    "shopinvader-git-bot@shopinvader.com",
 ]
 
 SUMMARY_TERMS_TO_SKIP = [
@@ -673,15 +675,19 @@ class BranchesDiff():
 
     def print_diff(self, verbose=False):
         lines_to_print = [""]
+        fake_pr = None
         for i, pr in enumerate(self.commits_diff, 1):
             if pr.number:
                 lines_to_print.append(
                     f"{i}) {bcolors.BOLD}{bcolors.OKBLUE}PR #{pr.number}{bcolors.END} "
                     f"({pr.url or 'w/o PR'}) {bcolors.OKBLUE}{pr.title}{bcolors.ENDC}:"
                 )
+                lines_to_print.append(f"\tBy {pr.author}, merged at {pr.merged_at}")
             else:
-                lines_to_print.append("{i}) w/o PR:")
-            lines_to_print.append(f"\tBy {pr.author}, merged at {pr.merged_at}")
+                lines_to_print.append(
+                    f"{i}) {bcolors.BOLD}{bcolors.OKBLUE}w/o PR{bcolors.END}:"
+                )
+                fake_pr = pr
             if verbose:
                 pr_paths = ", ".join(
                     [f"{bcolors.DIM}{path}{bcolors.ENDD}" for path in pr.paths]
@@ -689,31 +695,43 @@ class BranchesDiff():
                 lines_to_print.append(
                     f"\t=> Updates: {pr_paths}"
                 )
-            pr_paths_not_ported = ", ".join(
-                [
-                    f"{bcolors.OKBLUE}{path}{bcolors.ENDC}"
-                    for path in pr.paths_not_ported
-                ]
-            )
-            lines_to_print.append(
-                f"\t=> Not ported: {pr_paths_not_ported}"
-            )
+            if pr.number:
+                pr_paths_not_ported = ", ".join(
+                    [
+                        f"{bcolors.OKBLUE}{path}{bcolors.ENDC}"
+                        for path in pr.paths_not_ported
+                    ]
+                )
+                lines_to_print.append(
+                    f"\t=> Not ported: {pr_paths_not_ported}"
+                )
             lines_to_print.append(
                 f"\t=> {bcolors.BOLD}{bcolors.OKBLUE}{len(self.commits_diff[pr])} "
                 f"commit(s){bcolors.END} not (fully) ported"
             )
-            if verbose:
+            if verbose or not pr.number:
                 for commit in self.commits_diff[pr]:
                     lines_to_print.append(
                         f"\t\t{bcolors.DIM}{commit.hexsha[:8]} "
                         f"{commit.summary}{bcolors.ENDD}"
                     )
-        lines_to_print.insert(
-            0,
-            f"{bcolors.BOLD}{bcolors.OKBLUE}{i} pull request(s){bcolors.END} "
-            f"related to '{bcolors.OKBLUE}{self.path}{bcolors.ENDC}' to port from "
-            f"{self.from_branch} to {self.to_branch}"
-        )
+        if fake_pr:
+            # We have commits without PR, adapt the message
+            i -= 1
+            nb_commits = len(self.commits_diff[fake_pr])
+            message = (
+                f"{bcolors.BOLD}{bcolors.OKBLUE}{i} pull request(s){bcolors.END} "
+                f"and {bcolors.BOLD}{bcolors.OKBLUE}{nb_commits} commit(s) w/o "
+                f"PR{bcolors.END} related to '{bcolors.OKBLUE}{self.path}"
+                f"{bcolors.ENDC}' to port from {self.from_branch} to {self.to_branch}"
+            )
+        else:
+            message = (
+                f"{bcolors.BOLD}{bcolors.OKBLUE}{i} pull request(s){bcolors.END} "
+                f"related to '{bcolors.OKBLUE}{self.path}{bcolors.ENDC}' to port from "
+                f"{self.from_branch} to {self.to_branch}"
+            )
+        lines_to_print.insert(0, message)
         print("\n".join(lines_to_print))
 
     def get_commits_diff(self):
@@ -874,7 +892,7 @@ def _port_pull_request_commits(
             f"({pr.url}) {bcolors.OKCYAN}{pr.title}{bcolors.ENDC}..."
         )
     else:
-        print("- Port commits w/o PR...")
+        print(f"- {bcolors.BOLD}{bcolors.OKCYAN}Port commits w/o PR{bcolors.END}...")
     based_on_previous = False
     # Ensure to not start to work from a working branch
     remote_to_branch = f"{upstream}/{to_branch}"
@@ -882,7 +900,7 @@ def _port_pull_request_commits(
         repo.heads[to_branch].checkout()
     else:
         repo.git.checkout("--no-track", "-b", to_branch, remote_to_branch)
-    if not click.confirm("\tPort it?"):
+    if not click.confirm("\tPort it?" if pr.number else "\tPort them?"):
         return None, based_on_previous
     # Create a local branch based on last `{remote}/{to_branch}`
     branch_name = PR_BRANCH_NAME.format(
