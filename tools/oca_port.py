@@ -176,81 +176,112 @@ def main(
             "\nYou can change the GitHub organization with the "
             f"{bcolors.DIM}--user-org{bcolors.END} option."
         )
-    _fetch_branches(repo, upstream, from_branch, to_branch, verbose=verbose)
-    _check_addon(repo, addon, upstream, from_branch, raise_exc=True)
+    from_branch = Branch(repo, from_branch, upstream)
+    to_branch = Branch(repo, to_branch, upstream)
+    _fetch_branches(from_branch, to_branch, verbose=verbose)
+    _check_branches(from_branch, to_branch)
+    _check_addon(addon, from_branch, raise_exc=True)
     # Check if the addon (folder) exists on the target branch
     #   - if it already exists, check if some PRs could be ported
-    if _check_addon(repo, addon, upstream, to_branch):
+    if _check_addon(addon, to_branch):
         port_addon_pull_requests(
-            repo, upstream_org, repo_name, upstream,
-            from_branch, to_branch, fork, user_org, addon, verbose=verbose
+            repo, upstream_org, repo_name, from_branch, to_branch,
+            fork, user_org, addon, verbose=verbose
         )
     #   - if not, migrate it
     else:
         MigrateAddon(
-            repo, upstream_org, repo_name, upstream, from_branch, to_branch,
+            repo, upstream_org, repo_name, from_branch, to_branch,
             fork, user_org, addon
         ).run()
 
 
-def _check_addon(repo, addon, upstream, branch, raise_exc=False):
-    """Check that `addon` exists on `upstream/branch`."""
-    remote_branch = f"{upstream}/{branch}"
-    branch_addons = [t.path for t in repo.commit(remote_branch).tree.trees]
+def _fetch_branches(*branches, verbose=False):
+    """Fetch `branches`."""
+    for branch in branches:
+        if not branch.remote:
+            continue
+        remote_url = branch.repo.remotes[branch.remote].url
+        if verbose:
+            print(
+                f"Fetch {bcolors.BOLD}{branch.ref()}{bcolors.END} from {remote_url}"
+            )
+        branch.repo.remotes[branch.remote].fetch(branch.name)
+
+
+def _check_branches(from_branch, to_branch):
+    """Check that all required branches exist in the current repository."""
+    # Check if the source branch exists (required)
+    if not from_branch.remote:
+        raise click.ClickException(
+            "No source branch "
+            f"{bcolors.BOLD}{from_branch.ref()}{bcolors.END} available."
+        )
+    # Check if the target branch exists (with or w/o remote, allowing to work
+    # on a local one)
+    if not to_branch.remote and to_branch.name not in to_branch.repo.heads:
+        raise click.ClickException(
+            f"No target branch {bcolors.BOLD}{to_branch.name}{bcolors.END} or "
+            f"{bcolors.BOLD}{to_branch.ref()}{bcolors.END} available locally."
+        )
+    return True
+
+
+def _check_addon(addon, branch, raise_exc=False):
+    """Check that `addon` exists on `branch`."""
+    branch_addons = [t.path for t in branch.repo.commit(branch.ref()).tree.trees]
     if addon not in branch_addons:
         if not raise_exc:
             return False
         raise click.ClickException(
-            f"{bcolors.FAIL}{addon}{bcolors.ENDC} does not exist on {remote_branch}"
+            f"{bcolors.FAIL}{addon}{bcolors.ENDC} does not exist on {branch.ref()}"
         )
     return True
 
 
 def port_addon_pull_requests(
-        repo, upstream_org, repo_name, upstream,
+        repo, upstream_org, repo_name,
         from_branch, to_branch, fork, user_org, addon, verbose=False
         ):
     """Port pull requests of `addon`."""
     print(
         f"{bcolors.BOLD}{addon}{bcolors.END} already exists "
-        f"on {bcolors.BOLD}{to_branch}{bcolors.END}, checking PRs to port..."
+        f"on {bcolors.BOLD}{to_branch.name}{bcolors.END}, checking PRs to port..."
     )
     branches_diff = BranchesDiff(
-        repo, upstream_org, repo_name, addon,
-        f"{upstream}/{from_branch}", f"{upstream}/{to_branch}"
+        repo, upstream_org, repo_name, addon, from_branch, to_branch
     )
     branches_diff.print_diff(verbose)
     if fork:
         print()
         _port_pull_requests(
             branches_diff, upstream_org, repo_name,
-            upstream, from_branch, to_branch, fork, user_org, addon
+            from_branch, to_branch, fork, user_org, addon
         )
 
 
 class MigrateAddon():
     def __init__(
-            self, repo, upstream_org, repo_name, upstream, from_branch, to_branch,
+            self, repo, upstream_org, repo_name, from_branch, to_branch,
             fork, user_org, addon
             ):
         self.repo = repo
         self.upstream_org = upstream_org
         self.repo_name = repo_name
-        self.upstream = upstream
         self.from_branch = from_branch
         self.to_branch = to_branch
         self.fork = fork
         self.user_org = user_org
         self.addon = addon
-        self.remote_from_branch = f"{upstream}/{from_branch}"
-        self.remote_to_branch = f"{upstream}/{to_branch}"
-        self.mig_branch = MIG_BRANCH_NAME.format(branch=to_branch, addon=addon)
+        self.mig_branch = Branch(
+            repo, MIG_BRANCH_NAME.format(branch=to_branch.name[:4], addon=addon)
+        )
 
     def run(self):
         confirm = (
             f"Migrate {bcolors.BOLD}{self.addon}{bcolors.END} "
-            f"from {bcolors.BOLD}{self.from_branch}{bcolors.END} "
-            f"to {bcolors.BOLD}{self.to_branch}{bcolors.END}?"
+            f"from {bcolors.BOLD}{self.from_branch.name}{bcolors.END} "
+            f"to {bcolors.BOLD}{self.to_branch.name}{bcolors.END}?"
         )
         if not click.confirm(confirm):
             return
@@ -270,32 +301,32 @@ class MigrateAddon():
 
     def _checkout_base_branch(self):
         # Ensure to not start to work from a working branch
-        if self.to_branch in self.repo.heads:
-            self.repo.heads[self.to_branch].checkout()
+        if self.to_branch.name in self.repo.heads:
+            self.repo.heads[self.to_branch.name].checkout()
         else:
             self.repo.git.checkout(
-                "--no-track", "-b", self.to_branch, self.remote_to_branch
+                "--no-track", "-b", self.to_branch.name, self.to_branch.ref()
             )
 
     def _create_mig_branch(self):
         create_branch = True
-        if self.mig_branch in self.repo.heads:
+        if self.mig_branch.name in self.repo.heads:
             confirm = (
-                f"Branch {bcolors.BOLD}{self.mig_branch}{bcolors.END} already exists, "
+                f"Branch {bcolors.BOLD}{self.mig_branch.name}{bcolors.END} already exists, "
                 "recreate it?\n(⚠️  you will lose the existing branch)"
             )
             if click.confirm(confirm):
-                self.repo.delete_head(self.mig_branch, "-f")
+                self.repo.delete_head(self.mig_branch.name, "-f")
             else:
                 create_branch = False
         if create_branch:
             # Create branch
             print(
-                f"\tCreate branch {bcolors.BOLD}{self.mig_branch}{bcolors.END} "
-                f"from {self.remote_to_branch}..."
+                f"\tCreate branch {bcolors.BOLD}{self.mig_branch.name}{bcolors.END} "
+                f"from {self.to_branch.ref()}..."
             )
             self.repo.git.checkout(
-                "--no-track", "-b", self.mig_branch, self.remote_to_branch
+                "--no-track", "-b", self.mig_branch.name, self.to_branch.ref()
             )
         return create_branch
 
@@ -303,7 +334,7 @@ class MigrateAddon():
         print("\tGenerate patches...")
         self.repo.git.format_patch(
             "--keep-subject", "-o", patches_dir,
-            f"{self.remote_to_branch}..{self.remote_from_branch}",
+            f"{self.to_branch.ref()}..{self.from_branch.ref()}",
             "--", self.addon
         )
 
@@ -332,22 +363,38 @@ class MigrateAddon():
             )
 
     def _print_tips(self):
-        mig_tasks_url = MIG_TASKS_URL.format(branch=self.to_branch)
+        mig_tasks_url = MIG_TASKS_URL.format(branch=self.to_branch.name)
         pr_title_encoded = urllib.parse.quote(
-            MIG_NEW_PR_TITLE.format(to_branch=self.to_branch, addon=self.addon)
+            MIG_NEW_PR_TITLE.format(to_branch=self.to_branch.name[:4], addon=self.addon)
         )
         new_pr_url = MIG_NEW_PR_URL.format(
             upstream_org=self.upstream_org, repo_name=self.repo_name,
-            to_branch=self.to_branch, user_org=self.user_org,
-            mig_branch=self.mig_branch, title=pr_title_encoded
+            to_branch=self.to_branch.name, user_org=self.user_org,
+            mig_branch=self.mig_branch.name, title=pr_title_encoded
         )
         tips = MIG_TIPS.format(
             upstream_org=self.upstream_org, repo_name=self.repo_name,
-            addon=self.addon, to_branch=self.to_branch, fork=self.fork,
-            mig_branch=self.mig_branch, mig_tasks_url=mig_tasks_url,
+            addon=self.addon, to_branch=self.to_branch.name, fork=self.fork,
+            mig_branch=self.mig_branch.name, mig_tasks_url=mig_tasks_url,
             new_pr_url=new_pr_url
         )
         print(tips)
+
+
+class Branch():
+    def __init__(self, repo, name, remote=None):
+        self.repo = repo
+        self.name = name
+        self.remote = None
+        if remote:
+            if repo.git.ls_remote("--heads", remote, name):
+                self.remote = remote
+
+    def ref(self):
+        ref = self.name
+        if self.remote:
+            ref = f"{self.remote}/{self.name}"
+        return ref
 
 
 class Commit():
@@ -517,22 +564,6 @@ def clean_text(text):
     return re.sub(r"\[.*\]|\d+\.\d+", "", text).strip()
 
 
-def _fetch_branches(repo, remote, *branches, verbose=False):
-    """Fetch `branches` of the given repository.
-
-    The way a branch is spelled defines the remote from which it is fetched:
-    - '14.0' => fetch from 'origin'
-    - 'OCA/14.0' => fetch from 'OCA'
-    """
-    for branch in branches:
-        remote_url = repo.remotes[remote].url
-        if verbose:
-            print(
-                f"Fetch {bcolors.BOLD}{remote}/{branch}{bcolors.END} from {remote_url}"
-            )
-        repo.remotes[remote].fetch(branch)
-
-
 def _new_pull_request_from_github_data(data, paths=None, ported_paths=None):
     """Create a new PullRequest instance from GitHub data."""
     pr_number = data["number"]
@@ -638,7 +669,6 @@ def _get_branch_commits(repo, branch, path="."):
     return commits_list, commits_by_sha
 
 
-@functools.lru_cache()
 def _request_github(url, method="get", params=None, json=None):
     """Request GitHub API."""
     headers = {"Accept": "application/vnd.github.groot-preview+json"}
@@ -666,16 +696,17 @@ class BranchesDiff():
         self.path = path
         self.from_branch, self.to_branch = from_branch, to_branch
         self.from_branch_path_commits, _ = _get_branch_commits(
-            repo, self.from_branch, path
+            repo, self.from_branch.ref(), path
         )
-        self.from_branch_all_commits, _ = _get_branch_commits(repo, self.from_branch)
-        self.to_branch_path_commits, _ = _get_branch_commits(repo, self.to_branch, path)
-        self.to_branch_all_commits, _ = _get_branch_commits(repo, self.to_branch)
+        self.from_branch_all_commits, _ = _get_branch_commits(repo, self.from_branch.ref())
+        self.to_branch_path_commits, _ = _get_branch_commits(repo, self.to_branch.ref(), path)
+        self.to_branch_all_commits, _ = _get_branch_commits(repo, self.to_branch.ref())
         self.commits_diff = self.get_commits_diff()
 
     def print_diff(self, verbose=False):
         lines_to_print = [""]
         fake_pr = None
+        i = 0
         for i, pr in enumerate(self.commits_diff, 1):
             if pr.number:
                 lines_to_print.append(
@@ -723,13 +754,14 @@ class BranchesDiff():
                 f"{bcolors.BOLD}{bcolors.OKBLUE}{i} pull request(s){bcolors.END} "
                 f"and {bcolors.BOLD}{bcolors.OKBLUE}{nb_commits} commit(s) w/o "
                 f"PR{bcolors.END} related to '{bcolors.OKBLUE}{self.path}"
-                f"{bcolors.ENDC}' to port from {self.from_branch} to {self.to_branch}"
+                f"{bcolors.ENDC}' to port from {self.from_branch.ref()} "
+                f"to {self.to_branch.ref()}"
             )
         else:
             message = (
                 f"{bcolors.BOLD}{bcolors.OKBLUE}{i} pull request(s){bcolors.END} "
                 f"related to '{bcolors.OKBLUE}{self.path}{bcolors.ENDC}' to port from "
-                f"{self.from_branch} to {self.to_branch}"
+                f"{self.from_branch.ref()} to {self.to_branch.ref()}"
             )
         lines_to_print.insert(0, message)
         print("\n".join(lines_to_print))
@@ -832,12 +864,12 @@ class BranchesDiff():
 
 
 def _port_pull_requests(
-        branches_diff, upstream_org, repo_name, upstream, from_branch, to_branch,
+        branches_diff, upstream_org, repo_name, from_branch, to_branch,
         fork, user_org, addon
         ):
     """Open new Pull Requests (if it doesn't exist) on the GitHub repository."""
     repo = branches_diff.repo
-    base_ref = branches_diff.to_branch   # e.g. 'origin/14.0'
+    base_ref = branches_diff.to_branch  # e.g. 'origin/14.0'
     previous_pr = previous_pr_branch = None
     processed_prs = []
     last_pr = (
@@ -846,12 +878,12 @@ def _port_pull_requests(
     )
     for pr, commits in branches_diff.commits_diff.items():
         pr_branch, based_on_previous = _port_pull_request_commits(
-            repo, pr, commits, upstream, from_branch, to_branch, base_ref,
+            repo, pr, commits, from_branch, to_branch, base_ref,
             previous_pr, previous_pr_branch
         )
         if pr_branch:
             # Check if commits have been ported
-            if repo.commit(pr_branch) == repo.commit(to_branch):
+            if repo.commit(pr_branch.ref()) == repo.commit(to_branch.name):
                 print("\tℹ️  Nothing has been ported, skipping")
                 continue
             previous_pr = pr
@@ -862,7 +894,7 @@ def _port_pull_requests(
                 processed_prs = [pr]
             if pr == last_pr:
                 print("\t🎉 Last PR processed! 🎉")
-            is_pushed = _push_branch_to_remote(repo, pr_branch, fork)
+            is_pushed = _push_branch_to_remote(pr_branch, fork)
             if not is_pushed:
                 continue
             pr_data = _prepare_pull_request_data(
@@ -882,7 +914,7 @@ def _port_pull_requests(
 
 
 def _port_pull_request_commits(
-        repo, pr, commits, upstream, from_branch, to_branch, base_ref,
+        repo, pr, commits, from_branch, to_branch, base_ref,
         previous_pr=None, previous_pr_branch=None
         ):
     """Port commits of a Pull Request in a new branch."""
@@ -895,18 +927,17 @@ def _port_pull_request_commits(
         print(f"- {bcolors.BOLD}{bcolors.OKCYAN}Port commits w/o PR{bcolors.END}...")
     based_on_previous = False
     # Ensure to not start to work from a working branch
-    remote_to_branch = f"{upstream}/{to_branch}"
-    if to_branch in repo.heads:
-        repo.heads[to_branch].checkout()
+    if to_branch.name in repo.heads:
+        repo.heads[to_branch.name].checkout()
     else:
-        repo.git.checkout("--no-track", "-b", to_branch, remote_to_branch)
+        repo.git.checkout("--no-track", "-b", to_branch.name, to_branch.ref())
     if not click.confirm("\tPort it?" if pr.number else "\tPort them?"):
         return None, based_on_previous
-    # Create a local branch based on last `{remote}/{to_branch}`
+    # Create a local branch based on upstream
     branch_name = PR_BRANCH_NAME.format(
         pr_number=pr.number,
-        from_branch=from_branch,
-        to_branch=to_branch,
+        from_branch=from_branch.name,
+        to_branch=to_branch.name,
     )
     if branch_name in repo.heads:
         # If the local branch already exists, ask the user if he wants to recreate it
@@ -918,7 +949,7 @@ def _port_pull_request_commits(
             "recreate it?\n\t(⚠️  you will lose the existing branch)"
         )
         if not click.confirm(confirm):
-            return branch_name, based_on_previous
+            return Branch(repo, branch_name), based_on_previous
         repo.delete_head(branch_name, "-f")
     if previous_pr and click.confirm(
             f"\tUse the previous {bcolors.BOLD}PR #{previous_pr.number}{bcolors.END} "
@@ -929,7 +960,7 @@ def _port_pull_request_commits(
     print(
         f"\tCreate branch {bcolors.BOLD}{branch_name}{bcolors.END} from {base_ref}..."
     )
-    repo.git.checkout("--no-track", "-b", branch_name, base_ref)
+    repo.git.checkout("--no-track", "-b", branch_name, base_ref.ref())
 
     # Cherry-pick commits of the source PR
     for commit in commits:
@@ -974,17 +1005,18 @@ def _port_pull_request_commits(
                     ):
                 repo.git.am("--abort")
                 continue
-    return branch_name, based_on_previous
+    return Branch(repo, branch_name), based_on_previous
 
 
-def _push_branch_to_remote(repo, branch, remote):
+def _push_branch_to_remote(branch, remote):
     """Force push the local branch to remote."""
     confirm = (
-        f"\tPush branch '{bcolors.BOLD}{branch}{bcolors.END}' "
+        f"\tPush branch '{bcolors.BOLD}{branch.name}{bcolors.END}' "
         f"to remote '{bcolors.BOLD}{remote}{bcolors.END}'?"
     )
     if click.confirm(confirm):
-        repo.git.push(remote, branch, "--force-with-lease")
+        branch.repo.git.push(remote, branch.name, "--force-with-lease")
+        branch.remote= remote
         return True
 
 
@@ -993,21 +1025,23 @@ def _prepare_pull_request_data(
         processed_prs, pr_branch, user_org, addon
         ):
     if len(processed_prs) > 1:
-        title = f"[{to_branch}][FW] {addon}: multiple ports from {from_branch}"
+        title = (
+            f"[{to_branch.name}][FW] {addon}: multiple ports from {from_branch.name}"
+        )
         lines = [f"- #{pr.number}" for pr in processed_prs]
         body = "\n".join(
-            [f"Port of the following PRs from {from_branch} to {to_branch}:"]
+            [f"Port of the following PRs from {from_branch.name} to {to_branch.name}:"]
             + lines
         )
     else:
         pr = processed_prs[0]
-        title = f"[{to_branch}][FW] {pr.title}"
-        body = f"Port of #{pr.number} from {from_branch} to {to_branch}."
+        title = f"[{to_branch.name}][FW] {pr.title}"
+        body = f"Port of #{pr.number} from {from_branch.name} to {to_branch.name}."
     return {
         "draft": True,
         "title": title,
-        "head": f"{user_org}:{pr_branch}",
-        "base": to_branch,
+        "head": f"{user_org}:{pr_branch.name}",
+        "base": to_branch.name,
         "body": body,
     }
 
@@ -1035,8 +1069,8 @@ def _create_pull_request(
             )
         )
     if click.confirm(
-            f"\tCreate a draft PR from '{bcolors.BOLD}{pr_branch}{bcolors.END}' "
-            f"to '{bcolors.BOLD}{to_branch}{bcolors.END}' "
+            f"\tCreate a draft PR from '{bcolors.BOLD}{pr_branch.name}{bcolors.END}' "
+            f"to '{bcolors.BOLD}{to_branch.name}{bcolors.END}' "
             f"against {bcolors.BOLD}{upstream_org}/{repo_name}{bcolors.END}?"
             ):
         response = _request_github(
