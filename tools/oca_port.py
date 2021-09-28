@@ -364,7 +364,7 @@ class MigrateAddon():
         print(
             f"\tRun {bcolors.BOLD}pre-commit{bcolors.END} and commit changes if any..."
         )
-        subprocess.check_call(f"pre-commit run --files {self.addon}", shell=True)
+        subprocess.check_call(f"pre-commit run -a", shell=True)
         if self.repo.untracked_files or self.repo.is_dirty():
             self.repo.git.add("-A")
             self.repo.git.commit(
