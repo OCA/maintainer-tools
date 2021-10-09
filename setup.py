@@ -69,7 +69,6 @@ setuptools.setup(
             'oca-migrate-branch = tools.migrate_branch:main',
             'oca-migrate-branch-empty = tools.migrate_branch_empty:main',
             'oca-publish-modules = tools.publish_modules:main',
-            'oca-pypi-upload = tools.pypi_upload:cli',
             'oca-gen-addon-readme = tools.gen_addon_readme:gen_addon_readme',
             'oca-gen-addon-icon = tools.gen_addon_icon:gen_addon_icon',
             'oca-towncrier = tools.oca_towncrier:oca_towncrier',
