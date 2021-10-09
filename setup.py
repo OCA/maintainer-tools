@@ -24,7 +24,6 @@ setuptools.setup(
     install_requires=[
         'appdirs',
         'argparse',
-        'autopep8',
         'click',
         'configparser',  # for python2 compat
         # We need to pin docutils version, see
@@ -64,7 +63,6 @@ setuptools.setup(
             'oca-set-repo-labels = tools.set_repo_labels:main',
             'oca-odoo-login = tools.odoo_login:main',
             'oca-sync-users = tools.oca_sync_users:main',
-            'oca-autopep8 = tools.autopep8_extended:main',
             'oca-gen-addons-table = tools.gen_addons_table:gen_addons_table',
             'oca-migrate-branch = tools.migrate_branch:main',
             'oca-migrate-branch-empty = tools.migrate_branch_empty:main',
