@@ -20,8 +20,13 @@ from .oca_projects import get_repositories, temporary_clone
 @click.option(
     "--copier-template-vcs-ref",
 )
-def main(new_branch, copier_template, copier_template_vcs_ref):
-    for repo in get_repositories():
+@click.option(
+    "--repo",
+    "repos",
+    multiple=True,
+)
+def main(new_branch, copier_template, copier_template_vcs_ref, repos):
+    for repo in repos or get_repositories():
         print("=" * 10, repo, "=" * 10)
         with temporary_clone(repo):
             # check if branch already exists
