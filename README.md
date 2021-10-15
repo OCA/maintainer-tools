@@ -136,31 +136,6 @@ A custom icon can be added using the `--src-icon` argument:
     $ oca-gen-addon-icon --addon-dir=auth_keycloak --src-icon=/path/to/custom/icon.png
 
 
-### Auto fix pep8 guidelines
-
-To auto fix pep8 guidelines of your code you can run:
-
-    $ oca-autopep8 -ri PATH
-
-This script overwrite with monkey patch the original script of [autopep8](https://github.com/hhatto/autopep8)
-to support custom code refactoring.
-
-* List of errors added:
-
-    - `CW0001` Class name with snake_case style found, should use CamelCase.
-    - `CW0002` Delete vim comment.
-
-More info of original autopep8 [here](https://pypi.python.org/pypi/autopep8/)
-
-You can rename snake_case to CamelCase with next command:
-
-    $ oca-autopep8 -ri --select=CW0001 PATH
-
-You can delete vim comment
-
-    $ oca-autopep8 -ri --select=CW0002,W391 PATH
-
-
 ## Developers
 
 As a developer, you want to launch the scripts without installing the
