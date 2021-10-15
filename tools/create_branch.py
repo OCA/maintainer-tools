@@ -53,6 +53,8 @@ def main(new_branch, copier_template, copier_template_vcs_ref):
                 "repo_description=TODO: add repo description.",
                 "--data",
                 "dependency_installation_mode=PIP",
+                "--data",
+                "ci=GitHub",
                 "--force",
             ]
             if copier_template_vcs_ref:
