@@ -173,7 +173,7 @@ class MigrationIssuesCreator(object):
     def do_migration(self, projects=None):
         if not projects:
             projects = oca_projects.get_repositories()
-        for project in projects:
+        for project in sorted(projects):
             self._migrate_project(project)
 
 
