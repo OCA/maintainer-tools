@@ -263,7 +263,7 @@ class BranchNotFoundError(RuntimeError):
 
 
 @contextmanager
-def temporary_clone(project_name, branch, protocol='git', org_name='OCA'):
+def temporary_clone(project_name, branch=None, protocol='git', org_name='OCA'):
     """ context manager that clones a git branch and cd to it, with cache """
     # init cache directory
     cache_dir = appdirs.user_cache_dir('oca-mqt')
@@ -280,19 +280,25 @@ def temporary_clone(project_name, branch, protocol='git', org_name='OCA'):
         'refs/heads/*:refs/heads/*',
     ]
     subprocess.check_call(fetch_cmd, cwd=repo_cache_dir)
-    # check if branch exist
-    branches = subprocess.check_output(
-        ['git', 'branch'], universal_newlines=True, cwd=repo_cache_dir)
-    branches = [b.strip() for b in branches.split()]
-    if branch not in branches:
-        raise BranchNotFoundError()
+    if branch:
+        # check if branch exist
+        branches = subprocess.check_output(
+            ['git', 'branch'], universal_newlines=True, cwd=repo_cache_dir)
+        branches = [b.strip() for b in branches.split()]
+        if branch not in branches:
+            raise BranchNotFoundError()
     # clone to temp dir, with --reference to cache
     tempdir = tempfile.mkdtemp()
     try:
         clone_cmd = [
             'git', 'clone', '--quiet',
             '--reference', repo_cache_dir,
-            '--branch', branch,
+        ]
+        if branch:
+            clone_cmd += [
+                '--branch', branch,
+            ]
+        clone_cmd += [
             '--',
             repo_url,
             tempdir,
