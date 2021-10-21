@@ -99,8 +99,8 @@ def _iterate_repos_and_branches(repos: str, branches: str) -> Iterable[Tuple[str
 @click.option("--org", default="OCA")
 @click.option("--repos", required=True)
 @click.option("--branches", required=True)
-@click.option("--git-user-name")
-@click.option("--git-user-email")
+@click.option("--git-user-name", default="oca-git-bot")
+@click.option("--git-user-email", default="oca-git-bot@odoo-community.org")
 @click.option("--skip-ci/--no-skip-ci", default=False)
 def main(
     org: str,
