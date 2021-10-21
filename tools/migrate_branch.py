@@ -323,8 +323,7 @@ class BranchMigrator(object):
         # TODO: Is this really needed?
         # self._delete_setup_dirs(repo, root_contents, modules)
         self._update_metafiles(repo, root_contents)
-        # TODO: GitHub is returning 404
-        # self._make_default_branch(repo)
+        self._make_default_branch(repo)
 
     def do_migration(self, projects=None):
         if not projects:

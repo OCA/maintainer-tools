@@ -239,8 +239,7 @@ class BranchMigrator(object):
         repo.create_ref(
             'refs/heads/%s' % self.gh_target_branch, commit.sha,
         )
-        # TODO: GitHub is returning 404
-        # self._make_default_branch(repo)
+        self._make_default_branch(repo)
 
     def do_migration(self, projects=None):
         if not projects:
