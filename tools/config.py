@@ -57,7 +57,6 @@ NOT_ADDONS = {
     'odoo-sentinel',
     'odoo-sphinx-autodoc',
     'odoorpc',
-    'OpenUpgrade',
     'openupgradelib',
     'pylint-odoo',
 }
