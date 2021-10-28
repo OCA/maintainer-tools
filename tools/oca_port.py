@@ -40,7 +40,6 @@ of them.
 """
 from collections import abc, defaultdict
 import contextlib
-import functools
 import os
 import re
 import shutil
@@ -180,14 +179,14 @@ def main(
     to_branch = Branch(repo, to_branch, upstream)
     _fetch_branches(from_branch, to_branch, verbose=verbose)
     _check_branches(from_branch, to_branch)
-    _check_addon(addon, from_branch, raise_exc=True)
+    _check_addon_exists(addon, from_branch, raise_exc=True)
     # Check if the addon (folder) exists on the target branch
     #   - if it already exists, check if some PRs could be ported
-    if _check_addon(addon, to_branch):
-        port_addon_pull_requests(
+    if _check_addon_exists(addon, to_branch):
+        PortAddonPullRequest(
             repo, upstream_org, repo_name, from_branch, to_branch,
             fork, user_org, addon, verbose=verbose
-        )
+        ).run()
     #   - if not, migrate it
     else:
         MigrateAddon(
@@ -227,7 +226,7 @@ def _check_branches(from_branch, to_branch):
     return True
 
 
-def _check_addon(addon, branch, raise_exc=False):
+def _check_addon_exists(addon, branch, raise_exc=False):
     """Check that `addon` exists on `branch`."""
     branch_addons = [t.path for t in branch.repo.commit(branch.ref()).tree.trees]
     if addon not in branch_addons:
@@ -239,26 +238,283 @@ def _check_addon(addon, branch, raise_exc=False):
     return True
 
 
-def port_addon_pull_requests(
-        repo, upstream_org, repo_name,
-        from_branch, to_branch, fork, user_org, addon, verbose=False,
-        create_branch=True, push_branch=True
-        ):
-    """Port pull requests of `addon`."""
-    print(
-        f"{bcolors.BOLD}{addon}{bcolors.END} already exists "
-        f"on {bcolors.BOLD}{to_branch.name}{bcolors.END}, checking PRs to port..."
-    )
-    branches_diff = BranchesDiff(
-        repo, upstream_org, repo_name, addon, from_branch, to_branch
-    )
-    branches_diff.print_diff(verbose)
-    if fork:
-        print()
-        _port_pull_requests(
-            branches_diff, upstream_org, repo_name,
-            from_branch, to_branch, fork, user_org, addon, create_branch, push_branch
+class PortAddonPullRequest():
+    def __init__(
+            self, repo, upstream_org, repo_name,
+            from_branch, to_branch, fork, user_org, addon, verbose=False,
+            create_branch=True, push_branch=True
+            ):
+        """Port pull requests of `addon`."""
+        self.repo = repo
+        self.upstream_org = upstream_org
+        self.repo_name = repo_name
+        self.from_branch = from_branch
+        self.to_branch = to_branch
+        self.fork = fork
+        self.user_org = user_org
+        self.addon = addon
+        self.verbose = verbose
+        self.create_branch = create_branch
+        self.push_branch = push_branch
+
+    def run(self):
+        print(
+            f"{bcolors.BOLD}{self.addon}{bcolors.END} already exists "
+            f"on {bcolors.BOLD}{self.to_branch.name}{bcolors.END}, "
+            "checking PRs to port..."
         )
+        branches_diff = BranchesDiff(
+            self.repo, self.upstream_org, self.repo_name, self.addon,
+            self.from_branch, self.to_branch
+        )
+        branches_diff.print_diff(self.verbose)
+        if self.fork:
+            print()
+            self._port_pull_requests(branches_diff)
+
+    def _port_pull_requests(self, branches_diff):
+        """Open new Pull Requests (if it doesn't exist) on the GitHub repository."""
+        base_ref = branches_diff.to_branch  # e.g. 'origin/14.0'
+        previous_pr = previous_pr_branch = None
+        processed_prs = []
+        last_pr = (
+            list(branches_diff.commits_diff.keys())[-1]
+            if branches_diff.commits_diff else None
+        )
+        for pr, commits in branches_diff.commits_diff.items():
+            current_commit = self.repo.commit(self.to_branch.name)
+            pr_branch, based_on_previous = self._port_pull_request_commits(
+                pr, commits, base_ref, previous_pr, previous_pr_branch,
+            )
+            if pr_branch:
+                # Check if commits have been ported
+                if self.repo.commit(pr_branch.ref()) == current_commit:
+                    print("\tℹ️  Nothing has been ported, skipping")
+                    continue
+                previous_pr = pr
+                previous_pr_branch = pr_branch
+                if based_on_previous:
+                    processed_prs.append(pr)
+                else:
+                    processed_prs = [pr]
+                if pr == last_pr:
+                    print("\t🎉 Last PR processed! 🎉")
+                if not self.push_branch:
+                    continue
+                is_pushed = self._push_branch_to_remote(pr_branch)
+                if not is_pushed:
+                    continue
+                pr_data = self._prepare_pull_request_data(processed_prs, pr_branch)
+                pr_url = self._search_pull_request(pr_data["base"], pr_data["title"])
+                if pr_url:
+                    print(f"\tExisting PR has been refreshed => {pr_url}")
+                else:
+                    self._create_pull_request(pr_branch, pr_data, processed_prs)
+
+    def _port_pull_request_commits(
+            self, pr, commits, base_ref, previous_pr=None, previous_pr_branch=None,
+            ):
+        """Port commits of a Pull Request in a new branch."""
+        if pr.number:
+            print(
+                f"- {bcolors.BOLD}{bcolors.OKCYAN}Port PR #{pr.number}{bcolors.END} "
+                f"({pr.url}) {bcolors.OKCYAN}{pr.title}{bcolors.ENDC}..."
+            )
+        else:
+            print(f"- {bcolors.BOLD}{bcolors.OKCYAN}Port commits w/o PR{bcolors.END}...")
+        based_on_previous = False
+        # Ensure to not start to work from a working branch
+        if self.to_branch.name in self.repo.heads:
+            self.repo.heads[self.to_branch.name].checkout()
+        else:
+            self.repo.git.checkout(
+                "--no-track", "-b", self.to_branch.name, self.to_branch.ref()
+            )
+        if not click.confirm("\tPort it?" if pr.number else "\tPort them?"):
+            return None, based_on_previous
+        # Create a local branch based on upstream
+        if self.create_branch:
+            branch_name = PR_BRANCH_NAME.format(
+                pr_number=pr.number,
+                from_branch=self.from_branch.name,
+                to_branch=self.to_branch.name,
+            )
+            if branch_name in self.repo.heads:
+                # If the local branch already exists, ask the user if he wants to recreate it
+                # + check if this existing branch is based on the previous PR branch
+                if previous_pr_branch:
+                    based_on_previous = self.repo.is_ancestor(previous_pr_branch, branch_name)
+                confirm = (
+                    f"\tBranch {bcolors.BOLD}{branch_name}{bcolors.END} already exists, "
+                    "recreate it?\n\t(⚠️  you will lose the existing branch)"
+                )
+                if not click.confirm(confirm):
+                    return Branch(self.repo, branch_name), based_on_previous
+                self.repo.delete_head(branch_name, "-f")
+            if previous_pr and click.confirm(
+                    f"\tUse the previous {bcolors.BOLD}PR #{previous_pr.number}{bcolors.END} "
+                    "branch as base?"
+                    ):
+                base_ref = previous_pr_branch
+                based_on_previous = True
+            print(
+                f"\tCreate branch {bcolors.BOLD}{branch_name}{bcolors.END} from {base_ref}..."
+            )
+            self.repo.git.checkout("--no-track", "-b", branch_name, base_ref.ref())
+        else:
+            branch_name = self.to_branch.name
+
+        # Cherry-pick commits of the source PR
+        for commit in commits:
+            print(
+                f"\t\tApply {bcolors.OKCYAN}{commit.hexsha[:8]}{bcolors.ENDC} "
+                f"{commit.summary}..."
+            )
+            # Port only relevant diffs/paths from the commit
+            paths_to_port = set(commit.paths_to_port)
+            for diff in commit.diffs:
+                skip, message = self._skip_diff(commit, diff)
+                if skip:
+                    if message:
+                        print(f"\t\t\t{message}")
+                    if diff.a_path in paths_to_port:
+                        paths_to_port.remove(diff.a_path)
+                    if diff.b_path in paths_to_port:
+                        paths_to_port.remove(diff.b_path)
+                    continue
+            if not paths_to_port:
+                print(
+                    "\t\t\tℹ️  Nothing to port from this commit, skipping"
+                )
+                continue
+            try:
+                patches_dir = tempfile.mkdtemp()
+                self.repo.git.format_patch(
+                    "--keep-subject", "-o", patches_dir, "-1", commit.hexsha,
+                    "--", *paths_to_port
+                )
+                patches = [
+                    os.path.join(patches_dir, f) for f in sorted(os.listdir(patches_dir))
+                ]
+                self.repo.git.am("-3", "--keep", *patches)
+                shutil.rmtree(patches_dir)
+            except git.exc.GitCommandError as exc:
+                print(f"{bcolors.FAIL}ERROR:{bcolors.ENDC}\n{exc}\n")
+                # High chance a conflict occurs, ask the user to resolve it
+                if not click.confirm(
+                        "⚠️  A conflict occurs, please resolve it and "
+                        "confirm to continue the process (y) or skip this commit (N)."
+                        ):
+                    self.repo.git.am("--abort")
+                    continue
+        return Branch(self.repo, branch_name), based_on_previous
+
+    @staticmethod
+    def _skip_diff(commit, diff):
+        """Check if a commit diff should be skipped or not.
+
+        A skipped diff won't have its file path ported through 'git format-path'.
+
+        Return a tuple `(bool, message)` if the diff is skipped.
+        """
+        if diff.deleted_file:
+            if diff.a_path not in commit.paths_to_port:
+                return True, ""
+        if diff.b_path not in commit.paths_to_port:
+            return True, ""
+        if diff.renamed:
+            return False, ""
+        diff_path = diff.b_path.split("/", maxsplit=1)[0]
+        # Do not accept diff on unported addons
+        if not get_manifest_path(diff_path) and diff_path not in commit.addons_created:
+            return (
+                True,
+                (
+                    f"{bcolors.WARNING}SKIP diff "
+                    f"{bcolors.BOLD}{diff.change_type} {diff.b_path}{bcolors.END}: "
+                    "relates to an unported addon"
+                )
+            )
+        if diff.change_type in ("M", "D"):
+            # Do not accept update and deletion on non-existing files
+            if not os.path.exists(diff.b_path):
+                return (
+                    True,
+                    (
+                        f"SKIP: '{diff.change_type} {diff.b_path}' diff relates "
+                        "to a non-existing file"
+                    )
+                )
+        return False, ""
+
+    def _push_branch_to_remote(self, branch):
+        """Force push the local branch to remote fork."""
+        confirm = (
+            f"\tPush branch '{bcolors.BOLD}{branch.name}{bcolors.END}' "
+            f"to remote '{bcolors.BOLD}{self.fork}{bcolors.END}'?"
+        )
+        if click.confirm(confirm):
+            branch.repo.git.push(self.fork, branch.name, "--force-with-lease")
+            branch.remote = self.fork
+            return True
+
+    def _prepare_pull_request_data(self, processed_prs, pr_branch):
+        if len(processed_prs) > 1:
+            title = (
+                f"[{self.to_branch.name}][FW] {self.addon}: multiple ports from {self.from_branch.name}"
+            )
+            lines = [f"- #{pr.number}" for pr in processed_prs]
+            body = "\n".join(
+                [f"Port of the following PRs from {self.from_branch.name} to {self.to_branch.name}:"]
+                + lines
+            )
+        else:
+            pr = processed_prs[0]
+            title = f"[{self.to_branch.name}][FW] {pr.title}"
+            body = f"Port of #{pr.number} from {self.from_branch.name} to {self.to_branch.name}."
+        return {
+            "draft": True,
+            "title": title,
+            "head": f"{self.user_org}:{pr_branch.name}",
+            "base": self.to_branch.name,
+            "body": body,
+        }
+
+    def _search_pull_request(self, base_branch, title):
+        params = {
+            "q": (
+                f"is:pr repo:{self.upstream_org}/{self.repo_name} base:{base_branch} "
+                f"state:open {title} in:title"
+            ),
+        }
+        response = _request_github("search/issues", params=params)
+        if response["items"]:
+            return response["items"][0]["html_url"]
+
+    def _create_pull_request(self, pr_branch, pr_data, processed_prs):
+        if len(processed_prs) > 1:
+            print(
+                "\tPR(s) ported locally:",
+                ", ".join(
+                    [f"{bcolors.OKCYAN}#{pr.number}{bcolors.ENDC}" for pr in processed_prs]
+                )
+            )
+        if click.confirm(
+                f"\tCreate a draft PR from '{bcolors.BOLD}{pr_branch.name}{bcolors.END}' "
+                f"to '{bcolors.BOLD}{self.to_branch.name}{bcolors.END}' "
+                f"against {bcolors.BOLD}{self.upstream_org}/{self.repo_name}{bcolors.END}?"
+                ):
+            response = _request_github(
+                f"repos/{self.upstream_org}/{self.repo_name}/pulls",
+                method="post",
+                json=pr_data
+            )
+            pr_url = response["html_url"]
+            print(
+                f"\t\t{bcolors.BOLD}{bcolors.OKCYAN}PR created =>"
+                f"{bcolors.ENDC} {pr_url}{bcolors.END}"
+            )
+            return pr_url
 
 
 class MigrateAddon():
@@ -301,11 +557,11 @@ class MigrateAddon():
             self._run_pre_commit()
         # Check if the addon has commits that update neighboring addons to
         # make it work properly
-        port_addon_pull_requests(
+        PortAddonPullRequest(
             self.repo, self.upstream_org, self.repo_name,
             self.from_branch, self.mig_branch, self.fork, self.user_org,
             self.addon, verbose=self.verbose, create_branch=False, push_branch=False
-        )
+        ).run()
         self._print_tips()
 
     def _checkout_base_branch(self):
@@ -366,8 +622,8 @@ class MigrateAddon():
         )
         # First ensure that 'pre-commit' is initialized for the repository,
         # then run it (without checking the return code on purpose)
-        subprocess.check_call(f"pre-commit install", shell=True)
-        subprocess.run(f"pre-commit run -a", shell=True)
+        subprocess.check_call("pre-commit install", shell=True)
+        subprocess.run("pre-commit run -a", shell=True)
         if self.repo.untracked_files or self.repo.is_dirty():
             self.repo.git.add("-A")
             self.repo.git.commit(
@@ -506,11 +762,11 @@ class Commit():
         """Return the list of file paths to port."""
         current_paths = {
             diff.a_path for diff in self.diffs
-            if _keep_diff_path(diff, diff.a_path)
+            if self._keep_diff_path(diff, diff.a_path)
         }.union(
             {
                 diff.b_path for diff in self.diffs
-                if _keep_diff_path(diff, diff.b_path)
+                if self._keep_diff_path(diff, diff.b_path)
             }
         )
         ported_paths = set()
@@ -519,6 +775,16 @@ class Commit():
                 ported_paths.add(diff.a_path)
                 ported_paths.add(diff.b_path)
         return current_paths - ported_paths
+
+    def _keep_diff_path(self, diff, path):
+        """Check if a file path should be ported."""
+        # Ignore 'setup' files
+        if path.startswith("setup"):
+            return False
+        # Ignore changes on po/pot files
+        if PO_FILE_REGEX.match(path):
+            return False
+        return True
 
     @property
     def diffs(self):
@@ -576,111 +842,6 @@ def clean_text(text):
     return re.sub(r"\[.*\]|\d+\.\d+", "", text).strip()
 
 
-def _new_pull_request_from_github_data(data, paths=None, ported_paths=None):
-    """Create a new PullRequest instance from GitHub data."""
-    pr_number = data["number"]
-    pr_url = data["html_url"]
-    pr_author = data["user"].get("login", "")
-    pr_title = data["title"]
-    pr_body = data["body"]
-    pr_merge_at = data["merged_at"]
-    return PullRequest(
-        number=pr_number,
-        url=pr_url,
-        author=pr_author,
-        title=pr_title,
-        body=pr_body,
-        merged_at=pr_merge_at,
-        paths=paths,
-        ported_paths=ported_paths,
-    )
-
-
-def _skip_commit(commit):
-    """Check if a commit should be skipped or not.
-
-    Merge or translations commits are skipped for instance.
-    """
-    return (
-        # Skip merge commit
-        len(commit.parents) > 1
-        or commit.author_email in AUTHOR_EMAILS_TO_SKIP
-        or any([term in commit.summary for term in SUMMARY_TERMS_TO_SKIP])
-    )
-
-
-def _skip_diff(commit, diff):
-    """Check if a commit diff should be skipped or not.
-
-    A skipped diff won't have its file path ported through 'git format-path'.
-
-    Return a tuple `(bool, message)` if the diff is skipped.
-    """
-    if diff.deleted_file:
-        if diff.a_path not in commit.paths_to_port:
-            return True, ""
-    if diff.b_path not in commit.paths_to_port:
-        return True, ""
-    if diff.renamed:
-        return False, ""
-    diff_path = diff.b_path.split("/", maxsplit=1)[0]
-    # Do not accept diff on unported addons
-    if not get_manifest_path(diff_path) and diff_path not in commit.addons_created:
-        return (
-            True,
-            (
-                f"{bcolors.WARNING}SKIP diff "
-                f"{bcolors.BOLD}{diff.change_type} {diff.b_path}{bcolors.END}: "
-                "relates to an unported addon"
-            )
-        )
-    if diff.change_type in ("M", "D"):
-        # Do not accept update and deletion on non-existing files
-        if not os.path.exists(diff.b_path):
-            return (
-                True,
-                (
-                    f"SKIP: '{diff.change_type} {diff.b_path}' diff relates "
-                    "to a non-existing file"
-                )
-            )
-    return False, ""
-
-
-def _keep_diff_path(diff, path):
-    """Check if a file path should be ported."""
-    # Ignore 'setup' files
-    if path.startswith("setup"):
-        return False
-    # Ignore changes on po/pot files
-    if PO_FILE_REGEX.match(path):
-        return False
-    return True
-
-
-def _get_branch_commits(repo, branch, path="."):
-    """Get commits from the local repository `repo` for the given `branch`.
-
-    An optional `path` parameter can be set to limit commits to a given folder.
-    This function also filters out undesirable commits (merge or translation
-    commits...).
-
-    Return two data structures:
-        - a list of Commit objects `[Commit, ...]`
-        - a dict of Commits objects grouped by SHA `{SHA: Commit, ...}`
-    """
-    commits = repo.iter_commits(branch, paths=path)
-    commits_list = []
-    commits_by_sha = {}
-    for commit in commits:
-        com = Commit(commit)
-        if _skip_commit(com):
-            continue
-        commits_list.append(com)
-        commits_by_sha[commit.hexsha] = com
-    return commits_list, commits_by_sha
-
-
 def _request_github(url, method="get", params=None, json=None):
     """Request GitHub API."""
     headers = {"Accept": "application/vnd.github.groot-preview+json"}
@@ -707,13 +868,52 @@ class BranchesDiff():
         self.repo_name = repo_name
         self.path = path
         self.from_branch, self.to_branch = from_branch, to_branch
-        self.from_branch_path_commits, _ = _get_branch_commits(
-            repo, self.from_branch.ref(), path
+        self.from_branch_path_commits, _ = self._get_branch_commits(
+            self.from_branch.ref(), path
         )
-        self.from_branch_all_commits, _ = _get_branch_commits(repo, self.from_branch.ref())
-        self.to_branch_path_commits, _ = _get_branch_commits(repo, self.to_branch.ref(), path)
-        self.to_branch_all_commits, _ = _get_branch_commits(repo, self.to_branch.ref())
+        self.from_branch_all_commits, _ = self._get_branch_commits(
+            self.from_branch.ref()
+        )
+        self.to_branch_path_commits, _ = self._get_branch_commits(
+            self.to_branch.ref(), self.path
+        )
+        self.to_branch_all_commits, _ = self._get_branch_commits(self.to_branch.ref())
         self.commits_diff = self.get_commits_diff()
+
+    def _get_branch_commits(self, branch, path="."):
+        """Get commits from the local repository for the given `branch`.
+
+        An optional `path` parameter can be set to limit commits to a given folder.
+        This function also filters out undesirable commits (merge or translation
+        commits...).
+
+        Return two data structures:
+            - a list of Commit objects `[Commit, ...]`
+            - a dict of Commits objects grouped by SHA `{SHA: Commit, ...}`
+        """
+        commits = self.repo.iter_commits(branch, paths=path)
+        commits_list = []
+        commits_by_sha = {}
+        for commit in commits:
+            com = Commit(commit)
+            if self._skip_commit(com):
+                continue
+            commits_list.append(com)
+            commits_by_sha[commit.hexsha] = com
+        return commits_list, commits_by_sha
+
+    @staticmethod
+    def _skip_commit(commit):
+        """Check if a commit should be skipped or not.
+
+        Merge or translations commits are skipped for instance.
+        """
+        return (
+            # Skip merge commit
+            len(commit.parents) > 1
+            or commit.author_email in AUTHOR_EMAILS_TO_SKIP
+            or any([term in commit.summary for term in SUMMARY_TERMS_TO_SKIP])
+        )
 
     def print_diff(self, verbose=False):
         lines_to_print = [""]
@@ -802,7 +1002,7 @@ class BranchesDiff():
                 # Fake PR for commits w/o related PR
                 pr = PullRequest(*[""] * 6, tuple(), tuple())
                 if gh_commit_pull:
-                    pr = _new_pull_request_from_github_data(gh_commit_pull[0])
+                    pr = self._new_pull_request_from_github_data(gh_commit_pull[0])
                     # Get all commits of the related PR as they could update
                     # others addons than the one the user is interested in
                     gh_pr_commits = _request_github(
@@ -813,7 +1013,7 @@ class BranchesDiff():
                         raw_commit = self.repo.commit(gh_pr_commit["sha"])
                         pr_commit = Commit(raw_commit)
                         pr.paths.update(pr_commit.paths)
-                        if _skip_commit(pr_commit):
+                        if self._skip_commit(pr_commit):
                             continue
                         # Check that this PR commit does not change the current
                         # addon we are interested in, in such case also check
@@ -874,234 +1074,25 @@ class BranchesDiff():
             sorted_commits_by_pr[pr] = commits_by_pr[pr]
         return sorted_commits_by_pr
 
-
-def _port_pull_requests(
-        branches_diff, upstream_org, repo_name, from_branch, to_branch,
-        fork, user_org, addon, create_branch, push_branch
-        ):
-    """Open new Pull Requests (if it doesn't exist) on the GitHub repository."""
-    repo = branches_diff.repo
-    base_ref = branches_diff.to_branch  # e.g. 'origin/14.0'
-    previous_pr = previous_pr_branch = None
-    processed_prs = []
-    last_pr = (
-        list(branches_diff.commits_diff.keys())[-1]
-        if branches_diff.commits_diff else None
-    )
-    for pr, commits in branches_diff.commits_diff.items():
-        current_commit = repo.commit(to_branch.name)
-        pr_branch, based_on_previous = _port_pull_request_commits(
-            repo, pr, commits, from_branch, to_branch, base_ref,
-            previous_pr, previous_pr_branch, create_branch=create_branch
+    @staticmethod
+    def _new_pull_request_from_github_data(data, paths=None, ported_paths=None):
+        """Create a new PullRequest instance from GitHub data."""
+        pr_number = data["number"]
+        pr_url = data["html_url"]
+        pr_author = data["user"].get("login", "")
+        pr_title = data["title"]
+        pr_body = data["body"]
+        pr_merge_at = data["merged_at"]
+        return PullRequest(
+            number=pr_number,
+            url=pr_url,
+            author=pr_author,
+            title=pr_title,
+            body=pr_body,
+            merged_at=pr_merge_at,
+            paths=paths,
+            ported_paths=ported_paths,
         )
-        if pr_branch:
-            # Check if commits have been ported
-            if repo.commit(pr_branch.ref()) == current_commit:
-                print("\tℹ️  Nothing has been ported, skipping")
-                continue
-            previous_pr = pr
-            previous_pr_branch = pr_branch
-            if based_on_previous:
-                processed_prs.append(pr)
-            else:
-                processed_prs = [pr]
-            if pr == last_pr:
-                print("\t🎉 Last PR processed! 🎉")
-            if not push_branch:
-                continue
-            is_pushed = _push_branch_to_remote(pr_branch, fork)
-            if not is_pushed:
-                continue
-            pr_data = _prepare_pull_request_data(
-                upstream_org, repo_name, from_branch, to_branch,
-                processed_prs, pr_branch, user_org, addon
-            )
-            pr_url = _search_pull_request(
-                upstream_org, repo_name, pr_data["base"], pr_data["title"]
-            )
-            if pr_url:
-                print(f"\tExisting PR has been refreshed => {pr_url}")
-            else:
-                _create_pull_request(
-                    upstream_org, repo_name, to_branch, pr_branch, pr_data,
-                    processed_prs
-                )
-
-
-def _port_pull_request_commits(
-        repo, pr, commits, from_branch, to_branch, base_ref,
-        previous_pr=None, previous_pr_branch=None, create_branch=True
-        ):
-    """Port commits of a Pull Request in a new branch."""
-    if pr.number:
-        print(
-            f"- {bcolors.BOLD}{bcolors.OKCYAN}Port PR #{pr.number}{bcolors.END} "
-            f"({pr.url}) {bcolors.OKCYAN}{pr.title}{bcolors.ENDC}..."
-        )
-    else:
-        print(f"- {bcolors.BOLD}{bcolors.OKCYAN}Port commits w/o PR{bcolors.END}...")
-    based_on_previous = False
-    # Ensure to not start to work from a working branch
-    if to_branch.name in repo.heads:
-        repo.heads[to_branch.name].checkout()
-    else:
-        repo.git.checkout("--no-track", "-b", to_branch.name, to_branch.ref())
-    if not click.confirm("\tPort it?" if pr.number else "\tPort them?"):
-        return None, based_on_previous
-    # Create a local branch based on upstream
-    if create_branch:
-        branch_name = PR_BRANCH_NAME.format(
-            pr_number=pr.number,
-            from_branch=from_branch.name,
-            to_branch=to_branch.name,
-        )
-        if branch_name in repo.heads:
-            # If the local branch already exists, ask the user if he wants to recreate it
-            # + check if this existing branch is based on the previous PR branch
-            if previous_pr_branch:
-                based_on_previous = repo.is_ancestor(previous_pr_branch, branch_name)
-            confirm = (
-                f"\tBranch {bcolors.BOLD}{branch_name}{bcolors.END} already exists, "
-                "recreate it?\n\t(⚠️  you will lose the existing branch)"
-            )
-            if not click.confirm(confirm):
-                return Branch(repo, branch_name), based_on_previous
-            repo.delete_head(branch_name, "-f")
-        if previous_pr and click.confirm(
-                f"\tUse the previous {bcolors.BOLD}PR #{previous_pr.number}{bcolors.END} "
-                "branch as base?"
-                ):
-            base_ref = previous_pr_branch
-            based_on_previous = True
-        print(
-            f"\tCreate branch {bcolors.BOLD}{branch_name}{bcolors.END} from {base_ref}..."
-        )
-        repo.git.checkout("--no-track", "-b", branch_name, base_ref.ref())
-    else:
-        branch_name = to_branch.name
-
-    # Cherry-pick commits of the source PR
-    for commit in commits:
-        print(
-            f"\t\tApply {bcolors.OKCYAN}{commit.hexsha[:8]}{bcolors.ENDC} "
-            f"{commit.summary}..."
-        )
-        # Port only relevant diffs/paths from the commit
-        paths_to_port = set(commit.paths_to_port)
-        for diff in commit.diffs:
-            skip, message = _skip_diff(commit, diff)
-            if skip:
-                if message:
-                    print(f"\t\t\t{message}")
-                if diff.a_path in paths_to_port:
-                    paths_to_port.remove(diff.a_path)
-                if diff.b_path in paths_to_port:
-                    paths_to_port.remove(diff.b_path)
-                continue
-        if not paths_to_port:
-            print(
-                "\t\t\tℹ️  Nothing to port from this commit, skipping"
-            )
-            continue
-        try:
-            patches_dir = tempfile.mkdtemp()
-            repo.git.format_patch(
-                "--keep-subject", "-o", patches_dir, "-1", commit.hexsha,
-                "--", *paths_to_port
-            )
-            patches = [
-                os.path.join(patches_dir, f) for f in sorted(os.listdir(patches_dir))
-            ]
-            repo.git.am("-3", "--keep", *patches)
-            shutil.rmtree(patches_dir)
-        except git.exc.GitCommandError as exc:
-            print(f"{bcolors.FAIL}ERROR:{bcolors.ENDC}\n{exc}\n")
-            # High chance a conflict occurs, ask the user to resolve it
-            if not click.confirm(
-                    "⚠️  A conflict occurs, please resolve it and "
-                    "confirm to continue the process (y) or skip this commit (N)."
-                    ):
-                repo.git.am("--abort")
-                continue
-    return Branch(repo, branch_name), based_on_previous
-
-
-def _push_branch_to_remote(branch, remote):
-    """Force push the local branch to remote."""
-    confirm = (
-        f"\tPush branch '{bcolors.BOLD}{branch.name}{bcolors.END}' "
-        f"to remote '{bcolors.BOLD}{remote}{bcolors.END}'?"
-    )
-    if click.confirm(confirm):
-        branch.repo.git.push(remote, branch.name, "--force-with-lease")
-        branch.remote= remote
-        return True
-
-
-def _prepare_pull_request_data(
-        upstream_org, repo_name, from_branch, to_branch,
-        processed_prs, pr_branch, user_org, addon
-        ):
-    if len(processed_prs) > 1:
-        title = (
-            f"[{to_branch.name}][FW] {addon}: multiple ports from {from_branch.name}"
-        )
-        lines = [f"- #{pr.number}" for pr in processed_prs]
-        body = "\n".join(
-            [f"Port of the following PRs from {from_branch.name} to {to_branch.name}:"]
-            + lines
-        )
-    else:
-        pr = processed_prs[0]
-        title = f"[{to_branch.name}][FW] {pr.title}"
-        body = f"Port of #{pr.number} from {from_branch.name} to {to_branch.name}."
-    return {
-        "draft": True,
-        "title": title,
-        "head": f"{user_org}:{pr_branch.name}",
-        "base": to_branch.name,
-        "body": body,
-    }
-
-
-def _search_pull_request(upstream_org, repo_name, base_branch, title):
-    params = {
-        "q": (
-            f"is:pr repo:{upstream_org}/{repo_name} base:{base_branch} "
-            f"state:open {title} in:title"
-        ),
-    }
-    response = _request_github("search/issues", params=params)
-    if response["items"]:
-        return response["items"][0]["html_url"]
-
-
-def _create_pull_request(
-        upstream_org, repo_name, to_branch, pr_branch, pr_data, processed_prs
-        ):
-    if len(processed_prs) > 1:
-        print(
-            "\tPR(s) ported locally:",
-            ", ".join(
-                [f"{bcolors.OKCYAN}#{pr.number}{bcolors.ENDC}" for pr in processed_prs]
-            )
-        )
-    if click.confirm(
-            f"\tCreate a draft PR from '{bcolors.BOLD}{pr_branch.name}{bcolors.END}' "
-            f"to '{bcolors.BOLD}{to_branch.name}{bcolors.END}' "
-            f"against {bcolors.BOLD}{upstream_org}/{repo_name}{bcolors.END}?"
-            ):
-        response = _request_github(
-            f"repos/{upstream_org}/{repo_name}/pulls",
-            method="post",
-            json=pr_data
-        )
-        pr_url = response["html_url"]
-        print(
-            f"\t\t{bcolors.BOLD}{bcolors.OKCYAN}PR created =>"
-            f"{bcolors.ENDC} {pr_url}{bcolors.END}"
-        )
-        return pr_url
 
 
 if __name__ == '__main__':
