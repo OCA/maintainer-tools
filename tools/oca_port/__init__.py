@@ -63,9 +63,11 @@ from .port_addon_pr import PortAddonPullRequest
 @click.option("--user-org", show_default="--fork", help="User organization name.")
 @click.option("--verbose", is_flag=True,
               help="List the commits of Pull Requests.")
+@click.option("--non-interactive", is_flag=True,
+              help="Disable all interactive prompts.")
 def main(
         from_branch, to_branch, addon, upstream_org, upstream, repo_name,
-        fork, user_org, verbose
+        fork, user_org, verbose, non_interactive
         ):
     """Migrate ADDON from FROM_BRANCH to TO_BRANCH or list Pull Requests to port
     if ADDON already exists on TO_BRANCH.
@@ -106,13 +108,13 @@ def main(
     if _check_addon_exists(addon, to_branch):
         PortAddonPullRequest(
             repo, upstream_org, repo_name, from_branch, to_branch,
-            fork, user_org, addon, verbose=verbose
+            fork, user_org, addon, verbose=verbose, non_interactive=non_interactive
         ).run()
     #   - if not, migrate it
     else:
         MigrateAddon(
             repo, upstream_org, repo_name, from_branch, to_branch,
-            fork, user_org, addon, verbose
+            fork, user_org, addon, verbose, non_interactive=non_interactive
         ).run()
 
 

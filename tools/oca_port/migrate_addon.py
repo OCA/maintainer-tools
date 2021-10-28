@@ -5,6 +5,7 @@ import click
 import os
 import subprocess
 import tempfile
+import sys
 import urllib.parse
 
 from . import misc
@@ -51,7 +52,7 @@ MIG_TIPS = "\n".join([
 class MigrateAddon():
     def __init__(
             self, repo, upstream_org, repo_name, from_branch, to_branch,
-            fork, user_org, addon, verbose
+            fork, user_org, addon, verbose=False, non_interactive=False
             ):
         self.repo = repo
         self.upstream_org = upstream_org
@@ -65,8 +66,12 @@ class MigrateAddon():
             repo, MIG_BRANCH_NAME.format(branch=to_branch.name[:4], addon=addon)
         )
         self.verbose = verbose
+        self.non_interactive = non_interactive
 
     def run(self):
+        if self.non_interactive:
+            # Exit with an error code if the addon is eligible for a migration
+            sys.exit(1)
         confirm = (
             f"Migrate {bc.BOLD}{self.addon}{bc.END} "
             f"from {bc.BOLD}{self.from_branch.name}{bc.END} "
@@ -91,7 +96,7 @@ class MigrateAddon():
         PortAddonPullRequest(
             self.repo, self.upstream_org, self.repo_name,
             self.from_branch, self.mig_branch, self.fork, self.user_org,
-            self.addon, verbose=self.verbose, create_branch=False, push_branch=False
+            self.addon, self.verbose, create_branch=False, push_branch=False
         ).run()
         self._print_tips()
 

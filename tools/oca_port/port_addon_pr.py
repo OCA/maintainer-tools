@@ -5,6 +5,7 @@ from collections import defaultdict
 import shutil
 import tempfile
 import os
+import sys
 
 import click
 import git
@@ -35,7 +36,7 @@ class PortAddonPullRequest():
     def __init__(
             self, repo, upstream_org, repo_name,
             from_branch, to_branch, fork, user_org, addon, verbose=False,
-            create_branch=True, push_branch=True
+            non_interactive=False, create_branch=True, push_branch=True
             ):
         """Port pull requests of `addon`."""
         self.repo = repo
@@ -47,6 +48,7 @@ class PortAddonPullRequest():
         self.user_org = user_org
         self.addon = addon
         self.verbose = verbose
+        self.non_interactive = non_interactive
         self.create_branch = create_branch
         self.push_branch = push_branch
 
@@ -61,6 +63,11 @@ class PortAddonPullRequest():
             self.from_branch, self.to_branch
         )
         branches_diff.print_diff(self.verbose)
+        if self.non_interactive:
+            if branches_diff.commits_diff:
+                # Exit with an error code if commits are eligible for (back)porting
+                sys.exit(1)
+            return
         if self.fork:
             print()
             self._port_pull_requests(branches_diff)
