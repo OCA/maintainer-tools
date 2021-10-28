@@ -14,7 +14,7 @@ setuptools.setup(
     description='Set of tools to help managing Odoo Community projects',
     long_description=long_description,
     license='AGPL3',
-    packages=['tools'],
+    packages=['tools', 'tools.oca_port'],
     include_package_data=True,
     zip_safe=False,
     use_scm_version=True,
