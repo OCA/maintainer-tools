@@ -100,6 +100,7 @@ def main(
         )
     from_branch = misc.Branch(repo, from_branch, upstream)
     to_branch = misc.Branch(repo, to_branch, upstream)
+    storage = misc.InputStorage(repo.working_dir)
     _fetch_branches(from_branch, to_branch, verbose=verbose)
     _check_branches(from_branch, to_branch)
     _check_addon_exists(addon, from_branch, raise_exc=True)
@@ -108,14 +109,15 @@ def main(
     if _check_addon_exists(addon, to_branch):
         PortAddonPullRequest(
             repo, upstream_org, repo_name, from_branch, to_branch,
-            fork, user_org, addon, verbose=verbose, non_interactive=non_interactive
+            fork, user_org, addon, storage, verbose, non_interactive
         ).run()
     #   - if not, migrate it
     else:
         MigrateAddon(
             repo, upstream_org, repo_name, from_branch, to_branch,
-            fork, user_org, addon, verbose, non_interactive=non_interactive
+            fork, user_org, addon, storage, verbose, non_interactive
         ).run()
+    storage.save()
 
 
 def _fetch_branches(*branches, verbose=False):

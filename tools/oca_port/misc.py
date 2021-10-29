@@ -1,11 +1,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 # Copyright 2021 Camptocamp SA
 
-from collections import abc
+from collections import abc, defaultdict
 import contextlib
+import json
 import re
 import os
 
+import click
 import git
 import requests
 
@@ -176,6 +178,15 @@ class Commit():
         return self.raw_commit.diff(git.NULL_TREE)
 
 
+@contextlib.contextmanager
+def no_strict_commit_equality():
+    try:
+        Commit.eq_strict = False
+        yield
+    finally:
+        Commit.eq_strict = True
+
+
 class PullRequest(abc.Hashable):
     eq_attrs = ("number", "url", "author", "title", "body", "merged_at")
 
@@ -211,13 +222,79 @@ class PullRequest(abc.Hashable):
         return list(self.paths - self.ported_paths)
 
 
-@contextlib.contextmanager
-def no_strict_commit_equality():
-    try:
-        Commit.eq_strict = False
-        yield
-    finally:
-        Commit.eq_strict = True
+class InputStorage():
+    """Store the user inputs related to an addon.
+
+    If commits/pull requests of an addon may be ported, some of them could be
+    false-positive and as such the user can choose to not port them.
+    This class will help to store these informations and by doing so the tool
+    won't list anymore these commits the next time we perform an analysis on
+    the same addon.
+
+    Technically the data are stored in a json file at the root of the repository.
+    """
+    def __init__(self, root_path):
+        self.root_path = root_path
+        self._data = self._get_data()
+
+    def _get_data(self):
+        """Return the data of the current repository.
+
+        If a JSON file is found, return its content, otherwise return an empty
+        dictionary.
+        """
+        file_path = self._get_file_path()
+
+        def defaultdict_from_dict(d):
+            nd = lambda: defaultdict(nd)    # noqa
+            ni = nd()
+            ni.update(d)
+            return ni
+
+        try:
+            with open(file_path, "r") as file_:
+                return json.load(file_, object_hook=defaultdict_from_dict)
+        except IOError:
+            nested_dict = lambda: defaultdict(nested_dict)  # noqa
+            return nested_dict()
+
+    def save(self):
+        """Store the data at the root of the current repository."""
+        if not self._data:
+            return
+        file_path = self._get_file_path()
+        with open(file_path, "w") as file_:
+            json.dump(self._data, file_, indent=4)
+
+    def _get_file_path(self):
+        return os.path.join(self.root_path, ".oca-port.json")
+
+    def is_pr_blacklisted(self, from_branch, to_branch, addon, pr_ref):
+        pr_ref = str(pr_ref or "orphaned_commits")
+        return self._data.get(
+            from_branch, {}).get(
+                to_branch, {}).get(
+                    addon, {}).get(
+                        "blacklist_pull_requests", {}).get(pr_ref, False)
+
+    def blacklist_pr(self, from_branch, to_branch, addon, pr_ref, confirm=False):
+        if confirm and not click.confirm("\tRemember this choice?"):
+            return
+        pr_ref = str(pr_ref or "orphaned_commits")
+        addon_data = self._data[from_branch][to_branch][addon]
+        addon_data["blacklist_pull_requests"][pr_ref] = True
+
+    def is_addon_blacklisted(self, from_branch, to_branch, addon):
+        return self._data.get(
+            from_branch, {}).get(
+                to_branch, {}).get(
+                    addon, {}).get("blacklist_addon", False)
+
+    def blacklist_addon(self, from_branch, to_branch, addon, confirm=False):
+        if confirm and not click.confirm("\tRemember this choice?"):
+            return
+        addon_data = self._data[from_branch][to_branch][addon]
+        addon_data["blacklist_addon"] = True
 
 
 def clean_text(text):

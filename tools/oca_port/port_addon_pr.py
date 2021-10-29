@@ -35,8 +35,9 @@ PR_BRANCH_NAME = (
 class PortAddonPullRequest():
     def __init__(
             self, repo, upstream_org, repo_name,
-            from_branch, to_branch, fork, user_org, addon, verbose=False,
-            non_interactive=False, create_branch=True, push_branch=True
+            from_branch, to_branch, fork, user_org, addon, storage,
+            verbose=False, non_interactive=False,
+            create_branch=True, push_branch=True
             ):
         """Port pull requests of `addon`."""
         self.repo = repo
@@ -47,6 +48,7 @@ class PortAddonPullRequest():
         self.fork = fork
         self.user_org = user_org
         self.addon = addon
+        self.storage = storage
         self.verbose = verbose
         self.non_interactive = non_interactive
         self.create_branch = create_branch
@@ -60,7 +62,7 @@ class PortAddonPullRequest():
         )
         branches_diff = BranchesDiff(
             self.repo, self.upstream_org, self.repo_name, self.addon,
-            self.from_branch, self.to_branch
+            self.from_branch, self.to_branch, self.storage
         )
         branches_diff.print_diff(self.verbose)
         if self.non_interactive:
@@ -90,6 +92,15 @@ class PortAddonPullRequest():
                 # Check if commits have been ported
                 if self.repo.commit(pr_branch.ref()) == current_commit:
                     print("\tℹ️  Nothing has been ported, skipping")
+                    self.storage.blacklist_pr(
+                        self.from_branch.name, self.to_branch.name,
+                        self.addon, pr.number
+                    )
+                    msg = (
+                        f"\t{bc.DIM}PR #{pr.number} has been"
+                        if pr.number else "Orphaned commits have been"
+                    ) + f" automatically blacklisted{bc.ENDD}"
+                    print(msg)
                     continue
                 previous_pr = pr
                 previous_pr_branch = pr_branch
@@ -131,6 +142,10 @@ class PortAddonPullRequest():
                 "--no-track", "-b", self.to_branch.name, self.to_branch.ref()
             )
         if not click.confirm("\tPort it?" if pr.number else "\tPort them?"):
+            self.storage.blacklist_pr(
+                self.from_branch.name, self.to_branch.name,
+                self.addon, pr.number, confirm=True
+            )
             return None, based_on_previous
         # Create a local branch based on upstream
         if self.create_branch:
@@ -330,7 +345,9 @@ class PortAddonPullRequest():
 
 class BranchesDiff():
     """Helper to compare easily commits (and related PRs) between two branches."""
-    def __init__(self, repo, upstream_org, repo_name, path, from_branch, to_branch):
+    def __init__(
+            self, repo, upstream_org, repo_name, path, from_branch, to_branch, storage
+            ):
         self.repo = repo
         self.upstream_org = upstream_org
         self.repo_name = repo_name
@@ -346,6 +363,7 @@ class BranchesDiff():
             self.to_branch.ref(), self.path
         )
         self.to_branch_all_commits, _ = self._get_branch_commits(self.to_branch.ref())
+        self.storage = storage
         self.commits_diff = self.get_commits_diff()
 
     def _get_branch_commits(self, branch, path="."):
@@ -536,9 +554,19 @@ class BranchesDiff():
             else:
                 # FIXME log?
                 pass
-        # Sort PRs on the merge date (better to port them in the right order)
+        # Sort PRs on the merge date (better to port them in the right order).
+        # Do not return blacklisted PR.
         sorted_commits_by_pr = {}
         for pr in sorted(commits_by_pr, key=lambda pr: pr.merged_at):
+            if self.storage.is_pr_blacklisted(
+                    self.from_branch.name, self.to_branch.name, self.path, pr.number
+                    ):
+                msg = (
+                    f"{bc.DIM}PR #{pr.number}"
+                    if pr.number else "Orphaned commits"
+                ) + f" blacklisted{bc.ENDD}"
+                print(msg)
+                continue
             sorted_commits_by_pr[pr] = commits_by_pr[pr]
         return sorted_commits_by_pr
 
