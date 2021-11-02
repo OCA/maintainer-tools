@@ -50,6 +50,15 @@ class Branch():
         return ref
 
 
+class CommitPath(str):
+    """Helper class to know if a base path is a directory or a file."""
+    def __new__(cls, value):
+        new_value = value.split("/", maxsplit=1)[0]
+        obj = super().__new__(cls, new_value)
+        obj.isdir = "/" in value
+        return obj
+
+
 class Commit():
     # Attributes used to check equality between commits.
     # We do not want to use the SHA here as it changed from one branch to another
@@ -79,7 +88,7 @@ class Commit():
         self.committed_datetime = commit.committed_datetime.replace(tzinfo=None)
         self.parents = [parent.hexsha for parent in commit.parents]
         self.files = {f for f in set(commit.stats.files.keys()) if "=>" not in f}
-        self.paths = {f.split("/", maxsplit=1)[0] for f in self.files}
+        self.paths = {CommitPath(f) for f in self.files}
         self.ported_commits = []
 
     def _get_equality_attrs(self):

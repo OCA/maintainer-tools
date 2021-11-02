@@ -31,6 +31,27 @@ PR_BRANCH_NAME = (
     "oca-port-pr-{pr_number}-from-{from_branch}-to-{to_branch}"
 )
 
+FOLDERS_TO_SKIP = [
+    "setup",
+    ".github",
+]
+
+FILES_TO_KEEP = [
+    "requirements.txt",
+    "test-requirements.txt",
+    "oca_dependencies.txt",
+]
+
+
+def path_to_skip(commit_path):
+    """Return True if the commit path should not be ported."""
+    # Allows all folders (addons!) excepted those like 'setup/' generated
+    # automatically by pre-commit.
+    if commit_path.isdir:
+        return commit_path in FOLDERS_TO_SKIP
+    # Forbid all files excepted those that developers could update
+    return commit_path not in FILES_TO_KEEP
+
 
 class PortAddonPullRequest():
     def __init__(
@@ -392,13 +413,16 @@ class BranchesDiff():
     def _skip_commit(commit):
         """Check if a commit should be skipped or not.
 
-        Merge or translations commits are skipped for instance.
+        Merge or translations commits are skipped for instance, or commits
+        updating only files/folders we do not want to port (pre-commit
+        configuration, setuptools files...).
         """
         return (
             # Skip merge commit
             len(commit.parents) > 1
             or commit.author_email in AUTHOR_EMAILS_TO_SKIP
             or any([term in commit.summary for term in SUMMARY_TERMS_TO_SKIP])
+            or all(path_to_skip(path) for path in commit.paths)
         )
 
     def print_diff(self, verbose=False):
@@ -496,11 +520,20 @@ class BranchesDiff():
                         f"/pulls/{pr.number}/commits"
                     )
                     for gh_pr_commit in gh_pr_commits:
-                        raw_commit = self.repo.commit(gh_pr_commit["sha"])
+                        try:
+                            raw_commit = self.repo.commit(gh_pr_commit["sha"])
+                        except ValueError:
+                            # Ignore commits referenced by a PR but not present
+                            # in the stable branches
+                            continue
                         pr_commit = misc.Commit(raw_commit)
-                        pr.paths.update(pr_commit.paths)
                         if self._skip_commit(pr_commit):
                             continue
+                        pr_commit_paths = set(
+                            path for path in pr_commit.paths
+                            if not path_to_skip(path)
+                        )
+                        pr.paths.update(pr_commit_paths)
                         # Check that this PR commit does not change the current
                         # addon we are interested in, in such case also check
                         # for each updated addons that the commit has already
@@ -509,7 +542,7 @@ class BranchesDiff():
                         # in the past (with git-format-patch), and we now want
                         # to port the remaining chunks.
                         if pr_commit not in self.to_branch_path_commits:
-                            paths = set(pr_commit.paths)
+                            paths = set(pr_commit_paths)
                             # A commit could have been ported several times
                             # if it was impacting several addons and the
                             # migration has been done with git-format-patch
@@ -520,9 +553,13 @@ class BranchesDiff():
                                 while pr_commit in to_branch_all_commits:
                                     index = to_branch_all_commits.index(pr_commit)
                                     ported_commit = to_branch_all_commits.pop(index)
-                                    pr.ported_paths.update(ported_commit.paths)
+                                    ported_commit_paths = set(
+                                        path for path in ported_commit.paths
+                                        if not path_to_skip(path)
+                                    )
+                                    pr.ported_paths.update(ported_commit_paths)
                                     pr_commit.ported_commits.append(ported_commit)
-                                    paths -= ported_commit.paths
+                                    paths -= ported_commit_paths
                                     if not paths:
                                         # The ported commits have already updated
                                         # the same addons than the original one,
@@ -557,7 +594,7 @@ class BranchesDiff():
         # Sort PRs on the merge date (better to port them in the right order).
         # Do not return blacklisted PR.
         sorted_commits_by_pr = {}
-        for pr in sorted(commits_by_pr, key=lambda pr: pr.merged_at):
+        for pr in sorted(commits_by_pr, key=lambda pr: pr.merged_at or ""):
             if self.storage.is_pr_blacklisted(
                     self.from_branch.name, self.to_branch.name, self.path, pr.number
                     ):
