@@ -5,7 +5,6 @@ import click
 import os
 import subprocess
 import tempfile
-import sys
 import urllib.parse
 
 from . import misc
@@ -79,7 +78,7 @@ class MigrateAddon():
             return
         if self.non_interactive:
             # Exit with an error code if the addon is eligible for a migration
-            sys.exit(1)
+            raise SystemExit(1)
         confirm = (
             f"Migrate {bc.BOLD}{self.addon}{bc.END} "
             f"from {bc.BOLD}{self.from_branch.name}{bc.END} "

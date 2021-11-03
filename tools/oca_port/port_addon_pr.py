@@ -5,7 +5,6 @@ from collections import defaultdict
 import shutil
 import tempfile
 import os
-import sys
 
 import click
 import git
@@ -89,7 +88,7 @@ class PortAddonPullRequest():
         if self.non_interactive:
             if branches_diff.commits_diff:
                 # Exit with an error code if commits are eligible for (back)porting
-                sys.exit(1)
+                raise SystemExit(1)
             return
         if self.fork:
             print()
