@@ -117,7 +117,6 @@ def main(
             repo, upstream_org, repo_name, from_branch, to_branch,
             fork, user_org, addon, storage, verbose, non_interactive
         ).run()
-    storage.save()
 
 
 def _fetch_branches(*branches, verbose=False):

@@ -292,6 +292,7 @@ class InputStorage():
         pr_ref = str(pr_ref or "orphaned_commits")
         addon_data = self._data[from_branch][to_branch][addon]
         addon_data["blacklist_pull_requests"][pr_ref] = True
+        self.save()
 
     def is_addon_blacklisted(self, from_branch, to_branch, addon):
         return self._data.get(
@@ -304,6 +305,7 @@ class InputStorage():
             return
         addon_data = self._data[from_branch][to_branch][addon]
         addon_data["blacklist_addon"] = True
+        self.save()
 
 
 def clean_text(text):
