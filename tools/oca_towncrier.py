@@ -5,9 +5,9 @@
 import contextlib
 import datetime
 import os
-import shutil
 import subprocess
 import sys
+import tempfile
 
 import click
 import toml
@@ -27,45 +27,23 @@ def _get_towncrier_template():
 
 
 @contextlib.contextmanager
-def _preserve_file(path):
-    if not os.path.exists(path):
-        try:
-            yield
-        finally:
-            os.unlink(path)
-    else:
-        save_path = path + ".save"
-        assert not os.path.exists(save_path)
-        try:
-            shutil.copy2(path, save_path)
-            yield
-        finally:
-            shutil.copy2(save_path, path)
-            os.unlink(save_path)
-
-
-@contextlib.contextmanager
-def _prepare_pyproject_toml(addon_dir, org, repo):
+def _prepare_config(addon_dir, org, repo):
     """Inject towncrier options in pyproject.toml"""
-    pyproject_path = os.path.join(addon_dir, "pyproject.toml")
-    with _preserve_file(pyproject_path):
-        pyproject = {}
-        if os.path.exists(pyproject_path):
-            with open(pyproject_path) as f:
-                pyproject = toml.load(f)
-        if "tool" not in pyproject:
-            pyproject["tool"] = {}
-        pyproject["tool"]["towncrier"] = {
-            "template": _get_towncrier_template(),
-            "underlines": ["~"],
-            "title_format": "{version} ({project_date})",
-            "issue_format": _make_issue_format(org, repo),
-            "directory": "readme/newsfragments",
-            "filename": "readme/HISTORY.rst",
+    with tempfile.NamedTemporaryFile(dir=addon_dir, mode="w") as config_file:
+        config = {
+            "tool": {
+                "towncrier": {
+                    "template": _get_towncrier_template(),
+                    "underlines": ["~"],
+                    "issue_format": _make_issue_format(org, repo),
+                    "directory": "readme/newsfragments",
+                    "filename": "readme/HISTORY.rst",
+                }
+            }
         }
-        with open(pyproject_path, "w") as f:
-            toml.dump(pyproject, f)
-        yield
+        toml.dump(config, config_file)
+        config_file.flush()
+        yield config_file.name
 
 
 @click.command(
@@ -81,7 +59,7 @@ def _prepare_pyproject_toml(addon_dir, org, repo):
     "addon_dirs",
     type=click.Path(dir_okay=True, file_okay=False, exists=True),
     multiple=True,
-    help="Directory where addon manifest is located. This option " "may be repeated.",
+    help="Directory where addon manifest is located. This option may be repeated.",
 )
 @click.option("--version")
 @click.option("--date")
@@ -104,12 +82,14 @@ def oca_towncrier(addon_dirs, version, date, org, repo, commit):
         if not any(not f.startswith(".") for f in os.listdir(news_dir)):
             continue
         addon_version = version or read_manifest(addon_dir)["version"]
-        with _prepare_pyproject_toml(addon_dir, org, repo):
+        with _prepare_config(addon_dir, org, repo) as config_file_name:
             subprocess.call(
                 [
                     sys.executable,
                     "-m",
                     "towncrier",
+                    "--config",
+                    config_file_name,
                     "--version",
                     addon_version,
                     "--date",

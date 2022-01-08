@@ -39,7 +39,7 @@ setuptools.setup(
         'pygments',
         'requests',
         'toml>=0.10.0',  # for oca-towncrier
-        'towncrier>=19.2',  # for oca-towncrier
+        'towncrier>=21.3',  # for oca-towncrier
         'selenium',
         'twine',
         'wheel',
