@@ -45,7 +45,7 @@ class FakeProject(object):
 
 def get_cla_project(odoo):
     Partner = odoo.model('res.partner')
-    domain = [('github_login', '!=', False),
+    domain = [('github_name', '!=', False),
               '|',
               ('category_id.name', 'in', ('ECLA', 'ICLA')),
               ('parent_id.category_id.name', '=', 'ECLA')]
@@ -115,7 +115,7 @@ class GHTeamList(object):
 
 def get_members_project(odoo):
     Partner = odoo.model('res.partner')
-    domain = [('github_login', '!=', False),
+    domain = [('github_name', '!=', False),
               ('membership_state', 'in', ('paid', 'free'))]
     members = Partner.browse(domain)
     return FakeProject('OCA Members', members)
@@ -190,14 +190,14 @@ def copy_users(odoo, team=None, dry_run=False):
                            ])
         psc_user_logins = set()
         for user in users:
-            if user.github_login:
-                if user.github_login.lower() not in black_list:
-                    user_logins.add(user.github_login)
+            if user.github_name:
+                if user.github_name.lower() not in black_list:
+                    user_logins.add(user.github_name)
             else:
                 no_github_login.add("%s (%s)" % (user.name, user.login))
         for user in psc_users:
-            if user.github_login and user.github_login not in black_list:
-                psc_user_logins.add(user.github_login)
+            if user.github_name and user.github_name not in black_list:
+                psc_user_logins.add(user.github_name)
         sync_team(github_team, user_logins, dry_run)
         if psc_team:
             sync_team(psc_team, psc_user_logins, dry_run)
