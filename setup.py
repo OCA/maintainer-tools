@@ -23,7 +23,6 @@ setuptools.setup(
     ],
     install_requires=[
         'appdirs',
-        'argparse',
         'click',
         'configparser',  # for python2 compat
         # We need to pin docutils version, see
