@@ -107,8 +107,7 @@ class GHTeamList(object):
         if not self.dry_run:
             self._org.create_team(
                 name=team_name,
-                repo_names=repo_names,
-                permission='admin')
+                repo_names=repo_names)
         self._load_teams()
         return self._teams.get(team_name)
 
