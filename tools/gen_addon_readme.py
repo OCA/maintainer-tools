@@ -14,7 +14,6 @@ from jinja2 import Template
 
 from .gitutils import commit_if_needed
 from .manifest import read_manifest, find_addons, NoManifestFound
-from .runbot_ids import get_runbot_ids
 
 if sys.version_info[0] < 3:
     # python 2 import
@@ -108,12 +107,12 @@ RST2HTML_SETTINGS = {
 }
 
 
-def make_runbot_badge(runbot_id, branch):
+def make_runboat_badge(repo, branch):
     return (
-        'https://img.shields.io/badge/runbot-Try%20me-875A7B.png',
-        'https://runbot.odoo-community.org/runbot/'
-        '{runbot_id}/{branch}'.format(**locals()),
-        'Try me on Runbot',
+        'https://img.shields.io/badge/runboat-Try%20me-875A7B.png',
+        'https://runboat.odoo-community.org/webui/builds.html?'
+        'repo=OCA/{repo}&target_branch={branch}'.format(**locals()),
+        'Try me on Runboat',
     )
 
 
@@ -185,9 +184,6 @@ def gen_one_addon_readme(
                     org_name, repo_name, branch, addon_name, f)
                 if fragment:
                     fragments[fragment_name] = fragment
-    runbot_id = False
-    if org_name == 'OCA':
-        runbot_id = get_runbot_ids().get(repo_name)
     badges = []
     development_status = manifest.get('development_status', 'Beta').lower()
     if development_status in DEVELOPMENT_STATUS_BADGES:
@@ -198,10 +194,8 @@ def gen_one_addon_readme(
     badges.append(make_repo_badge(org_name, repo_name, branch, addon_name))
     if org_name == 'OCA':
         badges.append(make_weblate_badge(repo_name, branch, addon_name))
-    if runbot_id:
-        badges.append(make_runbot_badge(runbot_id, branch))
-    elif org_name == 'OCA':
-        print("Warning: There isn't a runbot_id for this repo: %s" % repo_name)
+    if org_name == 'OCA':
+        badges.append(make_runboat_badge(repo_name, branch))
     authors = [
         a.strip()
         for a in manifest.get('author', '').split(',')
@@ -228,7 +222,6 @@ def gen_one_addon_readme(
             manifest=manifest,
             org_name=org_name,
             repo_name=repo_name,
-            runbot_id=runbot_id,
             development_status=development_status,
         ))
     return readme_filename
