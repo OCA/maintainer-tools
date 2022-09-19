@@ -126,3 +126,113 @@ def test_update_pre_commit_excluded_addons_subdir(tmp_path):
               python: python3
         """
     )
+
+
+def test_update_coveragerc(tmp_path):
+    coveragerc = tmp_path / ".coveragerc"
+    coveragerc.write_text(
+        textwrap.dedent(
+            """\
+              [resport]
+              omit=
+                # NOT INSTALLABLE ADDONS
+                # END NOT INSTALLABLE ADDONS
+                **/tests/*
+
+              [run]
+            """
+        )
+    )
+    addon = tmp_path / "addon1"
+    addon.mkdir()
+    m = addon / "__manifest__.py"
+    # addoninstallable
+    m.write_text("{}")
+    subprocess.check_call(["oca-update-pre-commit-excluded-addons"], cwd=str(tmp_path))
+    assert coveragerc.read_text() == textwrap.dedent(
+        """\
+          [resport]
+          omit=
+            # NOT INSTALLABLE ADDONS
+            # END NOT INSTALLABLE ADDONS
+            **/tests/*
+
+          [run]
+      """
+    )
+    # addon installable
+    m.write_text("{'installable': False}")
+    subprocess.check_call(["oca-update-pre-commit-excluded-addons"], cwd=str(tmp_path))
+    assert coveragerc.read_text() == textwrap.dedent(
+        """\
+          [resport]
+          omit=
+            # NOT INSTALLABLE ADDONS
+            addon1/*
+            # END NOT INSTALLABLE ADDONS
+            **/tests/*
+
+          [run]
+      """
+    )
+
+
+def test_update_gitignore(tmp_path):
+    gitignore = tmp_path / ".gitignore"
+    gitignore.write_text(
+        textwrap.dedent(
+            """\
+              # Project specific
+              oca.cfg
+              .pytest_cache/
+              /.vscode
+
+              # NOT INSTALLABLE ADDONS
+              # END NOT INSTALLABLE ADDONS
+
+              # Installer logs
+              pip-log.txt
+              pip-delete-this-directory.txt
+            """
+        )
+    )
+    addon = tmp_path / "addon1"
+    addon.mkdir()
+    m = addon / "__manifest__.py"
+    # addoninstallable
+    m.write_text("{}")
+    subprocess.check_call(["oca-update-pre-commit-excluded-addons"], cwd=str(tmp_path))
+    assert gitignore.read_text() == textwrap.dedent(
+        """\
+              # Project specific
+              oca.cfg
+              .pytest_cache/
+              /.vscode
+
+              # NOT INSTALLABLE ADDONS
+              # END NOT INSTALLABLE ADDONS
+
+              # Installer logs
+              pip-log.txt
+              pip-delete-this-directory.txt
+      """
+    )
+    # addon installable
+    m.write_text("{'installable': False}")
+    subprocess.check_call(["oca-update-pre-commit-excluded-addons"], cwd=str(tmp_path))
+    assert gitignore.read_text() == textwrap.dedent(
+        """\
+              # Project specific
+              oca.cfg
+              .pytest_cache/
+              /.vscode
+
+              # NOT INSTALLABLE ADDONS
+              addon1/
+              # END NOT INSTALLABLE ADDONS
+
+              # Installer logs
+              pip-log.txt
+              pip-delete-this-directory.txt
+      """
+    )
