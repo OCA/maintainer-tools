@@ -56,8 +56,6 @@ def update_not_installable_addons_dir_in_file(
             for addon_dir in not_installable_addons_dir
         ]
     if not_installable_addons_dir:
-        content_to_replace = line_end.join(not_installable_addons_dir)
-        content_to_replace += line_end
         with open(file_path, "r+") as text_io:
             lines = text_io.readlines()
             text_io.seek(0)
@@ -70,6 +68,14 @@ def update_not_installable_addons_dir_in_file(
                 if PRE_COMMIT_EXCLUDE_SEPARATOR in line:
                     replace_on = True
                     text_io.write(line)
+                    preprend_spaces = line[: len(line) - len(line.lstrip(" "))]
+                    content_to_replace = line_end.join(
+                        [
+                            f"{preprend_spaces}{addon_dir}"
+                            for addon_dir in not_installable_addons_dir
+                        ]
+                    )
+                    content_to_replace += line_end
                     text_io.write(content_to_replace)
                     continue
                 text_io.write(line)
@@ -99,8 +105,8 @@ def main(addons_dir):
 
         [report]
         omit =
-          # NOT INSTALLABLE ADDONS
-          # END NOT INSTALLABLE ADDONS
+            # NOT INSTALLABLE ADDONS
+            # END NOT INSTALLABLE ADDONS
     ..
 
     In .gitignore
@@ -119,10 +125,10 @@ def main(addons_dir):
             not_installable_addons_dir.append(addon_dir)
     not_installable_addons_dir.sort()
     update_not_installable_addons_dir_in_file(
-        not_installable_addons_dir, PRE_COMMIT_FILE_PATH, "  ^{addon_dir}/", "|\n"
+        not_installable_addons_dir, PRE_COMMIT_FILE_PATH, "^{addon_dir}/", "|\n"
     )
     update_not_installable_addons_dir_in_file(
-        not_installable_addons_dir, COVERAGE_FILE_PATH, "  {addon_dir}/*", "\n"
+        not_installable_addons_dir, COVERAGE_FILE_PATH, "{addon_dir}/*", "\n"
     )
     update_not_installable_addons_dir_in_file(
         not_installable_addons_dir, GITIGNORE_FILE_PATH, "{addon_dir}/", "\n"
