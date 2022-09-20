@@ -6,7 +6,6 @@ import click
 
 PRE_COMMIT_FILE_PATH = ".pre-commit-config.yaml"
 COVERAGE_FILE_PATH = ".coveragerc"
-GITIGNORE_FILE_PATH = ".gitignore"
 PRE_COMMIT_EXCLUDE_SEPARATOR = "# NOT INSTALLABLE ADDONS"
 PRE_COMMIT_EXCLUDE_SEPARATOR_END = "# END NOT INSTALLABLE ADDONS"
 
@@ -85,7 +84,7 @@ def update_not_installable_addons_dir_in_file(
 @click.command()
 @click.option("--addons-dir", default="")
 def main(addons_dir):
-    """Update .pre-commit-config.yaml, .gitignore and .coveragerc files to exclude
+    """Update .pre-commit-config.yaml and .coveragerc files to exclude
     uninstallable addons. The content block to update must begin with a line
     containing '# NOT INSTALLABLE ADDONS' and end with a line
     containing '# END NOT INSTALLABLE ADDONS'.
@@ -109,13 +108,6 @@ def main(addons_dir):
             # END NOT INSTALLABLE ADDONS
     ..
 
-    In .gitignore
-
-    .. code-block::
-
-        # NOT INSTALLABLE ADDONS
-        # END NOT INSTALLABLE ADDONS
-    ..
     """
     not_installable_addons_dir = []
     addons = os.listdir(addons_dir or ".")
@@ -129,9 +121,6 @@ def main(addons_dir):
     )
     update_not_installable_addons_dir_in_file(
         not_installable_addons_dir, COVERAGE_FILE_PATH, "{addon_dir}/*", "\n"
-    )
-    update_not_installable_addons_dir_in_file(
-        not_installable_addons_dir, GITIGNORE_FILE_PATH, "{addon_dir}/", "\n"
     )
 
 
