@@ -148,7 +148,7 @@ class MigrationIssuesCreator(object):
         # Make sure labels exists
         labels = []
         for label in repo.labels():
-            if label.name in ['help wanted', 'work in progress']:
+            if label.name in ['help wanted', 'work in progress', 'no stale']:
                 labels.append(label.name)
         return repo.create_issue(
             title=title, body=body, milestone=milestone.number, labels=labels)
