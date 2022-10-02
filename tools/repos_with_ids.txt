@@ -132,7 +132,7 @@
 234|github.com/OCA/connector-lengow
 237|github.com/OCA/l10n-vietnam
 238|github.com/OCA/l10n-thailand
-239|github.com/OCA/vertical-realstate
+239|github.com/OCA/vertical-realestate
 240|github.com/OCA/maintenance
 248|github.com/OCA/mis-builder
 249|github.com/OCA/apps-store
