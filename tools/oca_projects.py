@@ -220,7 +220,7 @@ def get_repositories():
     return all_repos
 
 
-def get_repositories_and_branches(repos=(), branches=MAIN_BRANCHES):
+def get_repositories_and_branches(repos=(), branches=MAIN_BRANCHES, branch_filter=None):
     gh = login()
     for repo in gh.repositories_by('OCA'):
         if repos and repo.name not in repos:
@@ -229,6 +229,8 @@ def get_repositories_and_branches(repos=(), branches=MAIN_BRANCHES):
             continue
         for branch in repo.branches():
             if branches and branch.name not in branches:
+                continue
+            if branch_filter and not branch_filter(branch):
                 continue
             yield repo.name, branch.name
 

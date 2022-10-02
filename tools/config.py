@@ -4,6 +4,7 @@ from __future__ import absolute_import, print_function
 
 import configparser
 import os
+import re
 
 CREDENTIALS_FILE = 'oca.cfg'
 
@@ -65,6 +66,7 @@ NOT_ADDONS = {
 }
 
 
+# deprecated, use is_main_branch() instead
 MAIN_BRANCHES = (
     '6.1',
     '7.0',
@@ -76,4 +78,9 @@ MAIN_BRANCHES = (
     '13.0',
     '14.0',
     '15.0',
+    '16.0',
 )
+
+
+def is_main_branch(branch):
+    return re.match(r"^(6\.1|\d+\.0)$", branch)
