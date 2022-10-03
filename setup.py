@@ -44,6 +44,7 @@ setuptools.setup(
         "pyproject_dependencies ; python_version>='3.7'",
         "setuptools-odoo",  # for oca-gen-external-dependencies
         "whool",  # for oca-gen-external-dependencies
+        "copier>=9",
     ],
     python_requires=">=3.6",
     classifiers=[

@@ -1,13 +1,32 @@
-"""Create a branch in all addons project.
-
-TODO
-- load copier answers from a previous branch
-"""
+"""Create a branch in all addons project."""
+from pathlib import Path
 import subprocess
+from typing import Dict
 
 import click
+import yaml
+import copier
 
 from .oca_projects import get_repositories, temporary_clone
+
+COPIER_ANSWERS_FILE = ".copier-answers.yml"
+COPIER_ANSWERS_TO_CARRY_OVER = ("repo_description", "repo_name")
+
+
+def _read_prev_branch_answers(prev_branch: str, answers: Dict[str, str]) -> None:
+    try:
+        subprocess.check_call(["git", "checkout", prev_branch])
+    except subprocess.CalledProcessError:
+        # likely branch not found
+        return
+    if not Path(COPIER_ANSWERS_FILE).is_file():
+        return
+    with open(COPIER_ANSWERS_FILE) as f:
+        prev_branch_answers = yaml.load(f, Loader=yaml.SafeLoader)
+    for question in COPIER_ANSWERS_TO_CARRY_OVER:
+        if question not in prev_branch_answers:
+            continue
+        answers[question] = prev_branch_answers[question]
 
 
 @click.command("Create an orphan branch from a 'copier' template")
@@ -25,8 +44,12 @@ from .oca_projects import get_repositories, temporary_clone
     "repos",
     multiple=True,
 )
-def main(new_branch, copier_template, copier_template_vcs_ref, repos):
-    for repo in repos or get_repositories():
+@click.option(
+    "--prev-branch",
+    help="Previous branch where to read some copier answers.",
+)
+def main(new_branch, copier_template, copier_template_vcs_ref, repos, prev_branch):
+    for repo in repos or sorted(get_repositories()):
         print("=" * 10, repo, "=" * 10)
         with temporary_clone(repo):
             # check if branch already exists
@@ -42,30 +65,27 @@ def main(new_branch, copier_template, copier_template_vcs_ref, repos):
             subprocess.check_call(
                 ["git", "config", "user.email", "oca-git-bot@odoo-community.org"],
             )
+            # read answers from previous branch
+            answers = {
+                "odoo_version": float(new_branch),
+                "repo_slug": repo,
+                "repo_name": repo,
+                "ci": "GitHub",
+            }
+            if prev_branch:
+                _read_prev_branch_answers(prev_branch, answers)
             # create empty git branch
             subprocess.check_call(["git", "checkout", "--orphan", new_branch])
             subprocess.check_call(["git", "reset", "--hard"])
             # copier
-            copier_cmd = [
-                "copier",
-                "--data",
-                f"odoo_version={new_branch}",
-                "--data",
-                f"repo_slug={repo}",
-                "--data",
-                f"repo_name={repo}",
-                "--data",
-                "repo_description=TODO: add repo description.",
-                "--data",
-                "dependency_installation_mode=PIP",
-                "--data",
-                "ci=GitHub",
-                "--force",
-            ]
-            if copier_template_vcs_ref:
-                copier_cmd += ["--vcs-ref", copier_template_vcs_ref]
-            copier_cmd += [copier_template, "."]
-            subprocess.check_call(copier_cmd)
+            copier.run_copy(
+                src_path=copier_template,
+                dst_path=".",
+                data=answers,
+                defaults=True,
+                vcs_ref=copier_template_vcs_ref,
+                unsafe=True,
+            )
             # pre-commit run -a
             subprocess.check_call(["git", "add", "."])
             subprocess.call(["pre-commit", "run", "-a"])
