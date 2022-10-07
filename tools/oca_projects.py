@@ -230,7 +230,7 @@ def get_repositories_and_branches(repos=(), branches=MAIN_BRANCHES, branch_filte
         for branch in repo.branches():
             if branches and branch.name not in branches:
                 continue
-            if branch_filter and not branch_filter(branch):
+            if branch_filter and not branch_filter(branch.name):
                 continue
             yield repo.name, branch.name
 
