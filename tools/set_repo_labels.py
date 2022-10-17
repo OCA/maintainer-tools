@@ -8,6 +8,8 @@ from __future__ import print_function
 from .github_login import login
 
 REPO_TO_IGNORE = [
+    ".github",
+    "mirrors-flake8",
 ]
 
 # List of labels to sync on all repositories
