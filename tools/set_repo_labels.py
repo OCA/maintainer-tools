@@ -66,9 +66,17 @@ def main():
             if (
                 repo_label.name != label_name
                 or repo_label.color != label_color
-                or repo_label.description != label_description
+                or (
+                    label_description is not None
+                    and repo_label.description != label_description
+                )
             ):
-                print(f"Updating label '{label_name}' in {repo.name}")
+                print(
+                    f"Updating label '{repo_label.name}' -> '{label_name}', "
+                    f"'{repo_label.color}' -> '{label_color}', "
+                    f"'{repo_label.description}' -> '{label_description}' "
+                    f"in {repo.name}"
+                )
                 repo_label.update(label_name, label_color, label_description)
         # Create labels
         for label_name in labels_to_create:
