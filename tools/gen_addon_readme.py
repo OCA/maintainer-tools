@@ -2,7 +2,6 @@
 # Copyright (c) 2018 ACSONE SA/NV
 # Copyright (c) 2018 GRAP (http://www.grap.coop)
 
-import io
 import os
 import re
 import sys
@@ -179,7 +178,7 @@ def gen_one_addon_readme(
             addon_dir, FRAGMENTS_DIR, fragment_name + '.rst',
         )
         if os.path.exists(fragment_filename):
-            with io.open(fragment_filename, 'rU', encoding='utf8') as f:
+            with open(fragment_filename, 'r', encoding='utf8') as f:
                 fragment = generate_fragment(
                     org_name, repo_name, branch, addon_name, f)
                 if fragment:
@@ -210,9 +209,9 @@ def gen_one_addon_readme(
         os.path.join(os.path.dirname(__file__), 'gen_addon_readme.template')
     readme_filename = \
         os.path.join(addon_dir, 'README.rst')
-    with io.open(template_filename, 'rU', encoding='utf8') as tf:
+    with open(template_filename, 'r', encoding='utf8') as tf:
         template = Template(tf.read())
-    with io.open(readme_filename, 'w', encoding='utf8') as rf:
+    with open(readme_filename, 'w', encoding='utf8') as rf:
         rf.write(template.render(
             addon_name=addon_name,
             authors=authors,
