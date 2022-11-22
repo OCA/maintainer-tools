@@ -63,6 +63,7 @@ setuptools.setup(
             'oca-odoo-login = tools.odoo_login:main',
             'oca-sync-users = tools.oca_sync_users:main',
             'oca-gen-addons-table = tools.gen_addons_table:gen_addons_table',
+            'oca-massive-change = tools.massive_change:main',
             'oca-migrate-branch = tools.migrate_branch:main',
             'oca-migrate-branch-empty = tools.migrate_branch_empty:main',
             'oca-publish-modules = tools.publish_modules:main',
