@@ -128,8 +128,9 @@ def make_weblate_badge(repo_name, branch, addon_name):
 
 def make_repo_badge(org_name, repo_name, branch, addon_name):
     badge_repo_name = repo_name.replace('-', '--')
+    badge_org_name = org_name.replace('-', '--')
     return (
-        'https://img.shields.io/badge/github-{org_name}%2F{badge_repo_name}'
+        'https://img.shields.io/badge/github-{badge_org_name}%2F{badge_repo_name}'
         '-lightgray.png?logo=github'.format(**locals()),
         'https://github.com/{org_name}/{repo_name}/tree/'
         '{branch}/{addon_name}'.format(**locals()),
