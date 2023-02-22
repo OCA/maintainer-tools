@@ -170,8 +170,8 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
     return fragment
 
 
-def gen_one_addon_readme(
-        org_name, repo_name, branch, addon_name, addon_dir, manifest):
+def gen_one_addon_readme(org_name, repo_name, branch, addon_name, addon_dir,
+                         manifest, template_filename):
     fragments = {}
     for fragment_name in FRAGMENTS:
         fragment_filename = os.path.join(
@@ -205,8 +205,6 @@ def gen_one_addon_readme(
         # maintainers section
     ]
     # generate
-    template_filename = \
-        os.path.join(os.path.dirname(__file__), 'gen_addon_readme.template')
     readme_filename = \
         os.path.join(addon_dir, 'README.rst')
     with open(template_filename, 'r', encoding='utf8') as tf:
@@ -285,8 +283,14 @@ def gen_one_addon_index(readme_filename):
               help="git commit changes to README.rst, if any.")
 @click.option('--gen-html/--no-gen-html', default=True,
               help="Generate index html file.")
-def gen_addon_readme(
-        org_name, repo_name, branch, addon_dirs, addons_dir, commit, gen_html):
+@click.option('--template-filename',
+              default=os.path.join(
+                  os.path.dirname(__file__),
+                  'gen_addon_readme.template',
+              ),
+              help="Template file to use.")
+def gen_addon_readme(org_name, repo_name, branch, addon_dirs, addons_dir,
+                     commit, gen_html, template_filename):
     """ Generate README.rst from fragments.
 
     Do nothing if readme/DESCRIPTION.rst is absent, otherwise overwrite
@@ -309,7 +313,9 @@ def gen_addon_readme(
                 os.path.join(addon_dir, FRAGMENTS_DIR, 'DESCRIPTION.rst')):
             continue
         readme_filename = gen_one_addon_readme(
-            org_name, repo_name, branch, addon_name, addon_dir, manifest)
+            org_name, repo_name, branch, addon_name, addon_dir, manifest,
+            template_filename
+        )
         check_rst(readme_filename)
         readme_filenames.append(readme_filename)
         if gen_html:
