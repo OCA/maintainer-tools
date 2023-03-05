@@ -13,7 +13,7 @@ def test_gen_addon_icon(tmp_path):
     addon_dir = tmp_path / "addon"
     addon_dir.mkdir()
     with (addon_dir / "__manifest__.py").open("w") as f:
-        f.write(u"{'name': 'addon'}")
+        f.write("{'name': 'addon'}")
     cmd = [
         sys.executable,
         "-m",
@@ -23,4 +23,5 @@ def test_gen_addon_icon(tmp_path):
     ]
     subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     assert os.path.exists(
-        os.path.join(addon_dir._str, ICONS_DIR, 'icon.%s' % ICON_TYPE))
+        os.path.join(addon_dir._str, ICONS_DIR, "icon.%s" % ICON_TYPE)
+    )

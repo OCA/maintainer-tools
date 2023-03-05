@@ -88,33 +88,36 @@ from .config import read_config
 
 import github3
 
-MANIFESTS = ('__openerp__.py', '__manifest__.py')
+MANIFESTS = ("__openerp__.py", "__manifest__.py")
 
 
 class MigrationIssuesCreator(object):
     def __init__(self, source, target, target_org=None, email=None):
         # Read config
         config = read_config()
-        self.gh_token = config.get('GitHub', 'token')
+        self.gh_token = config.get("GitHub", "token")
         # Connect to GitHub
         self.github = github_login.login()
         gh_user = self.github.me()
         if not gh_user.email and not email:
             raise Exception(
-                'Email required to commit to github. Please provide one on '
-                'the command line or make the one of your github profile '
-                'public.')
-        self.gh_credentials = {'name': gh_user.name or str(gh_user),
-                               'email': gh_user.email or email}
+                "Email required to commit to github. Please provide one on "
+                "the command line or make the one of your github profile "
+                "public."
+            )
+        self.gh_credentials = {
+            "name": gh_user.name or str(gh_user),
+            "email": gh_user.email or email,
+        }
         self.gh_source_branch = source
         self.gh_target_branch = target
-        self.gh_org = target_org or 'OCA'
+        self.gh_org = target_org or "OCA"
 
     def _get_modules_list(self, repo, root_contents):
         """Get the list of the modules in previous branch."""
         modules = []
         for root_content in root_contents.values():
-            if root_content.type != 'dir':
+            if root_content.type != "dir":
                 continue
             module_contents = repo.directory_contents(
                 root_content.path, self.gh_source_branch, return_as=dict
@@ -137,9 +140,11 @@ class MigrationIssuesCreator(object):
             if issue.title == title:
                 print(" migration issue already exists")
                 return issue
-        body = ("# Todo\n\nhttps://github.com/OCA/maintainer-tools/wiki/"
-                "Migration-to-version-%s\n\n# Modules to migrate\n\n" %
-                self.gh_target_branch)
+        body = (
+            "# Todo\n\nhttps://github.com/OCA/maintainer-tools/wiki/"
+            "Migration-to-version-%s\n\n# Modules to migrate\n\n"
+            % self.gh_target_branch
+        )
         body += "\n".join(["- [ ] %s" % x for x in modules])
         body += (
             "\n\nMissing module? Check https://github.com/OCA/maintainer-"
@@ -148,22 +153,24 @@ class MigrationIssuesCreator(object):
         # Make sure labels exists
         labels = []
         for label in repo.labels():
-            if label.name in ['help wanted', 'work in progress', 'no stale']:
+            if label.name in ["help wanted", "work in progress", "no stale"]:
                 labels.append(label.name)
         return repo.create_issue(
-            title=title, body=body, milestone=milestone.number, labels=labels)
+            title=title, body=body, milestone=milestone.number, labels=labels
+        )
 
     def _migrate_project(self, project):
         print("Preparing project %s/%s" % (self.gh_org, project))
         repo = self.github.repository(self.gh_org, project)
         try:
             root_contents = repo.directory_contents(
-                '', self.gh_source_branch, return_as=dict,
+                "",
+                self.gh_source_branch,
+                return_as=dict,
             )
         except github3.exceptions.NotFoundError:
             print(
-                " no commit found on branch {}, skipping"
-                .format(self.gh_source_branch)
+                " no commit found on branch {}, skipping".format(self.gh_source_branch)
             )
             return
         modules = self._get_modules_list(repo, root_contents)
@@ -179,32 +186,51 @@ class MigrationIssuesCreator(object):
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description='Migrate one OCA branch from one version to another, '
-                    'applying the needed transformations',
-        add_help=True)
-    parser.add_argument('source', help="Source branch (existing)")
-    parser.add_argument('target', help="Target branch (to create)")
+        description="Migrate one OCA branch from one version to another, "
+        "applying the needed transformations",
+        add_help=True,
+    )
+    parser.add_argument("source", help="Source branch (existing)")
+    parser.add_argument("target", help="Target branch (to create)")
     parser.add_argument(
-        '-p', '--projects', dest='projects', nargs='+',
-        default=[], help='List of specific projects to migrate')
+        "-p",
+        "--projects",
+        dest="projects",
+        nargs="+",
+        default=[],
+        help="List of specific projects to migrate",
+    )
     parser.add_argument(
-        '-e', '--email', dest='email',
-        help=('Provides an email address used to commit on GitHub if the one '
-              'associated to the GitHub account is not public'))
+        "-e",
+        "--email",
+        dest="email",
+        help=(
+            "Provides an email address used to commit on GitHub if the one "
+            "associated to the GitHub account is not public"
+        ),
+    )
     parser.add_argument(
-        '-t', '--target-org', dest='target_org',
-        help=('By default, the GitHub organization used is OCA. This arg lets '
-              'you provide an alternative organization'))
+        "-t",
+        "--target-org",
+        dest="target_org",
+        help=(
+            "By default, the GitHub organization used is OCA. This arg lets "
+            "you provide an alternative organization"
+        ),
+    )
     return parser
 
 
 def main():
     args = get_parser().parse_args()
     migrator = MigrationIssuesCreator(
-        source=args.source, target=args.target, target_org=args.target_org,
-        email=args.email)
+        source=args.source,
+        target=args.target,
+        target_org=args.target_org,
+        email=args.email,
+    )
     migrator.do_migration(projects=args.projects)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

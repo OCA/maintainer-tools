@@ -96,41 +96,44 @@ from . import oca_projects
 from .config import read_config
 from github3.exceptions import NotFoundError
 
-MANIFESTS = ('__openerp__.py', '__manifest__.py')
+MANIFESTS = ("__openerp__.py", "__manifest__.py")
 
 
 class BranchMigrator(object):
     def __init__(self, source, target, target_org=None, email=None):
         # Read config
         config = read_config()
-        self.gh_token = config.get('GitHub', 'token')
+        self.gh_token = config.get("GitHub", "token")
         # Connect to GitHub
         self.github = github_login.login()
         gh_user = self.github.me()
         if not gh_user.email and not email:
             raise Exception(
-                'Email required to commit to github. Please provide one on '
-                'the command line or make the one of your github profile '
-                'public.')
-        self.gh_credentials = {'name': gh_user.name or str(gh_user),
-                               'email': gh_user.email or email}
+                "Email required to commit to github. Please provide one on "
+                "the command line or make the one of your github profile "
+                "public."
+            )
+        self.gh_credentials = {
+            "name": gh_user.name or str(gh_user),
+            "email": gh_user.email or email,
+        }
         self.gh_source_branch = source
         self.gh_target_branch = target
-        self.gh_org = target_org or 'OCA'
+        self.gh_org = target_org or "OCA"
 
     def _replace_content(self, repo, path, replace_list, gh_file=None):
         if not gh_file:
             # Re-read path for retrieving content
             gh_file = repo.file_contents(path, self.gh_source_branch)
-        content = gh_file.decoded.decode('utf-8')
+        content = gh_file.decoded.decode("utf-8")
         for replace in replace_list:
             content = re.sub(replace[0], replace[1], content, flags=re.DOTALL)
-        new_file_blob = repo.create_blob(content, encoding='utf-8')
+        new_file_blob = repo.create_blob(content, encoding="utf-8")
         return {
-            'path': path,
-            'mode': '100644',
-            'type': 'blob',
-            'sha': new_file_blob,
+            "path": path,
+            "mode": "100644",
+            "type": "blob",
+            "sha": new_file_blob,
         }
 
     def _create_commit(self, repo, tree_data, message, use_sha=True):
@@ -152,8 +155,11 @@ class BranchMigrator(object):
             parents = []
         tree = repo.create_tree(tree_data, tree_sha)
         commit = repo.create_commit(
-            message=message, tree=tree.sha, parents=parents,
-            author=self.gh_credentials, committer=self.gh_credentials,
+            message=message,
+            tree=tree.sha,
+            parents=parents,
+            author=self.gh_credentials,
+            committer=self.gh_credentials,
         )
         return commit
 
@@ -162,42 +168,45 @@ class BranchMigrator(object):
         branch.
         """
         tree_data = []
-        source_string = self.gh_source_branch.replace('.', r'\.')
+        source_string = self.gh_source_branch.replace(".", r"\.")
         target_string = self.gh_target_branch
-        source_string_dash = self.gh_source_branch.replace('.', '-')
-        target_string_dash = self.gh_target_branch.replace('.', '-')
+        source_string_dash = self.gh_source_branch.replace(".", "-")
+        target_string_dash = self.gh_target_branch.replace(".", "-")
         REPLACES = {
-            'README.md': {
+            "README.md": {
                 None: [
                     (source_string, target_string),
                     (source_string_dash, target_string_dash),
                     (r"\[//]: # \(addons\).*\[//]: # \(end addons\)", ""),
                 ],
             },
-            '.travis.yml': {
+            ".travis.yml": {
                 None: [
                     (source_string, target_string),
                     (source_string_dash, target_string_dash),
-                    (r"(?i)([^\n]+ODOO_REPO=['\"]ODOO[^\n]+)\n([^\n]+"
-                     r"ODOO_REPO=['\"]oca\/ocb[^\n]+)", r'\2\n\1'),
+                    (
+                        r"(?i)([^\n]+ODOO_REPO=['\"]ODOO[^\n]+)\n([^\n]+"
+                        r"ODOO_REPO=['\"]oca\/ocb[^\n]+)",
+                        r"\2\n\1",
+                    ),
                 ],
-                u'11.0': [
+                "11.0": [
                     ("2.7", "3.5"),
-                    (r'(?m)virtualenv:.*\n.*system_site_packages: true\n', ''),
+                    (r"(?m)virtualenv:.*\n.*system_site_packages: true\n", ""),
                 ],
-                u'12.0': [
-                    (r'addons:\n', r'addons:\n  postgresql: "9.6"'),
+                "12.0": [
+                    (r"addons:\n", r'addons:\n  postgresql: "9.6"'),
                 ],
             },
-            '.gitignore': {
+            ".gitignore": {
                 None: [],
             },
-            'CONTRIBUTING.md': {
+            "CONTRIBUTING.md": {
                 None: [],
             },
-            'LICENSE': {
+            "LICENSE": {
                 None: [],
-            }
+            },
         }
         for filename in REPLACES:
             if not root_contents.get(filename):
@@ -209,7 +218,10 @@ class BranchMigrator(object):
                 replaces += REPLACES[filename][version]
             tree_data.append(self._replace_content(repo, filename, replaces))
         commit = self._create_commit(
-            repo, tree_data, "[MIG] Add metafiles\n\n[skip ci]", use_sha=False,
+            repo,
+            tree_data,
+            "[MIG] Add metafiles\n\n[skip ci]",
+            use_sha=False,
         )
         return commit
 
@@ -233,11 +245,14 @@ class BranchMigrator(object):
             print("Branch already exists. Skipping...")
             return
         root_contents = repo.directory_contents(
-            '', self.gh_source_branch, return_as=dict,
+            "",
+            self.gh_source_branch,
+            return_as=dict,
         )
         commit = self._create_metafiles(repo, root_contents)
         repo.create_ref(
-            'refs/heads/%s' % self.gh_target_branch, commit.sha,
+            "refs/heads/%s" % self.gh_target_branch,
+            commit.sha,
         )
         # TODO: GitHub is returning 404
         # self._make_default_branch(repo)
@@ -251,32 +266,51 @@ class BranchMigrator(object):
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description='Migrate one OCA branch from one version to another, '
-                    'applying the needed transformations',
-        add_help=True)
-    parser.add_argument('source', help="Source branch (existing)")
-    parser.add_argument('target', help="Target branch (to create)")
+        description="Migrate one OCA branch from one version to another, "
+        "applying the needed transformations",
+        add_help=True,
+    )
+    parser.add_argument("source", help="Source branch (existing)")
+    parser.add_argument("target", help="Target branch (to create)")
     parser.add_argument(
-        '-p', '--projects', dest='projects', nargs='+',
-        default=[], help='List of specific projects to migrate')
+        "-p",
+        "--projects",
+        dest="projects",
+        nargs="+",
+        default=[],
+        help="List of specific projects to migrate",
+    )
     parser.add_argument(
-        '-e', '--email', dest='email',
-        help=('Provides an email address used to commit on GitHub if the one '
-              'associated to the GitHub account is not public'))
+        "-e",
+        "--email",
+        dest="email",
+        help=(
+            "Provides an email address used to commit on GitHub if the one "
+            "associated to the GitHub account is not public"
+        ),
+    )
     parser.add_argument(
-        '-t', '--target-org', dest='target_org',
-        help=('By default, the GitHub organization used is OCA. This arg lets '
-              'you provide an alternative organization'))
+        "-t",
+        "--target-org",
+        dest="target_org",
+        help=(
+            "By default, the GitHub organization used is OCA. This arg lets "
+            "you provide an alternative organization"
+        ),
+    )
     return parser
 
 
 def main():
     args = get_parser().parse_args()
     migrator = BranchMigrator(
-        source=args.source, target=args.target, target_org=args.target_org,
-        email=args.email)
+        source=args.source,
+        target=args.target,
+        target_org=args.target_org,
+        email=args.email,
+    )
     migrator.do_migration(projects=args.projects)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

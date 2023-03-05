@@ -18,8 +18,6 @@
     "depends": [
         "base",
     ],
-    "data": [
-    ],
-    "demo": [
-    ],
+    "data": [],
+    "demo": [],
 }

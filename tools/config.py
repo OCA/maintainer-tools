@@ -6,7 +6,7 @@ import configparser
 import os
 import re
 
-CREDENTIALS_FILE = 'oca.cfg'
+CREDENTIALS_FILE = "oca.cfg"
 
 
 def init_config():
@@ -21,7 +21,8 @@ def init_config():
     config.set("apps.odoo.com", "username", "")
     config.set("apps.odoo.com", "password", "")
     config.set(
-        "apps.odoo.com", "chromedriver_path",
+        "apps.odoo.com",
+        "chromedriver_path",
         "/usr/lib/chromium-browser/chromedriver",
     )
     write_config(config)
@@ -36,51 +37,51 @@ def read_config():
 
 
 def write_config(config):
-    with open(CREDENTIALS_FILE, 'w') as fd:
+    with open(CREDENTIALS_FILE, "w") as fd:
         config.write(fd)
 
 
 NOT_ADDONS = {
-    '.github',
-    'ansible-odoo',
-    'connector-magento-php-extension',
-    'contribute-md-template',
-    'maintainer-quality-tools',
-    'maintainer-tools',
-    'mirrors-flake8',
-    'oca-addons-repo-template',
-    'oca-ci',
-    'oca-custom',
-    'oca-decorators',
-    'oca-github-bot',
-    'oca-port',
-    'oca-weblate-deployment',
-    'OCB',
-    'odoo-community.org',
-    'odoo-module-migrator',
-    'odoo-pre-commit-hooks',
-    'odoo-sentinel',
-    'odoo-sphinx-autodoc',
-    'odoorpc',
-    'OpenUpgrade',
-    'openupgradelib',
-    'pylint-odoo',
+    ".github",
+    "ansible-odoo",
+    "connector-magento-php-extension",
+    "contribute-md-template",
+    "maintainer-quality-tools",
+    "maintainer-tools",
+    "mirrors-flake8",
+    "oca-addons-repo-template",
+    "oca-ci",
+    "oca-custom",
+    "oca-decorators",
+    "oca-github-bot",
+    "oca-port",
+    "oca-weblate-deployment",
+    "OCB",
+    "odoo-community.org",
+    "odoo-module-migrator",
+    "odoo-pre-commit-hooks",
+    "odoo-sentinel",
+    "odoo-sphinx-autodoc",
+    "odoorpc",
+    "OpenUpgrade",
+    "openupgradelib",
+    "pylint-odoo",
 }
 
 
 # deprecated, use is_main_branch() instead
 MAIN_BRANCHES = (
-    '6.1',
-    '7.0',
-    '8.0',
-    '9.0',
-    '10.0',
-    '11.0',
-    '12.0',
-    '13.0',
-    '14.0',
-    '15.0',
-    '16.0',
+    "6.1",
+    "7.0",
+    "8.0",
+    "9.0",
+    "10.0",
+    "11.0",
+    "12.0",
+    "13.0",
+    "14.0",
+    "15.0",
+    "16.0",
 )
 
 
