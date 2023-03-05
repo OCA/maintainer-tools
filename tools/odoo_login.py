@@ -7,16 +7,16 @@ import os
 import sys
 import erppeek
 from getpass import getpass
-from . config import read_config, write_config
+from .config import read_config, write_config
 
 
-ODOO_URL = os.environ.get('ODOO_URL', 'https://odoo-community.org')
-ODOO_DB = os.environ.get('ODOO_DB', 'odoo_community_prod')
+ODOO_URL = os.environ.get("ODOO_URL", "https://odoo-community.org")
+ODOO_DB = os.environ.get("ODOO_DB", "odoo_community_prod")
 
 
 def login(username, store):
     if username:
-        password = getpass('Password for {0}: '.format(username))
+        password = getpass("Password for {0}: ".format(username))
         if store:
             config = read_config()
             config.set("odoo", "username", username)
@@ -30,9 +30,11 @@ def login(username, store):
             username = config.get("odoo", "username")
             password = config.get("odoo", "password")
         if not (username and password):
-            sys.exit("You must provide a Odoo username and password "
-                     "in the configuration file or with ODOO_USER and "
-                     "ODOO_PASSWORD environment variables.")
+            sys.exit(
+                "You must provide a Odoo username and password "
+                "in the configuration file or with ODOO_USER and "
+                "ODOO_PASSWORD environment variables."
+            )
 
     client = erppeek.Client(ODOO_URL)
     # workaround to connect on saas:
@@ -44,14 +46,19 @@ def login(username, store):
 
 def get_parser(with_help=False):
     parser = argparse.ArgumentParser(add_help=with_help)
-    group = parser.add_argument_group('odoo options')
-    group.add_argument("-u", "--username",
-                       help="Odoo Username. When a username is not provided,"
-                            " it will read the configuration file.")
-    group.add_argument("--store",
-                       action='store_true',
-                       help="Store the username and password in a "
-                            "configuration file. Warning, clear text!"),
+    group = parser.add_argument_group("odoo options")
+    group.add_argument(
+        "-u",
+        "--username",
+        help="Odoo Username. When a username is not provided,"
+        " it will read the configuration file.",
+    )
+    group.add_argument(
+        "--store",
+        action="store_true",
+        help="Store the username and password in a "
+        "configuration file. Warning, clear text!",
+    ),
     return parser
 
 
@@ -61,5 +68,5 @@ def main():
     login(args.username, args.store)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

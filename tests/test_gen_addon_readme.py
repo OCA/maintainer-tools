@@ -66,15 +66,15 @@ def test_rst_error(tmp_path):
     addon_dir = tmp_path / "addon"
     addon_dir.mkdir()
     with (addon_dir / "__manifest__.py").open("w") as f:
-        f.write(u"{'name': 'addon'}")
+        f.write("{'name': 'addon'}")
     with (addon_dir / "__init__.py").open("w") as f:
         pass
     readme_dir = addon_dir / "readme"
     readme_dir.mkdir()
     with (readme_dir / "DESCRIPTION.rst").open("w") as f:
-        f.write(u"Some description.")
+        f.write("Some description.")
     with (readme_dir / "USAGE.rst").open("w") as f:
-        f.write(u"Usage\n-----\n\nblah.\n")
+        f.write("Usage\n-----\n\nblah.\n")
     cmd = [
         sys.executable,
         "-m",

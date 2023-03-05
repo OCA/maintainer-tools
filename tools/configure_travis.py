@@ -44,9 +44,7 @@ class Travis(object):
     def set_env_vars(self, org, repo, vars):
         repo_slug = f"{org}%2F{repo}"
         existing_vars = self.get(f"/repo/github/{repo_slug}/env_vars")
-        existing_vars_by_name = {
-            v["name"]: v for v in existing_vars["env_vars"]
-        }
+        existing_vars_by_name = {v["name"]: v for v in existing_vars["env_vars"]}
         for var_name, var_value in vars.items():
             json = {
                 "env_var.name": var_name,

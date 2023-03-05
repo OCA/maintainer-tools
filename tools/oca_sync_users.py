@@ -10,7 +10,7 @@ from __future__ import absolute_import, print_function
 
 import xmlrpclib
 
-from . odoo_login import login, get_parser
+from .odoo_login import login, get_parser
 
 
 def main():
@@ -20,25 +20,29 @@ def main():
     ResPartner = client.ResPartner
     ResUsers = client.ResUsers
     ResGroups = client.ResGroups
-    grp_project_user = ResGroups.get('project.group_project_user')
-    members_with_gh = ResPartner.search([('x_github_login', '!=', False),
-                                         ('user_ids', '=', False)])
+    grp_project_user = ResGroups.get("project.group_project_user")
+    members_with_gh = ResPartner.search(
+        [("x_github_login", "!=", False), ("user_ids", "=", False)]
+    )
     if not members_with_gh:
         return
     for partner in ResPartner.browse(members_with_gh):
         try:
-            user = ResUsers.create({'partner_id': partner.id,
-                                    'login': partner.email,
-                                    'groups_id': [(4, grp_project_user.id, 0)],
-                                    })
+            user = ResUsers.create(
+                {
+                    "partner_id": partner.id,
+                    "login": partner.email,
+                    "groups_id": [(4, grp_project_user.id, 0)],
+                }
+            )
         except xmlrpclib.Fault:
-            print('unable to create user for partner %r (%s) : '
-                  'probable email address issue' % (partner.x_github_login,
-                                                    partner.id))
+            print(
+                "unable to create user for partner %r (%s) : "
+                "probable email address issue" % (partner.x_github_login, partner.id)
+            )
         else:
-            print(u'created user %r for partner %r' % (user,
-                                                       partner.x_github_login))
+            print("created user %r for partner %r" % (user, partner.x_github_login))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -33,12 +33,12 @@ ALL_LABELS = {
     "no stale": (
         "524D44",
         "Use this label to prevent the automated stale action "
-        "from closing this PR/Issue."
+        "from closing this PR/Issue.",
     ),
     "stale": (
         "006B75",
-        "PR/Issue without recent activity, it'll be soon closed automatically."
-    )
+        "PR/Issue without recent activity, it'll be soon closed automatically.",
+    ),
 }
 
 
@@ -47,10 +47,7 @@ def main():
     for repo in gh.repositories_by("OCA"):
         if repo.name in REPO_TO_IGNORE:
             continue
-        repo_labels = {
-            label.name.lower(): label
-            for label in repo.labels()
-        }
+        repo_labels = {label.name.lower(): label for label in repo.labels()}
         target_labels = set(ALL_LABELS.keys())
         existing_labels = set(repo_labels.keys())
         labels_to_update = target_labels & existing_labels
@@ -85,5 +82,5 @@ def main():
             repo.create_label(label_name, label_color, label_description)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

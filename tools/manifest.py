@@ -4,7 +4,7 @@
 import ast
 import os
 
-MANIFEST_NAMES = ('__manifest__.py', '__openerp__.py', '__terp__.py')
+MANIFEST_NAMES = ("__manifest__.py", "__openerp__.py", "__terp__.py")
 
 
 class NoManifestFound(Exception):
@@ -31,13 +31,13 @@ def read_manifest(addon_dir):
 
 
 def find_addons(addons_dir, installable_only=True):
-    """ yield (addon_name, addon_dir, manifest) """
+    """yield (addon_name, addon_dir, manifest)"""
     for addon_name in os.listdir(addons_dir):
         addon_dir = os.path.join(addons_dir, addon_name)
         try:
             manifest = read_manifest(addon_dir)
         except NoManifestFound:
             continue
-        if installable_only and not manifest.get('installable', True):
+        if installable_only and not manifest.get("installable", True):
             continue
         yield addon_name, addon_dir, manifest
