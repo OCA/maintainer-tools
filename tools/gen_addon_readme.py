@@ -287,7 +287,7 @@ def gen_one_addon_index(readme_filename):
     "--template-filename",
     default=os.path.join(
         os.path.dirname(__file__),
-        "gen_addon_readme.template",
+        "gen_addon_readme.rst.jinja",
     ),
     help="Template file to use.",
 )
