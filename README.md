@@ -89,6 +89,8 @@ will create two remotes, in addition to the default `origin`, called
 OCA projects. It does not matter whether the forks exist on github or not, and
 you can create them later.
 
+TIP to update branch in shell at once: `ls | xargs -I % sh -c 'cd %; git pull origin branch_number; cd ..'`
+
 
 ## Quality tools
 
