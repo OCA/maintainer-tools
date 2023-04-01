@@ -312,7 +312,7 @@ def _source_digest_match(readme_filename, source_digest):
     "--template-filename",
     default=os.path.join(
         os.path.dirname(__file__),
-        "gen_addon_readme.template",
+        "gen_addon_readme.rst.jinja",
     ),
     help="Template file to use.",
 )
