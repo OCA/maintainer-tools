@@ -168,9 +168,16 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
 
 
 def gen_one_addon_readme(
-    org_name, repo_name, branch, addon_name, addon_dir, manifest, template_filename
+    org_name,
+    repo_name,
+    branch,
+    addon_name,
+    addon_dir,
+    manifest,
+    template_filename,
+    readme_filename,
+    source_digest,
 ):
-    source_digest = dir_hash(os.path.join(addon_dir, FRAGMENTS_DIR))
     fragments = {}
     for fragment_name in FRAGMENTS:
         fragment_filename = os.path.join(
@@ -205,7 +212,6 @@ def gen_one_addon_readme(
         # maintainers section
     ]
     # generate
-    readme_filename = os.path.join(addon_dir, "README.rst")
     with open(template_filename, "r", encoding="utf8") as tf:
         template = Template(tf.read())
     with open(readme_filename, "w", encoding="utf8") as rf:
@@ -223,7 +229,6 @@ def gen_one_addon_readme(
                 source_digest=source_digest,
             )
         )
-    return readme_filename
 
 
 def check_rst(readme_filename):
@@ -265,6 +270,17 @@ def gen_one_addon_index(readme_filename):
     return index_filename
 
 
+def _source_digest_match(readme_filename, source_digest):
+    if not os.path.isfile(readme_filename):
+        return False
+    digest_comment = f"!! source digest: {source_digest}"
+    with open(readme_filename, "r", encoding="utf8") as f:
+        for line in f:
+            if digest_comment in line:
+                return True
+    return False
+
+
 @click.command()
 @click.option("--org-name", default="OCA", help="Organization name, eg. OCA.")
 @click.option("--repo-name", required=True, help="Repository name, eg. server-tools.")
@@ -281,6 +297,12 @@ def gen_one_addon_index(readme_filename):
     type=click.Path(dir_okay=True, file_okay=False, exists=True),
     help="Directory containing several addons, the README will be "
     "generated for all installable addons found there.",
+)
+@click.option(
+    "--if-fragments-changed",
+    is_flag=True,
+    default=False,
+    help="Only generate if source fragment changed.",
 )
 @click.option("--commit/--no-commit", help="git commit changes to README.rst, if any.")
 @click.option(
@@ -303,6 +325,7 @@ def gen_addon_readme(
     commit,
     gen_html,
     template_filename,
+    if_fragments_changed,
 ):
     """Generate README.rst from fragments.
 
@@ -322,11 +345,15 @@ def gen_addon_readme(
         addons.append((addon_name, addon_dir, manifest))
     readme_filenames = []
     for addon_name, addon_dir, manifest in addons:
-        if not os.path.exists(
-            os.path.join(addon_dir, FRAGMENTS_DIR, "DESCRIPTION.rst")
-        ):
+        fragments_dir = os.path.join(addon_dir, FRAGMENTS_DIR)
+        if not os.path.exists(os.path.join(fragments_dir, "DESCRIPTION.rst")):
             continue
-        readme_filename = gen_one_addon_readme(
+        readme_filename = os.path.join(addon_dir, "README.rst")
+        source_digest = dir_hash(fragments_dir)
+        if if_fragments_changed:
+            if _source_digest_match(readme_filename, source_digest):
+                continue
+        gen_one_addon_readme(
             org_name,
             repo_name,
             branch,
@@ -334,6 +361,8 @@ def gen_addon_readme(
             addon_dir,
             manifest,
             template_filename,
+            readme_filename,
+            source_digest,
         )
         check_rst(readme_filename)
         readme_filenames.append(readme_filename)
