@@ -13,6 +13,7 @@ from jinja2 import Template
 
 from .gitutils import commit_if_needed
 from .manifest import read_manifest, find_addons, NoManifestFound
+from ._hash import dir_hash
 
 if sys.version_info[0] < 3:
     # python 2 import
@@ -169,6 +170,7 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
 def gen_one_addon_readme(
     org_name, repo_name, branch, addon_name, addon_dir, manifest, template_filename
 ):
+    source_digest = dir_hash(os.path.join(addon_dir, FRAGMENTS_DIR))
     fragments = {}
     for fragment_name in FRAGMENTS:
         fragment_filename = os.path.join(
@@ -218,6 +220,7 @@ def gen_one_addon_readme(
                 org_name=org_name,
                 repo_name=repo_name,
                 development_status=development_status,
+                source_digest=source_digest,
             )
         )
     return readme_filename
