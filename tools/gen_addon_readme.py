@@ -12,8 +12,8 @@ from docutils.core import publish_file
 from jinja2 import Template
 
 from .gitutils import commit_if_needed
-from .manifest import read_manifest, find_addons, NoManifestFound
-from ._hash import dir_hash
+from .manifest import get_manifest_path, read_manifest, find_addons, NoManifestFound
+from ._hash import hash
 
 if sys.version_info[0] < 3:
     # python 2 import
@@ -349,7 +349,9 @@ def gen_addon_readme(
         if not os.path.exists(os.path.join(fragments_dir, "DESCRIPTION.rst")):
             continue
         readme_filename = os.path.join(addon_dir, "README.rst")
-        source_digest = dir_hash(fragments_dir)
+        source_digest = hash(
+            get_manifest_path(addon_dir), fragments_dir, relative_to=addon_dir
+        )
         if if_fragments_changed:
             if _source_digest_match(readme_filename, source_digest):
                 continue
