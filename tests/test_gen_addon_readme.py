@@ -44,6 +44,37 @@ def test_gen_addon_readme_oca(addons_dir):
     _assert_expected(addons_dir, "oca")
 
 
+def test_gen_addon_readme_if_fragments_changed(addons_dir):
+    cmd = [
+        sys.executable,
+        "-m",
+        "tools.gen_addon_readme",
+        "--addon-dir",
+        "addon1",
+        "--repo-name",
+        "server-tools",
+        "--branch",
+        "12.0",
+    ]
+    readme_filename = os.path.join(addons_dir, "addon1", "README.rst")
+    assert not os.path.exists(readme_filename)
+    subprocess.check_call([*cmd, "--if-fragments-changed"], cwd=str(addons_dir))
+    assert os.path.exists(readme_filename)
+    # append something to the README file
+    with open(readme_filename, "a") as readme_file:
+        readme_file.write("trailer")
+    # check the file is not regenerated
+    subprocess.check_call([*cmd, "--if-fragments-changed"], cwd=str(addons_dir))
+    with open(readme_filename) as readme_file:
+        assert readme_file.read().endswith("trailer")
+    # change something and check the file is regenerated
+    with open(os.path.join(addons_dir, "addon1", "readme", "CHUNK.rst"), "w") as f:
+        f.write("CHUNK")
+    subprocess.check_call([*cmd, "--if-fragments-changed"], cwd=str(addons_dir))
+    with open(readme_filename) as readme_file:
+        assert not readme_file.read().endswith("trailer")
+
+
 def test_gen_addon_readme_acme(addons_dir):
     cmd = [
         sys.executable,

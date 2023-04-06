@@ -12,7 +12,8 @@ from docutils.core import publish_file
 from jinja2 import Template
 
 from .gitutils import commit_if_needed
-from .manifest import read_manifest, find_addons, NoManifestFound
+from .manifest import get_manifest_path, read_manifest, find_addons, NoManifestFound
+from ._hash import hash
 
 if sys.version_info[0] < 3:
     # python 2 import
@@ -167,7 +168,15 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
 
 
 def gen_one_addon_readme(
-    org_name, repo_name, branch, addon_name, addon_dir, manifest, template_filename
+    org_name,
+    repo_name,
+    branch,
+    addon_name,
+    addon_dir,
+    manifest,
+    template_filename,
+    readme_filename,
+    source_digest,
 ):
     fragments = {}
     for fragment_name in FRAGMENTS:
@@ -203,7 +212,6 @@ def gen_one_addon_readme(
         # maintainers section
     ]
     # generate
-    readme_filename = os.path.join(addon_dir, "README.rst")
     with open(template_filename, "r", encoding="utf8") as tf:
         template = Template(tf.read())
     with open(readme_filename, "w", encoding="utf8") as rf:
@@ -218,9 +226,9 @@ def gen_one_addon_readme(
                 org_name=org_name,
                 repo_name=repo_name,
                 development_status=development_status,
+                source_digest=source_digest,
             )
         )
-    return readme_filename
 
 
 def check_rst(readme_filename):
@@ -262,6 +270,17 @@ def gen_one_addon_index(readme_filename):
     return index_filename
 
 
+def _source_digest_match(readme_filename, source_digest):
+    if not os.path.isfile(readme_filename):
+        return False
+    digest_comment = f"!! source digest: {source_digest}"
+    with open(readme_filename, "r", encoding="utf8") as f:
+        for line in f:
+            if digest_comment in line:
+                return True
+    return False
+
+
 @click.command()
 @click.option("--org-name", default="OCA", help="Organization name, eg. OCA.")
 @click.option("--repo-name", required=True, help="Repository name, eg. server-tools.")
@@ -279,6 +298,12 @@ def gen_one_addon_index(readme_filename):
     help="Directory containing several addons, the README will be "
     "generated for all installable addons found there.",
 )
+@click.option(
+    "--if-fragments-changed",
+    is_flag=True,
+    default=False,
+    help="Only generate if source fragment changed.",
+)
 @click.option("--commit/--no-commit", help="git commit changes to README.rst, if any.")
 @click.option(
     "--gen-html/--no-gen-html", default=True, help="Generate index html file."
@@ -287,7 +312,7 @@ def gen_one_addon_index(readme_filename):
     "--template-filename",
     default=os.path.join(
         os.path.dirname(__file__),
-        "gen_addon_readme.template",
+        "gen_addon_readme.rst.jinja",
     ),
     help="Template file to use.",
 )
@@ -300,6 +325,7 @@ def gen_addon_readme(
     commit,
     gen_html,
     template_filename,
+    if_fragments_changed,
 ):
     """Generate README.rst from fragments.
 
@@ -319,11 +345,17 @@ def gen_addon_readme(
         addons.append((addon_name, addon_dir, manifest))
     readme_filenames = []
     for addon_name, addon_dir, manifest in addons:
-        if not os.path.exists(
-            os.path.join(addon_dir, FRAGMENTS_DIR, "DESCRIPTION.rst")
-        ):
+        fragments_dir = os.path.join(addon_dir, FRAGMENTS_DIR)
+        if not os.path.exists(os.path.join(fragments_dir, "DESCRIPTION.rst")):
             continue
-        readme_filename = gen_one_addon_readme(
+        readme_filename = os.path.join(addon_dir, "README.rst")
+        source_digest = hash(
+            get_manifest_path(addon_dir), fragments_dir, relative_to=addon_dir
+        )
+        if if_fragments_changed:
+            if _source_digest_match(readme_filename, source_digest):
+                continue
+        gen_one_addon_readme(
             org_name,
             repo_name,
             branch,
@@ -331,6 +363,8 @@ def gen_addon_readme(
             addon_dir,
             manifest,
             template_filename,
+            readme_filename,
+            source_digest,
         )
         check_rst(readme_filename)
         readme_filenames.append(readme_filename)
