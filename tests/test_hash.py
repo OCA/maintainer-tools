@@ -17,6 +17,10 @@ def test_hash(tmp_path):
     dir2.mkdir()
     populate(dir2)
     assert hash(dir2, relative_to=dir2) == digest
+    # add dotfile (ignored, so no hash change)
+    dir2.joinpath("newfragments").mkdir()
+    dir2.joinpath("newfragments", ".gitignore").touch()
+    assert hash(dir2, relative_to=dir2) == digest
     # add empty file
     dir2.joinpath("e").touch()
     assert hash(dir2, relative_to=dir2) != digest

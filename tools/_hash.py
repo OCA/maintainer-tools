@@ -19,6 +19,8 @@ def _walk(*args, relative_to):
                 if reldir == ".":
                     reldir = ""
                 for filename in sorted(filenames):
+                    if filename.startswith("."):
+                        continue
                     yield os.path.join(reldir, filename)
         else:
             raise ValueError("Not a file or directory: %r" % arg)
