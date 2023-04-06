@@ -5,6 +5,8 @@ Create and modify labels on github to have same labels and same color
 on all repo
 """
 from __future__ import print_function
+import click
+
 from .github_login import login
 
 REPO_TO_IGNORE = [
@@ -42,44 +44,60 @@ ALL_LABELS = {
 }
 
 
-def main():
+@click.command()
+@click.option("--org", default="OCA")
+@click.option("--repos", required=False)
+def main(
+    org: str,
+    repos: str,
+) -> None:
     gh = login()
-    for repo in gh.repositories_by("OCA"):
-        if repo.name in REPO_TO_IGNORE:
-            continue
-        repo_labels = {label.name.lower(): label for label in repo.labels()}
-        target_labels = set(ALL_LABELS.keys())
-        existing_labels = set(repo_labels.keys())
-        labels_to_update = target_labels & existing_labels
-        labels_to_create = target_labels - existing_labels
-        # Report if extra labels are found, nothing to do though
-        extra_labels = existing_labels - target_labels
-        for label_name in extra_labels:
-            print(f"Found extra label '{repo_labels[label_name].name}' in {repo.name}")
-        # Check existing labels
-        for label_name in labels_to_update:
-            label_color, label_description = ALL_LABELS[label_name]
-            repo_label = repo_labels[label_name]
-            if (
-                repo_label.name != label_name
-                or repo_label.color != label_color
-                or (
-                    label_description is not None
-                    and repo_label.description != label_description
-                )
-            ):
-                print(
-                    f"Updating label '{repo_label.name}' -> '{label_name}', "
-                    f"'{repo_label.color}' -> '{label_color}', "
-                    f"'{repo_label.description}' -> '{label_description}' "
-                    f"in {repo.name}"
-                )
-                repo_label.update(label_name, label_color, label_description)
-        # Create labels
-        for label_name in labels_to_create:
-            label_color, label_description = ALL_LABELS[label_name]
-            print(f"Creating label '{label_name}' in {repo.name}")
-            repo.create_label(label_name, label_color, label_description)
+    repos = repos.split(",") if repos else []
+    if repos:
+        for repo_name in repos:
+            repo = gh.repository(org, repo_name)
+            _update_labels(repo)
+    else:
+        for repo in gh.repositories_by(org):
+            if repo.name in REPO_TO_IGNORE:
+                continue
+            _update_labels(repo)
+
+
+def _update_labels(repo):
+    repo_labels = {label.name.lower(): label for label in repo.labels()}
+    target_labels = set(ALL_LABELS.keys())
+    existing_labels = set(repo_labels.keys())
+    labels_to_update = target_labels & existing_labels
+    labels_to_create = target_labels - existing_labels
+    # Report if extra labels are found, nothing to do though
+    extra_labels = existing_labels - target_labels
+    for label_name in extra_labels:
+        print(f"Found extra label '{repo_labels[label_name].name}' in {repo.name}")
+    # Check existing labels
+    for label_name in labels_to_update:
+        label_color, label_description = ALL_LABELS[label_name]
+        repo_label = repo_labels[label_name]
+        if (
+            repo_label.name != label_name
+            or repo_label.color != label_color
+            or (
+                label_description is not None
+                and repo_label.description != label_description
+            )
+        ):
+            print(
+                f"Updating label '{repo_label.name}' -> '{label_name}', "
+                f"'{repo_label.color}' -> '{label_color}', "
+                f"'{repo_label.description}' -> '{label_description}' "
+                f"in {repo.name}"
+            )
+            repo_label.update(label_name, label_color, label_description)
+    # Create labels
+    for label_name in labels_to_create:
+        label_color, label_description = ALL_LABELS[label_name]
+        print(f"Creating label '{label_name}' in {repo.name}")
+        repo.create_label(label_name, label_color, label_description)
 
 
 if __name__ == "__main__":
