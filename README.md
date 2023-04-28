@@ -114,6 +114,8 @@ The result will be a fully PyPI compliant README.rst in the root of your module.
 You may also use this script for your own repositories by specifying this
 additional argument `--org-name=myorganisation`
 
+NOTE: You need the ```readme``` folder into addon-dir for correctly generation of README file
+some files that maybe put in directory readme are: CONFIGURE.rst, CONTRIBUTORS.rst, etc.
 
 ### Changelog generator using towncrier
 
