@@ -23,7 +23,7 @@ def _assert_expected(addons_dir, suffix):
         if not os.path.isdir(addon_dir):
             continue
         actual = os.path.join(addon_dir, "README.rst")
-        expected = os.path.join(addon_dir, "README.expected-" + suffix)
+        expected = os.path.join(addon_dir, "README.expected-" + suffix + ".rst")
         with open(actual) as actual_f, open(expected) as expected_f:
             assert actual_f.read() == expected_f.read()
 
