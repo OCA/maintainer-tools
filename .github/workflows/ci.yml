@@ -36,9 +36,10 @@ jobs:
         run: python -m pip install tox tox-gh-actions
       - name: "Run tox targets for ${{ matrix.python-version }}"
         run: python -m tox
+      # lcov support not available in python 3.6
+      - name: "Generate lcov report"
+        run: python -m pip install coverage && python -m coverage lcov
+        if: ${{ matrix.python-version != '3.6' }}
       - name: Coveralls
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python -m pip install coveralls
-          coveralls --service=github
+        uses: coverallsapp/github-action@v2
+        if: ${{ matrix.python-version != '3.6' }}
