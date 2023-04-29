@@ -105,7 +105,7 @@ RST2HTML_SETTINGS = {
 def make_runboat_badge(repo, branch):
     return (
         "https://img.shields.io/badge/runboat-Try%20me-875A7B.png",
-        "https://runboat.odoo-community.org/webui/builds.html?"
+        "https://runboat.odoo-community.org/builds?"
         "repo=OCA/{repo}&target_branch={branch}".format(**locals()),
         "Try me on Runboat",
     )
