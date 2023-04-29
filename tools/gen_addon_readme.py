@@ -2,14 +2,17 @@
 # Copyright (c) 2018 ACSONE SA/NV
 # Copyright (c) 2018 GRAP (http://www.grap.coop)
 
+import atexit
 import os
 import re
 import sys
 import tempfile
+from typing import Union, Literal
 
 import click
 from docutils.core import publish_file
 from jinja2 import Template
+import pypandoc
 
 from .gitutils import commit_if_needed
 from .manifest import get_manifest_path, read_manifest, find_addons, NoManifestFound
@@ -169,6 +172,64 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
     return fragment
 
 
+def make_fragment_filename(
+    addon_dir: str, fragment_name: str, format: Literal[".md", ".rst"]
+) -> str:
+    return os.path.join(
+        addon_dir,
+        FRAGMENTS_DIR,
+        fragment_name + format,
+    )
+
+
+def safe_remove(filename: str) -> None:
+    try:
+        os.remove(filename)
+    except Exception:
+        pass
+
+
+def prepare_rst_fragment(addon_dir: str, fragment_name: str) -> Union[str, None]:
+    fragment_rst_filename = make_fragment_filename(addon_dir, fragment_name, ".rst")
+    fragment_md_filename = make_fragment_filename(addon_dir, fragment_name, ".md")
+    if os.path.exists(fragment_rst_filename):
+        if os.path.exists(fragment_md_filename):
+            raise SystemExit(
+                f"Both .md and .rst fragment found. Please remove one of "
+                f"{fragment_rst_filename} or {fragment_md_filename}."
+            )
+        return fragment_rst_filename
+    if not os.path.exists(fragment_md_filename):
+        # no .rst nor .md fragment found
+        return None
+    # convert .md to .rst
+    pypandoc.ensure_pandoc_installed()
+    atexit.register(safe_remove, fragment_rst_filename)
+    pypandoc.convert_file(
+        fragment_md_filename,
+        format="gfm",  # GitHub Flavored Markdown
+        to="rst",
+        outputfile=fragment_rst_filename,
+    )
+    return fragment_rst_filename
+
+
+def fragment_exists(addon_dir: str, fragment_name: str) -> bool:
+    return os.path.exists(
+        make_fragment_filename(
+            addon_dir,
+            fragment_name,
+            ".rst",
+        )
+    ) or os.path.exists(
+        make_fragment_filename(
+            addon_dir,
+            fragment_name,
+            ".md",
+        )
+    )
+
+
 def gen_one_addon_readme(
     org_name,
     repo_name,
@@ -182,12 +243,8 @@ def gen_one_addon_readme(
 ):
     fragments = {}
     for fragment_name in FRAGMENTS:
-        fragment_filename = os.path.join(
-            addon_dir,
-            FRAGMENTS_DIR,
-            fragment_name + ".rst",
-        )
-        if os.path.exists(fragment_filename):
+        fragment_filename = prepare_rst_fragment(addon_dir, fragment_name)
+        if fragment_filename:
             with open(fragment_filename, "r", encoding="utf8") as f:
                 fragment = generate_fragment(org_name, repo_name, branch, addon_name, f)
                 if fragment:
@@ -331,9 +388,9 @@ def gen_addon_readme(
 ):
     """Generate README.rst from fragments.
 
-    Do nothing if readme/DESCRIPTION.rst is absent, otherwise overwrite
+    Do nothing if readme/DESCRIPTION(.rst|.md) is absent, otherwise overwrite
     existing README.rst with content generated from the template,
-    fragments (DESCRIPTION.rst, USAGE.rst, etc) and the addon manifest.
+    fragments (DESCRIPTION(.rst|.md), USAGE(.rst|.md), etc) and the addon manifest.
     """
     addons = []
     if addons_dir:
@@ -348,7 +405,7 @@ def gen_addon_readme(
     readme_filenames = []
     for addon_name, addon_dir, manifest in addons:
         fragments_dir = os.path.join(addon_dir, FRAGMENTS_DIR)
-        if not os.path.exists(os.path.join(fragments_dir, "DESCRIPTION.rst")):
+        if not fragment_exists(addon_dir, "DESCRIPTION"):
             continue
         readme_filename = os.path.join(addon_dir, "README.rst")
         source_digest = hash(
