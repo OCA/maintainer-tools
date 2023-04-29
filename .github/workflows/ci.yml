@@ -10,6 +10,8 @@ jobs:
     steps:
       - uses: "actions/checkout@v3"
       - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
       - uses: pre-commit/action@v2.0.3
   tests:
     name: "Test with python ${{ matrix.python-version }} on ${{ matrix.os }}"
