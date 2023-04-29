@@ -31,7 +31,6 @@ setuptools.setup(
         "docutils==0.16.*",
         "ERPpeek",
         "github3.py>=1",
-        "inflection",
         "jinja2",
         "PyYAML",
         "polib",
