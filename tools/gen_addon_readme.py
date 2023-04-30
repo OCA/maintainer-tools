@@ -416,9 +416,14 @@ def _source_digest_match(readme_filename, source_digest):
     default=False,
     help="Only generate if source fragment changed.",
 )
-@click.option("--commit/--no-commit", help="git commit changes to README.rst, if any.")
 @click.option(
-    "--gen-html/--no-gen-html", default=True, help="Generate index html file."
+    "--commit/--no-commit",
+    help="git commit changes to README.rst and index.html, if any.",
+)
+@click.option(
+    "--gen-html/--no-gen-html",
+    default=True,
+    help="Generate index html file.",
 )
 @click.option(
     "--template-filename",
@@ -457,12 +462,13 @@ def gen_addon_readme(
         addons.append((addon_name, addon_dir, manifest))
     readme_filenames = []
     for addon_name, addon_dir, manifest in addons:
-        fragments_dir = os.path.join(addon_dir, FRAGMENTS_DIR)
         if not fragment_exists(addon_dir, "DESCRIPTION"):
             continue
         readme_filename = os.path.join(addon_dir, "README.rst")
         source_digest = hash(
-            get_manifest_path(addon_dir), fragments_dir, relative_to=addon_dir
+            get_manifest_path(addon_dir),
+            os.path.join(addon_dir, FRAGMENTS_DIR),
+            relative_to=addon_dir,
         )
         if if_fragments_changed:
             if _source_digest_match(readme_filename, source_digest):
