@@ -26,20 +26,25 @@ else:
     from urllib.parse import urljoin
 
 
+class FragmentProperties:
+    def __init__(self, level: int):
+        self.level = level
+
+
 FRAGMENTS_DIR = "readme"
 
-FRAGMENTS = (
-    "DESCRIPTION",
-    "CONTEXT",
-    "INSTALL",
-    "CONFIGURE",
-    "USAGE",
-    "ROADMAP",
-    "DEVELOP",
-    "CONTRIBUTORS",
-    "CREDITS",
-    "HISTORY",
-)
+FRAGMENTS = {
+    "DESCRIPTION": FragmentProperties(level=2),
+    "CONTEXT": FragmentProperties(level=2),
+    "INSTALL": FragmentProperties(level=2),
+    "CONFIGURE": FragmentProperties(level=2),
+    "USAGE": FragmentProperties(level=2),
+    "ROADMAP": FragmentProperties(level=2),
+    "DEVELOP": FragmentProperties(level=2),
+    "CONTRIBUTORS": FragmentProperties(level=3),
+    "CREDITS": FragmentProperties(level=3),
+    "HISTORY": FragmentProperties(level=2),
+}
 
 LICENSE_BADGES = {
     "AGPL-3": (
@@ -203,6 +208,7 @@ def prepare_rst_fragment(addon_dir: str, fragment_name: str) -> Union[str, None]
         # no .rst nor .md fragment found
         return None
     # convert .md to .rst
+    fragment_properties = FRAGMENTS[fragment_name]
     pypandoc.ensure_pandoc_installed()
     atexit.register(safe_remove, fragment_rst_filename)
     pypandoc.convert_file(
@@ -210,6 +216,8 @@ def prepare_rst_fragment(addon_dir: str, fragment_name: str) -> Union[str, None]
         format="gfm",  # GitHub Flavored Markdown
         to="rst",
         outputfile=fragment_rst_filename,
+        extra_args=[f"--shift-heading-level-by={fragment_properties.level-2}"],
+        sandbox=True,
     )
     return fragment_rst_filename
 
