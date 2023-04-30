@@ -31,6 +31,8 @@ class FragmentProperties:
         self.level = level
 
 
+FragmentFormat = Literal[".rst", ".md"]
+
 FRAGMENTS_DIR = "readme"
 
 FRAGMENTS = {
@@ -177,8 +179,49 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
     return fragment
 
 
+def get_fragment_format(
+    addon_dir: str, fragment_name: str
+) -> Union[FragmentFormat, None]:
+    """Return the format of the named fragment of the given addon.
+
+    Raise an exception if several formats are found.
+    """
+    fragment_rst_filename = make_fragment_filename(addon_dir, fragment_name, ".rst")
+    fragment_md_filename = make_fragment_filename(addon_dir, fragment_name, ".md")
+    if os.path.exists(fragment_rst_filename):
+        if os.path.exists(fragment_md_filename):
+            raise SystemExit(
+                f"Both .md and .rst found for {fragment_name}. Please remove one"
+                f" of {fragment_rst_filename} or {fragment_md_filename}."
+            )
+        return ".rst"
+    if os.path.exists(fragment_md_filename):
+        return ".md"
+    return None
+
+
+def get_fragments_format(addon_dir: str) -> FragmentFormat:
+    """Return the format of the fragments of the given addon.
+
+    Raise an exception if several formats are found.
+    """
+    fragments_format = None
+    for fragment_name in FRAGMENTS:
+        this_fragment_format = get_fragment_format(addon_dir, fragment_name)
+        if this_fragment_format is None:
+            # fragment does not exist
+            continue
+        if fragments_format and this_fragment_format != fragments_format:
+            raise SystemExit(
+                f"Both .md and .rst fragments found in {addon_dir}/readme. "
+                f"Please ensure the same format is used for all fragments."
+            )
+        fragments_format = this_fragment_format
+    return fragments_format
+
+
 def make_fragment_filename(
-    addon_dir: str, fragment_name: str, format: Literal[".md", ".rst"]
+    addon_dir: str, fragment_name: str, format: FragmentFormat
 ) -> str:
     return os.path.join(
         addon_dir,
@@ -249,6 +292,7 @@ def gen_one_addon_readme(
     readme_filename,
     source_digest,
 ):
+    fragments_format = get_fragments_format(addon_dir)
     fragments = {}
     for fragment_name in FRAGMENTS:
         fragment_filename = prepare_rst_fragment(addon_dir, fragment_name)
@@ -294,6 +338,7 @@ def gen_one_addon_readme(
                 repo_name=repo_name,
                 development_status=development_status,
                 source_digest=source_digest,
+                level3_underline="~" if fragments_format == ".rst" else "-",
             )
         )
 
