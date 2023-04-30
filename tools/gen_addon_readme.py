@@ -3,6 +3,7 @@
 # Copyright (c) 2018 GRAP (http://www.grap.coop)
 
 import atexit
+import functools
 import os
 import re
 import sys
@@ -111,6 +112,11 @@ RST2HTML_SETTINGS = {
     # Pygments CSS can be used to style the output.
     "syntax_highlight": "short",
 }
+
+
+@functools.lru_cache(maxsize=None)
+def ensure_pandoc_installed() -> None:
+    pypandoc.ensure_pandoc_installed()
 
 
 def make_runboat_badge(repo, branch):
@@ -252,7 +258,7 @@ def prepare_rst_fragment(addon_dir: str, fragment_name: str) -> Union[str, None]
         return None
     # convert .md to .rst
     fragment_properties = FRAGMENTS[fragment_name]
-    pypandoc.ensure_pandoc_installed()
+    ensure_pandoc_installed()
     atexit.register(safe_remove, fragment_rst_filename)
     pypandoc.convert_file(
         fragment_md_filename,
@@ -279,6 +285,35 @@ def fragment_exists(addon_dir: str, fragment_name: str) -> bool:
             ".md",
         )
     )
+
+
+def convert_fragments_to_md(addon_dir: str) -> None:
+    """Convert all fragments from .rst to .md format."""
+    for fragment_name in FRAGMENTS:
+        fragment_rst_filename = make_fragment_filename(
+            addon_dir,
+            fragment_name,
+            ".rst",
+        )
+        if not os.path.exists(fragment_rst_filename):
+            continue
+        fragment_md_filename = make_fragment_filename(
+            addon_dir,
+            fragment_name,
+            ".md",
+        )
+        if os.path.exists(fragment_md_filename):
+            continue
+        ensure_pandoc_installed()
+        pypandoc.convert_file(
+            fragment_rst_filename,
+            format="rst",
+            to="gfm-raw_html",  # GitHub Flavored Markdown without html
+            outputfile=fragment_md_filename,
+            extra_args=["--shift-heading-level=1"],
+            sandbox=True,
+        )
+        os.remove(fragment_rst_filename)
 
 
 def gen_one_addon_readme(
@@ -433,6 +468,11 @@ def _source_digest_match(readme_filename, source_digest):
     ),
     help="Template file to use.",
 )
+@click.option(
+    "--convert-fragments-to-markdown",
+    is_flag=True,
+    default=False,
+)
 def gen_addon_readme(
     org_name,
     repo_name,
@@ -443,6 +483,7 @@ def gen_addon_readme(
     gen_html,
     template_filename,
     if_fragments_changed,
+    convert_fragments_to_markdown,
 ):
     """Generate README.rst from fragments.
 
@@ -462,6 +503,8 @@ def gen_addon_readme(
         addons.append((addon_name, addon_dir, manifest))
     readme_filenames = []
     for addon_name, addon_dir, manifest in addons:
+        if convert_fragments_to_markdown:
+            convert_fragments_to_md(addon_dir)
         if not fragment_exists(addon_dir, "DESCRIPTION"):
             continue
         readme_filename = os.path.join(addon_dir, "README.rst")
