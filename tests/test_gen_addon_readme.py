@@ -8,7 +8,11 @@ import sys
 
 import pytest
 
-from tools.gen_addon_readme import get_fragment_format, get_fragments_format
+from tools.gen_addon_readme import (
+    get_fragment_format,
+    get_fragments_format,
+    safe_remove,
+)
 
 
 @pytest.fixture
@@ -155,3 +159,11 @@ def test_get_fragments_format_rst(tmp_path):
     with pytest.raises(SystemExit) as e:
         get_fragments_format(tmp_path)
     assert "Both .md and .rst fragments found" in str(e)
+
+
+def test_safe_ramove(tmp_path):
+    file_path = tmp_path / "file"
+    file_path.touch()
+    safe_remove(file_path)
+    assert not file_path.exists()
+    safe_remove(file_path)  # removing non-existent file does not raise
