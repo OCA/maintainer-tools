@@ -6,9 +6,9 @@ import atexit
 import functools
 import os
 import re
-import sys
 import tempfile
 from typing import Union, Literal
+from urllib.parse import urljoin
 
 import click
 from docutils.core import publish_file
@@ -18,13 +18,6 @@ import pypandoc
 from .gitutils import commit_if_needed
 from .manifest import get_manifest_path, read_manifest, find_addons, NoManifestFound
 from ._hash import hash
-
-if sys.version_info[0] < 3:
-    # python 2 import
-    from urlparse import urljoin
-else:
-    # python 3 import
-    from urllib.parse import urljoin
 
 
 class FragmentProperties:
