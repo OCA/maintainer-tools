@@ -1,5 +1,7 @@
 from tools._hash import hash, _walk
 
+import pytest
+
 
 def test_hash(tmp_path):
     def populate(top):
@@ -48,3 +50,8 @@ def test_hash_walk(tmp_path):
         "d/b",
         "d/c",
     ]
+
+
+def test_hash_not_a_file(tmp_path):
+    with pytest.raises(ValueError):
+        hash(tmp_path / "a", relative_to=tmp_path)
