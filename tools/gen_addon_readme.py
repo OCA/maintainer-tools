@@ -6,8 +6,9 @@ import atexit
 import functools
 import os
 import re
+import sys
 import tempfile
-from typing import Union, Literal
+from typing import Union
 from urllib.parse import urljoin
 
 import click
@@ -18,6 +19,11 @@ import pypandoc
 from .gitutils import commit_if_needed
 from .manifest import get_manifest_path, read_manifest, find_addons, NoManifestFound
 from ._hash import hash
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class FragmentProperties:
