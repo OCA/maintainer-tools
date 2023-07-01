@@ -106,6 +106,8 @@ RST2HTML_SETTINGS = {
     "syntax_highlight": "short",
 }
 
+PANDOC_MARKDOWN_FORMAT = "gfm-raw_html"  # GitHub Flavored Markdown without raw HTML
+
 
 @functools.lru_cache(maxsize=None)
 def ensure_pandoc_installed() -> None:
@@ -255,7 +257,7 @@ def prepare_rst_fragment(addon_dir: str, fragment_name: str) -> Union[str, None]
     atexit.register(safe_remove, fragment_rst_filename)
     pypandoc.convert_file(
         fragment_md_filename,
-        format="gfm",  # GitHub Flavored Markdown
+        format=PANDOC_MARKDOWN_FORMAT,
         to="rst",
         outputfile=fragment_rst_filename,
         extra_args=[f"--shift-heading-level-by={fragment_properties.level-2}"],
@@ -301,7 +303,7 @@ def convert_fragments_to_md(addon_dir: str) -> None:
         pypandoc.convert_file(
             fragment_rst_filename,
             format="rst",
-            to="gfm-raw_html",  # GitHub Flavored Markdown without html
+            to=PANDOC_MARKDOWN_FORMAT,
             outputfile=fragment_md_filename,
             extra_args=["--shift-heading-level=1"],
             sandbox=True,
