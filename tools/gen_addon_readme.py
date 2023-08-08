@@ -27,6 +27,7 @@ FRAGMENTS_DIR = "readme"
 
 FRAGMENTS = (
     "DESCRIPTION",
+    "CONTEXT",
     "INSTALL",
     "CONFIGURE",
     "USAGE",
