@@ -112,7 +112,11 @@ RST2HTML_SETTINGS = {
     "syntax_highlight": "short",
 }
 
-PANDOC_MARKDOWN_FORMAT = "gfm-raw_html"  # GitHub Flavored Markdown without raw HTML
+# GitHub Flavored Markdown
+# - raw html is disabled
+# - auto identifiers is disabled because pylint-odoo complains about them (Hyperlink
+#   target "..;" is not referenced.)
+PANDOC_MARKDOWN_FORMAT = "gfm-raw_html-gfm_auto_identifiers"
 
 
 @functools.lru_cache(maxsize=None)
