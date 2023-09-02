@@ -300,10 +300,12 @@ def _source_digest_match(readme_filename, source_digest):
     "generated for all installable addons found there.",
 )
 @click.option(
+    "--if-source-changed",
     "--if-fragments-changed",
+    "if_fragments_changed",
     is_flag=True,
     default=False,
-    help="Only generate if source fragment changed.",
+    help="Only generate if source fragments or manifest changed.",
 )
 @click.option("--commit/--no-commit", help="git commit changes to README.rst, if any.")
 @click.option(
