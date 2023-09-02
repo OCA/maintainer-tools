@@ -2,41 +2,51 @@
 # Copyright (c) 2018 ACSONE SA/NV
 # Copyright (c) 2018 GRAP (http://www.grap.coop)
 
+import atexit
+import functools
 import os
 import re
 import sys
 import tempfile
+from typing import Union
+from urllib.parse import urljoin
 
 import click
 from docutils.core import publish_file
 from jinja2 import Template
+import pypandoc
 
 from .gitutils import commit_if_needed
 from .manifest import get_manifest_path, read_manifest, find_addons, NoManifestFound
 from ._hash import hash
 
-if sys.version_info[0] < 3:
-    # python 2 import
-    from urlparse import urljoin
+if sys.version_info >= (3, 8):
+    from typing import Literal
 else:
-    # python 3 import
-    from urllib.parse import urljoin
+    from typing_extensions import Literal
 
+
+class FragmentProperties:
+    def __init__(self, level: int):
+        self.level = level
+
+
+FragmentFormat = Literal[".rst", ".md"]
 
 FRAGMENTS_DIR = "readme"
 
-FRAGMENTS = (
-    "DESCRIPTION",
-    "CONTEXT",
-    "INSTALL",
-    "CONFIGURE",
-    "USAGE",
-    "ROADMAP",
-    "DEVELOP",
-    "CONTRIBUTORS",
-    "CREDITS",
-    "HISTORY",
-)
+FRAGMENTS = {
+    "DESCRIPTION": FragmentProperties(level=2),
+    "CONTEXT": FragmentProperties(level=2),
+    "INSTALL": FragmentProperties(level=2),
+    "CONFIGURE": FragmentProperties(level=2),
+    "USAGE": FragmentProperties(level=2),
+    "ROADMAP": FragmentProperties(level=2),
+    "DEVELOP": FragmentProperties(level=2),
+    "CONTRIBUTORS": FragmentProperties(level=3),
+    "CREDITS": FragmentProperties(level=3),
+    "HISTORY": FragmentProperties(level=2),
+}
 
 LICENSE_BADGES = {
     "AGPL-3": (
@@ -101,6 +111,17 @@ RST2HTML_SETTINGS = {
     # Pygments CSS can be used to style the output.
     "syntax_highlight": "short",
 }
+
+# GitHub Flavored Markdown
+# - raw html is disabled
+# - auto identifiers is disabled because pylint-odoo complains about them (Hyperlink
+#   target "..;" is not referenced.)
+PANDOC_MARKDOWN_FORMAT = "gfm-raw_html-gfm_auto_identifiers"
+
+
+@functools.lru_cache(maxsize=None)
+def ensure_pandoc_installed() -> None:
+    pypandoc.ensure_pandoc_installed()
 
 
 def make_runboat_badge(repo, branch):
@@ -169,6 +190,137 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
     return fragment
 
 
+def get_fragment_format(
+    addon_dir: str, fragment_name: str
+) -> Union[FragmentFormat, None]:
+    """Return the format of the named fragment of the given addon.
+
+    Raise an exception if several formats are found.
+    """
+    fragment_rst_filename = make_fragment_filename(addon_dir, fragment_name, ".rst")
+    fragment_md_filename = make_fragment_filename(addon_dir, fragment_name, ".md")
+    if os.path.exists(fragment_rst_filename):
+        if os.path.exists(fragment_md_filename):
+            raise SystemExit(
+                f"Both .md and .rst found for {fragment_name}. Please remove one"
+                f" of {fragment_rst_filename} or {fragment_md_filename}."
+            )
+        return ".rst"
+    if os.path.exists(fragment_md_filename):
+        return ".md"
+    return None
+
+
+def get_fragments_format(addon_dir: str) -> FragmentFormat:
+    """Return the format of the fragments of the given addon.
+
+    Raise an exception if several formats are found.
+    """
+    fragments_format = None
+    for fragment_name in FRAGMENTS:
+        this_fragment_format = get_fragment_format(addon_dir, fragment_name)
+        if this_fragment_format is None:
+            # fragment does not exist
+            continue
+        if fragments_format and this_fragment_format != fragments_format:
+            raise SystemExit(
+                f"Both .md and .rst fragments found in {addon_dir}/readme. "
+                f"Please ensure the same format is used for all fragments."
+            )
+        fragments_format = this_fragment_format
+    return fragments_format
+
+
+def make_fragment_filename(
+    addon_dir: str, fragment_name: str, format: FragmentFormat
+) -> str:
+    return os.path.join(
+        addon_dir,
+        FRAGMENTS_DIR,
+        fragment_name + format,
+    )
+
+
+def safe_remove(filename: str) -> None:
+    try:
+        os.remove(filename)
+    except Exception:
+        pass
+
+
+def prepare_rst_fragment(addon_dir: str, fragment_name: str) -> Union[str, None]:
+    fragment_rst_filename = make_fragment_filename(addon_dir, fragment_name, ".rst")
+    fragment_md_filename = make_fragment_filename(addon_dir, fragment_name, ".md")
+    if os.path.exists(fragment_rst_filename):
+        if os.path.exists(fragment_md_filename):
+            raise SystemExit(
+                f"Both .md and .rst fragment found. Please remove one of "
+                f"{fragment_rst_filename} or {fragment_md_filename}."
+            )
+        return fragment_rst_filename
+    if not os.path.exists(fragment_md_filename):
+        # no .rst nor .md fragment found
+        return None
+    # convert .md to .rst
+    fragment_properties = FRAGMENTS[fragment_name]
+    ensure_pandoc_installed()
+    atexit.register(safe_remove, fragment_rst_filename)
+    pypandoc.convert_file(
+        fragment_md_filename,
+        format=PANDOC_MARKDOWN_FORMAT,
+        to="rst",
+        outputfile=fragment_rst_filename,
+        extra_args=[f"--shift-heading-level-by={fragment_properties.level-2}"],
+        sandbox=True,
+    )
+    return fragment_rst_filename
+
+
+def fragment_exists(addon_dir: str, fragment_name: str) -> bool:
+    return os.path.exists(
+        make_fragment_filename(
+            addon_dir,
+            fragment_name,
+            ".rst",
+        )
+    ) or os.path.exists(
+        make_fragment_filename(
+            addon_dir,
+            fragment_name,
+            ".md",
+        )
+    )
+
+
+def convert_fragments_to_md(addon_dir: str) -> None:
+    """Convert all fragments from .rst to .md format."""
+    for fragment_name in FRAGMENTS:
+        fragment_rst_filename = make_fragment_filename(
+            addon_dir,
+            fragment_name,
+            ".rst",
+        )
+        if not os.path.exists(fragment_rst_filename):
+            continue
+        fragment_md_filename = make_fragment_filename(
+            addon_dir,
+            fragment_name,
+            ".md",
+        )
+        if os.path.exists(fragment_md_filename):
+            continue
+        ensure_pandoc_installed()
+        pypandoc.convert_file(
+            fragment_rst_filename,
+            format="rst",
+            to=PANDOC_MARKDOWN_FORMAT,
+            outputfile=fragment_md_filename,
+            extra_args=["--shift-heading-level=1"],
+            sandbox=True,
+        )
+        os.remove(fragment_rst_filename)
+
+
 def gen_one_addon_readme(
     org_name,
     repo_name,
@@ -180,14 +332,11 @@ def gen_one_addon_readme(
     readme_filename,
     source_digest,
 ):
+    fragments_format = get_fragments_format(addon_dir)
     fragments = {}
     for fragment_name in FRAGMENTS:
-        fragment_filename = os.path.join(
-            addon_dir,
-            FRAGMENTS_DIR,
-            fragment_name + ".rst",
-        )
-        if os.path.exists(fragment_filename):
+        fragment_filename = prepare_rst_fragment(addon_dir, fragment_name)
+        if fragment_filename:
             with open(fragment_filename, "r", encoding="utf8") as f:
                 fragment = generate_fragment(org_name, repo_name, branch, addon_name, f)
                 if fragment:
@@ -229,6 +378,7 @@ def gen_one_addon_readme(
                 repo_name=repo_name,
                 development_status=development_status,
                 source_digest=source_digest,
+                level3_underline="~" if fragments_format == ".rst" else "-",
             )
         )
 
@@ -306,9 +456,14 @@ def _source_digest_match(readme_filename, source_digest):
     default=False,
     help="Only generate if source fragment changed.",
 )
-@click.option("--commit/--no-commit", help="git commit changes to README.rst, if any.")
 @click.option(
-    "--gen-html/--no-gen-html", default=True, help="Generate index html file."
+    "--commit/--no-commit",
+    help="git commit changes to README.rst and index.html, if any.",
+)
+@click.option(
+    "--gen-html/--no-gen-html",
+    default=True,
+    help="Generate index html file.",
 )
 @click.option(
     "--template-filename",
@@ -317,6 +472,11 @@ def _source_digest_match(readme_filename, source_digest):
         "gen_addon_readme.rst.jinja",
     ),
     help="Template file to use.",
+)
+@click.option(
+    "--convert-fragments-to-markdown",
+    is_flag=True,
+    default=False,
 )
 def gen_addon_readme(
     org_name,
@@ -328,12 +488,13 @@ def gen_addon_readme(
     gen_html,
     template_filename,
     if_fragments_changed,
+    convert_fragments_to_markdown,
 ):
     """Generate README.rst from fragments.
 
-    Do nothing if readme/DESCRIPTION.rst is absent, otherwise overwrite
+    Do nothing if readme/DESCRIPTION(.rst|.md) is absent, otherwise overwrite
     existing README.rst with content generated from the template,
-    fragments (DESCRIPTION.rst, USAGE.rst, etc) and the addon manifest.
+    fragments (DESCRIPTION(.rst|.md), USAGE(.rst|.md), etc) and the addon manifest.
     """
     addons = []
     if addons_dir:
@@ -347,12 +508,15 @@ def gen_addon_readme(
         addons.append((addon_name, addon_dir, manifest))
     readme_filenames = []
     for addon_name, addon_dir, manifest in addons:
-        fragments_dir = os.path.join(addon_dir, FRAGMENTS_DIR)
-        if not os.path.exists(os.path.join(fragments_dir, "DESCRIPTION.rst")):
+        if convert_fragments_to_markdown:
+            convert_fragments_to_md(addon_dir)
+        if not fragment_exists(addon_dir, "DESCRIPTION"):
             continue
         readme_filename = os.path.join(addon_dir, "README.rst")
         source_digest = hash(
-            get_manifest_path(addon_dir), fragments_dir, relative_to=addon_dir
+            get_manifest_path(addon_dir),
+            os.path.join(addon_dir, FRAGMENTS_DIR),
+            relative_to=addon_dir,
         )
         if if_fragments_changed:
             if _source_digest_match(readme_filename, source_digest):

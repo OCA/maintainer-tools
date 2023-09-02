@@ -8,6 +8,12 @@ import sys
 
 import pytest
 
+from tools.gen_addon_readme import (
+    get_fragment_format,
+    get_fragments_format,
+    safe_remove,
+)
+
 
 @pytest.fixture
 def addons_dir(tmpdir):
@@ -23,7 +29,7 @@ def _assert_expected(addons_dir, suffix):
         if not os.path.isdir(addon_dir):
             continue
         actual = os.path.join(addon_dir, "README.rst")
-        expected = os.path.join(addon_dir, "README.expected-" + suffix)
+        expected = os.path.join(addon_dir, "README.expected-" + suffix + ".rst")
         with open(actual) as actual_f, open(expected) as expected_f:
             assert actual_f.read() == expected_f.read()
 
@@ -127,3 +133,37 @@ def test_rst_error(tmp_path):
             assert "Title level inconsistent" in e.output
         else:
             assert False, "A rst syntax error should have been detected."
+
+
+def test_get_fragment_format(tmp_path):
+    readme_path = tmp_path / "readme"
+    readme_path.mkdir()
+    readme_path.joinpath("DESCRIPTION.rst").touch()
+    assert get_fragment_format(tmp_path, "DESCRIPTION") == ".rst"
+    readme_path.joinpath("USAGE.md").touch()
+    assert get_fragment_format(tmp_path, "USAGE") == ".md"
+    readme_path.joinpath("USAGE.rst").touch()
+    with pytest.raises(SystemExit) as e:
+        get_fragment_format(tmp_path, "USAGE")
+    assert "Both .md and .rst found for USAGE" in str(e)
+
+
+def test_get_fragments_format_rst(tmp_path):
+    readme_path = tmp_path / "readme"
+    readme_path.mkdir()
+    readme_path.joinpath("DESCRIPTION.rst").touch()
+    assert get_fragments_format(tmp_path) == ".rst"
+    readme_path.joinpath("USAGE.rst").touch()
+    assert get_fragments_format(tmp_path) == ".rst"
+    readme_path.joinpath("INSTALL.md").touch()
+    with pytest.raises(SystemExit) as e:
+        get_fragments_format(tmp_path)
+    assert "Both .md and .rst fragments found" in str(e)
+
+
+def test_safe_ramove(tmp_path):
+    file_path = tmp_path / "file"
+    file_path.touch()
+    safe_remove(file_path)
+    assert not file_path.exists()
+    safe_remove(file_path)  # removing non-existent file does not raise

@@ -65,17 +65,17 @@ Credits
 
 {% if authors -%}
 Authors
-~~~~~~~
+{{ level3_underline * 7 }}
 
 {% for author in authors -%}
 * {{ author }}
 {% endfor %}
 {% endif -%}
 
-{{ fragment('CONTRIBUTORS', 'Contributors', sub='~') }}
-{{- fragment('CREDITS', 'Other credits', sub='~') -}}
+{{ fragment('CONTRIBUTORS', 'Contributors', sub=level3_underline) }}
+{{- fragment('CREDITS', 'Other credits', sub=level3_underline) -}}
 Maintainers
-~~~~~~~~~~~
+{{ level3_underline * 11 }}
 {%- if org_name == 'OCA' %}
 
 This module is maintained by the OCA.

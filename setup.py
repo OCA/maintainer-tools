@@ -28,6 +28,7 @@ setuptools.setup(
         # https://github.com/OCA/maintainer-tools/issues/423
         # Consider carefully before changing this.
         "docutils==0.16.*",
+        "pypandoc",  # for oca-gen-addon-readme to work with markdown fragments
         "ERPpeek",
         "github3.py>=1",
         "jinja2",
