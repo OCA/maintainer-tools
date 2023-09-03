@@ -24,10 +24,7 @@ setuptools.setup(
     install_requires=[
         "appdirs",
         "click",
-        # We need to pin docutils version, see
-        # https://github.com/OCA/maintainer-tools/issues/423
-        # Consider carefully before changing this.
-        "docutils==0.16.*",
+        "docutils",
         "pypandoc",  # for oca-gen-addon-readme to work with markdown fragments
         "ERPpeek",
         "github3.py>=1",
