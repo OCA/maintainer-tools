@@ -3,8 +3,6 @@
 
 To configure this module, you need to:
 
-#. Go to ...
+- Go to ...
 
-.. figure:: ../static/description/image.png
-   :alt: alternative description
-   :width: 600 px
+![alternative description]()../static/description/image.png)
