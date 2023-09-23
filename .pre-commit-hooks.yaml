@@ -32,3 +32,10 @@
   pass_filenames: false
   language: python
   files: (__manifest__\.py|__openerp__\.py|__terp__\.py)$
+
+- id: oca-gen-external-dependencies
+  name: Generate requirements.txt for an addons directory
+  entry: oca-gen-external-dependencies
+  language: python
+  pass_filenames: false
+  files: (__manifest__\.py|__openerp__\.py|__terp__\.py|setup\.py|pyproject\.toml)$

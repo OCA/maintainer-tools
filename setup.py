@@ -41,6 +41,9 @@ setuptools.setup(
         "selenium",
         "twine",
         "wheel",
+        "pyproject_dependencies ; python_version>='3.7'",
+        "setuptools-odoo",  # for oca-gen-external-dependencies
+        "whool",  # for oca-gen-external-dependencies
     ],
     python_requires=">=3.6",
     classifiers=[
@@ -67,6 +70,7 @@ setuptools.setup(
             "oca-publish-modules = tools.publish_modules:main",
             "oca-gen-addon-readme = tools.gen_addon_readme:gen_addon_readme",
             "oca-gen-addon-icon = tools.gen_addon_icon:gen_addon_icon",
+            "oca-gen-external-dependencies = tools.gen_external_dependencies:main",
             "oca-gen-metapackage = tools.gen_metapackage:main",
             "oca-towncrier = tools.oca_towncrier:oca_towncrier",
             "oca-create-migration-issue = tools.create_migration_issue:main",
