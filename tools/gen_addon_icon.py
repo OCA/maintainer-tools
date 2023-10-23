@@ -31,6 +31,7 @@ SUPPORTED_SERVICE_URLS = [
     "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css",  # noqa
     "https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css",  # noqa
     "https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css",  # noqa
+    "https://www.experimentalenhancements.com/FontCountry/FontCountry.css",  # noqa
 ]
 
 TEMPLATE = Template(
