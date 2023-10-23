@@ -91,7 +91,7 @@ def _prepare_extra_icon_html(icon_extra):
 async def generate_template_screenshot(template, options, filetype):
     """Generate custom icon with chromium headless"""
     styles_filename = os.path.join(os.path.dirname(__file__), "gen_addon_icon.css")
-    browser = await launch()
+    browser = await launch(args=["--no-sandbox", "--disable-setuid-sandbox"])
     page = await browser.newPage()
     await page.goto("data:text/html,{}".format(template))
     for url in SUPPORTED_SERVICE_URLS:
