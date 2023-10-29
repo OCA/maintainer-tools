@@ -117,16 +117,17 @@ def gen_special_addon_icon(icon_dir, icon_set_params, icon_color, icon_extra, fi
             "clip": {
                 "y": 0,
                 "x": 0,
-                "width": 128,
-                "height": 128,
+                "width": 140,
+                "height": 140,
             },
         }
     else:
         options = {
             "path": icon_filename,
-            "width": 128,
-            "height": 128,
-            "printBackground": True,
+            "width": 140,
+            "height": 140,
+            "printBackground": False,
+            "omitBackground": True,
             "scale": 1,
         }
     template = TEMPLATE.substitute(

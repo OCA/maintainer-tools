@@ -6,8 +6,8 @@ html {
 }
 
 body {
-  width: 128px;
-  height: 128px;
+  width: 140px;
+  height: 140px;
   background: transparent;
 }
 
@@ -15,13 +15,11 @@ body {
   position: relative;
   text-align: center;
   overflow: hidden;
-  width: 128px;
-  height: 128px;
+  width: 140px;
+  height: 140px;
   font-size: 90px;
   line-height: 120px;
   border-radius: 6px;
-  border-bottom: 2px solid;
-  border-top: 2px solid;
   padding: 0;
 }
 
@@ -31,12 +29,14 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
+  box-shadow: inset 0 1px 0px 0px rgba(255, 255, 255, 0.38), inset 0 -1px 0px 0px rgba(0, 0, 0, 0.38);
+  -webkit-box-shadow: inset 0 1px 0px 0px rgba(255, 255, 255, 0.38), inset 0 -1px 0px 0px rgba(0, 0, 0, 0.38);
 }
 
 .icon-box span {
   display: block;
-  height: 128px;
-  width: 128px;
+  height: 140px;
+  width: 140px;
   color: #fff;
   padding: 15;
   z-index: 999;
@@ -55,7 +55,7 @@ body {
 }
 
 .oyellow {
-  background: linear-gradient(45deg, #b5aa59a4, #cdc484);
+  background: linear-gradient(45deg, #b5aa59, #cdc484);
   border-top-color: #ddd8b1;
   border-bottom-color: #5b5739;
 }
