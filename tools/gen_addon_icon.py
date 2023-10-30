@@ -129,11 +129,16 @@ async def generate_template_screenshot(template, options, filetype):
     styles_filename = os.path.join(os.path.dirname(__file__), "gen_addon_icon.css")
     browser = await launch(headless=True, args=minimal_args)
     page = await browser.newPage()
-    await page.goto("data:text/html,{}".format(template))
+    await page.goto(
+        "data:text/html,{}".format(template), {"waitUntil": "domcontentloaded"}
+    )
     for url in SUPPORTED_SERVICE_URLS:
         await page.addStyleTag({"url": url})
     await page.addStyleTag({"path": styles_filename})
     await page.emulateMedia("screen")
+    await page.mouse.click(
+        0, 0, {"delay": 500}
+    )  # hack to wait until icons are displayed
     if filetype in ["png", "jpg"]:
         await page.screenshot(options)
     else:
