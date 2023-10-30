@@ -22,15 +22,15 @@ ICON_TYPES = ["png", "svg", "pdf"]
 COLORS = ["orange", "pink", "yellow", "gray", "teal", "blue1", "blue2", "red", "green"]
 
 SUPPORTED_SERVICE_URLS = [
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css",  # noqa
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css",  # noqa
     "https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css",  # noqa
     "https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic.min.css",  # noqa
     "https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.2/iconfont/material-icons.min.css",  # noqa
     "https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/1.35.0/iconfont/tabler-icons.min.css",  # noqa
     "https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css",  # noqa
-    "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css",  # noqa
+    "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css",  # noqa
     "https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css",  # noqa
-    "https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css",  # noqa
+    "https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css",  # noqa
     "https://www.experimentalenhancements.com/FontCountry/FontCountry.css",  # noqa
 ]
 
