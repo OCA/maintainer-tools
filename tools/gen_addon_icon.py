@@ -89,10 +89,45 @@ def _prepare_extra_icon_html(icon_extra):
     return icon_extra_html
 
 
+minimal_args = [
+    "--autoplay-policy=user-gesture-required",
+    "--disable-background-networking",
+    "--disable-background-timer-throttling",
+    "--disable-backgrounding-occluded-windows",
+    "--disable-breakpad",
+    "--disable-default-apps",
+    "--disable-dev-shm-usage",
+    "--disable-domain-reliability",
+    "--disable-extensions",
+    "--disable-features=AudioServiceOutOfProcess",
+    "--disable-hang-monitor",
+    "--disable-ipc-flooding-protection",
+    "--disable-notifications",
+    "--disable-offer-store-unmasked-wallet-cards",
+    "--disable-popup-blocking",
+    "--disable-print-preview",
+    "--disable-prompt-on-repost",
+    "--disable-renderer-backgrounding",
+    "--disable-setuid-sandbox",
+    "--disable-speech-api",
+    "--disable-sync",
+    "--hide-scrollbars",
+    "--ignore-gpu-blacklist",
+    "--metrics-recording-only",
+    "--mute-audio",
+    "--no-default-browser-check",
+    "--no-first-run",
+    "--no-pings",
+    "--no-sandbox",
+    "--no-zygote",
+    "--password-store=basic",
+]
+
+
 async def generate_template_screenshot(template, options, filetype):
     """Generate custom icon with chromium headless"""
     styles_filename = os.path.join(os.path.dirname(__file__), "gen_addon_icon.css")
-    browser = await launch(args=["--no-sandbox", "--disable-setuid-sandbox"])
+    browser = await launch(headless=True, args=minimal_args)
     page = await browser.newPage()
     await page.goto("data:text/html,{}".format(template))
     for url in SUPPORTED_SERVICE_URLS:
