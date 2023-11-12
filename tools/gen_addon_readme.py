@@ -8,6 +8,7 @@ import os
 import re
 import sys
 import tempfile
+from pathlib import Path
 from typing import Union
 from urllib.parse import urljoin
 
@@ -433,6 +434,21 @@ def _source_digest_match(readme_filename, source_digest):
     return False
 
 
+def _get_source_digest(readme_filename: str) -> Union[str, None]:
+    """Get the source digest from the given readme file.
+
+    Return None if the file does not exist, or if the digest is not found.
+    """
+    readme_path = Path(readme_filename)
+    if not readme_path.is_file():
+        return None
+    digest_re = re.compile(r"!! source digest: (?P<digest>sha256:\w+)")
+    mo = digest_re.search(readme_path.read_text(encoding="utf8"))
+    if not mo:
+        return None
+    return mo.group("digest")
+
+
 @click.command()
 @click.option("--org-name", default="OCA", help="Organization name, eg. OCA.")
 @click.option("--repo-name", required=True, help="Repository name, eg. server-tools.")
@@ -457,6 +473,16 @@ def _source_digest_match(readme_filename, source_digest):
     is_flag=True,
     default=False,
     help="Only generate if source fragments or manifest changed.",
+)
+@click.option(
+    "--keep-source-digest",
+    is_flag=True,
+    default=False,
+    help=(
+        "Do not update the source digest in the generated file. "
+        "Useful to avoid merge conflicts when changes that do not impact "
+        "the generated file are made to the manifest."
+    ),
 )
 @click.option(
     "--commit/--no-commit",
@@ -491,6 +517,7 @@ def gen_addon_readme(
     template_filename,
     if_fragments_changed,
     convert_fragments_to_markdown,
+    keep_source_digest,
 ):
     """Generate README.rst from fragments.
 
@@ -523,6 +550,8 @@ def gen_addon_readme(
         if if_fragments_changed:
             if _source_digest_match(readme_filename, source_digest):
                 continue
+        if keep_source_digest:
+            source_digest = _get_source_digest(readme_filename) or source_digest
         gen_one_addon_readme(
             org_name,
             repo_name,
