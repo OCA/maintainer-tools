@@ -26,6 +26,8 @@ def _read_prev_branch_answers(prev_branch: str, answers: Dict[str, str]) -> None
     for question in COPIER_ANSWERS_TO_CARRY_OVER:
         if question not in prev_branch_answers:
             continue
+        if prev_branch_answers[question] is None:
+            continue
         answers[question] = prev_branch_answers[question]
 
 
@@ -70,6 +72,7 @@ def main(new_branch, copier_template, copier_template_vcs_ref, repos, prev_branc
                 "odoo_version": float(new_branch),
                 "repo_slug": repo,
                 "repo_name": repo,
+                "repo_description": "TODO: add repo description",
                 "ci": "GitHub",
             }
             if prev_branch:
