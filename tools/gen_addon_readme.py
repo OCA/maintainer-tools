@@ -111,6 +111,15 @@ RST2HTML_SETTINGS = {
     # Use the short form of syntax highlighting so that the generated
     # Pygments CSS can be used to style the output.
     "syntax_highlight": "short",
+    # Since odoo/odoo@8d06889, Odoo emits a warning
+    # if index.html contains an xml declaration
+    "xml_declaration": False,
+    # ...but even for previous versions we don't need
+    # the xml declaration as docutils adds a <meta> tag:
+    # <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    # utf-8 is default value for output_encoding
+    # but let's make it explicit here:
+    "output_encoding": "utf-8",
 }
 
 # GitHub Flavored Markdown
