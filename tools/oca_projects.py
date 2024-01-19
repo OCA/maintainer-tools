@@ -18,7 +18,7 @@ import subprocess
 import tempfile
 
 import appdirs
-from .config import MAIN_BRANCHES, NOT_ADDONS
+from .config import NOT_ADDONS, is_main_branch
 from .github_login import login
 
 ALL = ["OCA_PROJECTS", "OCA_REPOSITORY_NAMES", "url"]
@@ -234,7 +234,7 @@ def get_repositories():
     return all_repos
 
 
-def get_repositories_and_branches(repos=(), branches=MAIN_BRANCHES, branch_filter=None):
+def get_repositories_and_branches(repos=(), branches=(), branch_filter=is_main_branch):
     gh = login()
     for repo in gh.repositories_by("OCA"):
         if repos and repo.name not in repos:
