@@ -49,6 +49,7 @@ NOT_ADDONS = {
     "maintainer-quality-tools",
     "maintainer-tools",
     "mirrors-flake8",
+    "oca.recipe.odoo",
     "oca-addons-repo-template",
     "oca-ci",
     "oca-custom",
@@ -66,6 +67,8 @@ NOT_ADDONS = {
     "OpenUpgrade",
     "openupgradelib",
     "pylint-odoo",
+    "repo-maintainer",
+    "repo-maintainer-conf",
 }
 
 
