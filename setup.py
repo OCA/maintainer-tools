@@ -16,6 +16,9 @@ setuptools.setup(
     license="AGPL3",
     packages=["tools"],
     include_package_data=True,
+    package_data={
+        "tools": ["*.png"],
+    },
     zip_safe=False,
     use_scm_version=True,
     setup_requires=[
@@ -44,6 +47,7 @@ setuptools.setup(
         "pyproject_dependencies ; python_version>='3.7'",
         "setuptools-odoo",  # for oca-gen-external-dependencies
         "whool",  # for oca-gen-external-dependencies
+        "Pillow",  # For oca-gen-addon-banner
     ],
     python_requires=">=3.6",
     classifiers=[
@@ -69,6 +73,7 @@ setuptools.setup(
             "oca-migrate-branch-empty = tools.migrate_branch_empty:main",
             "oca-publish-modules = tools.publish_modules:main",
             "oca-gen-addon-readme = tools.gen_addon_readme:gen_addon_readme",
+            "oca-gen-addon-banner = tools.gen_addon_banner:gen_addon_banner",
             "oca-gen-addon-icon = tools.gen_addon_icon:gen_addon_icon",
             "oca-gen-external-dependencies = tools.gen_external_dependencies:main",
             "oca-gen-metapackage = tools.gen_metapackage:main",
