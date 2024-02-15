@@ -19,6 +19,13 @@
   language: python
   pass_filenames: false
 
+- id: oca-gen-metapackage
+  name: Generate setup/_metapackage with dependencies on all installable addons in repo
+  always_run: true
+  entry: oca-gen-metapackage
+  language: python
+  pass_filenames: false
+
 - id: oca-update-pre-commit-excluded-addons
   name: Update pre-commit excluded addons
   entry: oca-update-pre-commit-excluded-addons
