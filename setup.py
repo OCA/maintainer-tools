@@ -37,7 +37,9 @@ setuptools.setup(
         "requests",
         "toml>=0.10.0",  # for oca-towncrier
         "tomli ; python_version < '3.11'",  # from 3.11 tomllib is in stdlib
-        "towncrier>=21.3",  # for oca-towncrier
+        "towncrier>=21.3; python_version < '3.8'",  # for oca-towncrier
+        # for oca-towncrier with MarkDow support
+        "towncrier>=23.11; python_version >= '3.8'",
         "selenium",
         "twine",
         "wheel",
