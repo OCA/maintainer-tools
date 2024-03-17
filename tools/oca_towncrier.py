@@ -17,7 +17,7 @@ from .manifest import read_manifest
 
 
 def _make_issue_format(org, repo, fragment_format):
-    return " #{{issue}}"
+    return "{issue}"
 
 
 def _get_towncrier_template(fragment_format):
