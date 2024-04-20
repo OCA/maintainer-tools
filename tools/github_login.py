@@ -4,7 +4,6 @@ from __future__ import absolute_import, print_function
 
 import argparse
 import os
-import sys
 from getpass import getpass
 import github3
 from .config import read_config, write_config
@@ -29,67 +28,32 @@ def login():
     return github3.login(token=token)
 
 
-def authorize_token(user):
+def store_token():
     config = read_config()
     if config.get("GitHub", "token"):
-        print("The token already exists.")
-        sys.exit()
-
-    password = getpass("Password for {0}: ".format(user))
-
-    note = "OCA (odoo community association) Maintainers Tools"
-    note_url = "https://github.com/OCA/maintainers-tools"
-    scopes = ["repo", "read:org", "write:org", "admin:org"]
-
-    try:
-        # Python 2
-        prompt = raw_input
-    except NameError:
-        # Python 3
-        prompt = input
-
-    def two_factor_prompt():
-        code = ""
-        while not code:
-            # The user could accidentally press Enter before being ready,
-            # let's protect them from doing that.
-            code = prompt("Enter 2FA code: ")
-        return code
-
-    try:
-        auth = github3.authorize(
-            user,
-            password,
-            scopes,
-            note,
-            note_url,
-            two_factor_callback=two_factor_prompt,
-        )
-    except github3.GitHubError as err:
-        if err.code == 422:
-            for error in err.errors:
-                if error["code"] == "already_exists":
-                    msg = (
-                        "The 'OCA (odoo community association) Maintainers "
-                        "Tools' token already exists. You will find it at "
-                        "https://github.com/settings/tokens and can "
-                        "revoke it or set the token manually in the "
-                        "configuration file."
-                    )
-                    sys.exit(msg)
-        raise
-
-    config.set("GitHub", "token", auth.token)
+        print("Note: a token already exists and will be replaced.")
+    token = getpass("Enter Github Client Token: ")
+    auth = github3.login(token=token)
+    config.set("GitHub", "token", token)
     write_config(config)
-    print("Token stored in configuration file")
+    print("Token stored in configuration file.")
+    return auth
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("username", help="GitHub Username")
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        help="Test the Github authentication.",
+    )
     args = parser.parse_args()
 
-    authorize_token(args.username)
+    if args.test:
+        auth = login()
+    else:
+        auth = store_token()
+    print("Authenticated as %s." % auth.me().login)
 
 
 if __name__ == "__main__":

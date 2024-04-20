@@ -22,13 +22,15 @@ They are used by OCA maintainers to address common operations across all repos.
 
 **Prerequisite**
 
-Get a token from Github.
+Github authentication uses a token, that must be previously created on Github, at
+[Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens).
 
-    $ oca-github-login USERNAME
 
+Set and store the token to be used for Github auth using:
 
-NOTE: you may have to delete the existing one from
-"Account settings -> Developer Settings -> Personal Access Tokens".
+    $ oca-github-login
+
+Alternatively, the token can be set on the GITHUB_TOKEN environment variable.
 
 
 ### Sync team users from community.odoo.com to GitHub teams
@@ -155,9 +157,9 @@ egg.
     $ tox -e py27  # python 2.7
     $ tox -- -k readme -v  # run tests containing 'readme' in their name, verbose
 
-**Get a token from Github**
+**Set the client token to use for Github* authentication*
 
-    $ python -m tools.github_login USERNAME
+    $ python -m tools.github_login
 
 **Run a script**
 
