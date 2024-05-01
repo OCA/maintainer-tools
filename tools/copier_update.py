@@ -94,6 +94,20 @@ def _iterate_repos_and_branches(repos: str, branches: str) -> Iterable[Tuple[str
             yield repo, branch
 
 
+def _fix_copier_answers():
+    copier_answers_path = Path(".copier-answers.yml")
+    if not copier_answers_path.exists():
+        return
+    modified_copier_answers = copier_answers = copier_answers_path.read_text()
+    modified_copier_answers = modified_copier_answers.replace(
+        "repo_description: null", 'repo_description: ""'
+    )
+    if modified_copier_answers != copier_answers:
+        copier_answers_path.write_text(modified_copier_answers)
+        subprocess.check_call(["git", "add", ".copier-answers.yml"])
+        subprocess.check_call(["git", "commit", "-m", "[FIX] .copier-answers.yml"])
+
+
 @click.command()
 @click.option("--org", default="OCA")
 @click.option("--repos", required=True)
@@ -124,7 +138,8 @@ def main(
                 if not Path(".copier-answers.yml").exists():
                     print(f"Skipping {repo} because it has no .copier-answers.yml")
                     continue
-                r = subprocess.call(["copier", "-f", "update"])
+                _fix_copier_answers()
+                r = subprocess.call(["copier", "update", "-f", "--trust"])
                 if r != 0:
                     print("$" * 10, f"copier update failed on {repo}")
                     continue
