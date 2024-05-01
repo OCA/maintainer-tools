@@ -42,12 +42,11 @@ def _get_update_dotfiles_open_pr(org: str, repo: str, branch: str) -> Optional[s
 
 
 def _make_update_dotfiles_pr(org: str, repo: str, branch: str) -> None:
-    subprocess.check_call(
-        ["git", "checkout", "-B", _make_update_dotfiles_branch(branch)]
-    )
+    pr_branch = _make_update_dotfiles_branch(branch)
+    subprocess.check_call(["git", "checkout", "-B", pr_branch])
     subprocess.check_call(["git", "add", "."])
     subprocess.check_call(["git", "commit", "-m", _make_commit_msg(ci_skip=False)])
-    subprocess.check_call(["git", "push", "-f"])
+    subprocess.check_call(["git", "push", "-f", "origin", pr_branch])
     if not _get_update_dotfiles_open_pr(org, repo, branch):
         subprocess.check_call(
             [
@@ -95,13 +94,44 @@ def _iterate_repos_and_branches(repos: str, branches: str) -> Iterable[Tuple[str
             yield repo, branch
 
 
+def _fix_copier_answers():
+    copier_answers_path = Path(".copier-answers.yml")
+    if not copier_answers_path.exists():
+        return
+    modified_copier_answers = copier_answers = copier_answers_path.read_text()
+    modified_copier_answers = modified_copier_answers.replace(
+        "repo_description: null", 'repo_description: ""'
+    )
+    if modified_copier_answers != copier_answers:
+        copier_answers_path.write_text(modified_copier_answers)
+        subprocess.check_call(["git", "add", ".copier-answers.yml"])
+        subprocess.check_call(["git", "commit", "-m", "[FIX] .copier-answers.yml"])
+
+
 @click.command()
-@click.option("--org", default="OCA")
-@click.option("--repos", required=True)
-@click.option("--branches", required=True)
-@click.option("--git-user-name", default="oca-git-bot")
-@click.option("--git-user-email", default="oca-git-bot@odoo-community.org")
+@click.option("--org", default="OCA", show_default=True)
+@click.option(
+    "--repos",
+    required=True,
+    help="Comma-separated list of repo names, or :all:",
+)
+@click.option(
+    "--branches",
+    required=True,
+    help="Comma-separated list of branches",
+)
+@click.option(
+    "--git-user-name",
+    default="oca-git-bot",
+    show_default=True,
+)
+@click.option(
+    "--git-user-email",
+    default="oca-git-bot@odoo-community.org",
+    show_default=True,
+)
 @click.option("--skip-ci/--no-skip-ci", default=False)
+@click.option("--git-protocol", default="git", show_default=True)
 def main(
     org: str,
     repos: str,
@@ -109,10 +139,13 @@ def main(
     git_user_name: str,
     git_user_email: str,
     skip_ci: bool,
+    git_protocol: str,
 ) -> None:
     for repo, branch in _iterate_repos_and_branches(repos, branches):
         try:
-            with temporary_clone(org_name=org, project_name=repo, branch=branch):
+            with temporary_clone(
+                org_name=org, project_name=repo, branch=branch, protocol=git_protocol
+            ):
                 print("=" * 10, repo, branch, "=" * 10)
                 if git_user_name:
                     subprocess.check_call(
@@ -125,7 +158,8 @@ def main(
                 if not Path(".copier-answers.yml").exists():
                     print(f"Skipping {repo} because it has no .copier-answers.yml")
                     continue
-                r = subprocess.call(["copier", "-f", "update"])
+                _fix_copier_answers()
+                r = subprocess.call(["copier", "update", "-f", "--trust"])
                 if r != 0:
                     print("$" * 10, f"copier update failed on {repo}")
                     continue
