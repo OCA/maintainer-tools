@@ -109,11 +109,27 @@ def _fix_copier_answers():
 
 
 @click.command()
-@click.option("--org", default="OCA")
-@click.option("--repos", required=True)
-@click.option("--branches", required=True)
-@click.option("--git-user-name", default="oca-git-bot")
-@click.option("--git-user-email", default="oca-git-bot@odoo-community.org")
+@click.option("--org", default="OCA", show_default=True)
+@click.option(
+    "--repos",
+    required=True,
+    help="Comma-separated list of repo names, or :all:",
+)
+@click.option(
+    "--branches",
+    required=True,
+    help="Comma-separated list of branches",
+)
+@click.option(
+    "--git-user-name",
+    default="oca-git-bot",
+    show_default=True,
+)
+@click.option(
+    "--git-user-email",
+    default="oca-git-bot@odoo-community.org",
+    show_default=True,
+)
 @click.option("--skip-ci/--no-skip-ci", default=False)
 def main(
     org: str,
