@@ -42,12 +42,11 @@ def _get_update_dotfiles_open_pr(org: str, repo: str, branch: str) -> Optional[s
 
 
 def _make_update_dotfiles_pr(org: str, repo: str, branch: str) -> None:
-    subprocess.check_call(
-        ["git", "checkout", "-B", _make_update_dotfiles_branch(branch)]
-    )
+    pr_branch = _make_update_dotfiles_branch(branch)
+    subprocess.check_call(["git", "checkout", "-B", pr_branch])
     subprocess.check_call(["git", "add", "."])
     subprocess.check_call(["git", "commit", "-m", _make_commit_msg(ci_skip=False)])
-    subprocess.check_call(["git", "push", "-f"])
+    subprocess.check_call(["git", "push", "-f", "origin", pr_branch])
     if not _get_update_dotfiles_open_pr(org, repo, branch):
         subprocess.check_call(
             [
