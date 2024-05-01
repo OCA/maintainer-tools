@@ -131,6 +131,7 @@ def _fix_copier_answers():
     show_default=True,
 )
 @click.option("--skip-ci/--no-skip-ci", default=False)
+@click.option("--git-protocol", default="git", show_default=True)
 def main(
     org: str,
     repos: str,
@@ -138,10 +139,13 @@ def main(
     git_user_name: str,
     git_user_email: str,
     skip_ci: bool,
+    git_protocol: str,
 ) -> None:
     for repo, branch in _iterate_repos_and_branches(repos, branches):
         try:
-            with temporary_clone(org_name=org, project_name=repo, branch=branch):
+            with temporary_clone(
+                org_name=org, project_name=repo, branch=branch, protocol=git_protocol
+            ):
                 print("=" * 10, repo, branch, "=" * 10)
                 if git_user_name:
                     subprocess.check_call(
