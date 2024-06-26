@@ -29,6 +29,8 @@ jobs:
             machine: ubuntu-22.04
           - python-version: "3.11"
             machine: ubuntu-22.04
+          - python-version: "3.12"
+            machine: ubuntu-22.04
     steps:
       - uses: "actions/checkout@v3"
       - uses: "actions/setup-python@v4"
