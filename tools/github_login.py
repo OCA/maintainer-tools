@@ -4,6 +4,7 @@ from __future__ import absolute_import, print_function
 
 import argparse
 import os
+import subprocess
 from getpass import getpass
 import github3
 from .config import read_config, write_config
@@ -19,6 +20,14 @@ def login():
     else:
         config = read_config()
         token = config.get("GitHub", "token")
+        if not token:
+            try:
+                # attempt to get token from gh
+                token = subprocess.check_output(
+                    ["gh", "auth", "token"], text=True
+                ).strip()
+            except subprocess.SubprocessError:
+                pass
     if not token:
         raise GitHubLoginError(
             "No token has been generated for this script. "

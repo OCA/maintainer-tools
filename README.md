@@ -32,6 +32,9 @@ Set and store the token to be used for Github auth using:
 
 Alternatively, the token can be set on the GITHUB_TOKEN environment variable.
 
+As a third alternative, if you have the [gh](https://cli.github.com/) client installed
+and have authenticated with `gh auth login`, maintainer tools will attempt to obtain the
+token from it using `gh auth token`.
 
 ### Sync team users from community.odoo.com to GitHub teams
 
