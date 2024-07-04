@@ -131,7 +131,7 @@ PANDOC_MARKDOWN_FORMAT = "gfm-raw_html-gfm_auto_identifiers"
 
 @functools.lru_cache(maxsize=None)
 def ensure_pandoc_installed() -> None:
-    pypandoc.ensure_pandoc_installed()
+    pypandoc.ensure_pandoc_installed(delete_installer=True)
 
 
 def make_runboat_badge(repo, branch):
