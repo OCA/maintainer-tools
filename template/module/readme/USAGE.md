@@ -16,6 +16,6 @@ To use this module, you need to:
 
   *insert screenshot!*
 
-- The value of `xyz` is now displayed in the list view.
+- The value of *xyz* is now displayed in the list view.
 
   *insert screenshot!*
