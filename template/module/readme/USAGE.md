@@ -12,7 +12,7 @@ To use this module, you need to:
 
   *insert screenshot!*
 
-- In “Contact” form, add a value to field `xyz` > save
+- In “Contact” form, add a value to field *xyz* > save
 
   *insert screenshot!*
 
