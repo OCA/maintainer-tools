@@ -1,11 +1,21 @@
-[ This file must be present and contains the usage instructions
-  for end-users. As all other rst files included in the README,
-  it MUST NOT contain reStructuredText sections
-  only body text (paragraphs, lists, tables, etc). Should you need
-  a more elaborate structure to explain the addon, please create a
-  Sphinx documentation (which may include this file as a "quick start"
-  section). ]
+[ This file is required and contains the instructions on **“how”** to use the module for end-users. 
+
+If the module does not have a visible impact on the user interface, just add the following sentence: 
+
+> This module does not impact the user interface.
+
+If that’s not the case, please make sure that every usage step is covered and remember that images speak more than words!]
 
 To use this module, you need to:
 
-1. Go to ...
+- Go to *App* > Menu > Menu item
+
+  *insert screenshot!*
+
+- In “Contact” form, add a value to field *xyz* > save
+
+  *insert screenshot!*
+
+- The value of *xyz* is now displayed in the list view.
+
+  *insert screenshot!*
