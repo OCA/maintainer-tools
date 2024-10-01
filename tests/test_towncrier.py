@@ -97,7 +97,7 @@ def test_oca_towncrier_md(tmp_path):
         """\
             ## 14.0.1.0.1 (2021-12-31)
 
-            #### Bugfixes
+            ### Bugfixes
 
             - Bugfix description. ([#50](https://github.com/OCA/therepo/issues/50))
         """
