@@ -46,6 +46,7 @@ setuptools.setup(
         "pyproject_dependencies ; python_version>='3.7'",
         "setuptools-odoo",  # for oca-gen-external-dependencies
         "whool",  # for oca-gen-external-dependencies
+        "pyppeteer",  # to generate icons with oca-gen-addon-icon
     ],
     python_requires=">=3.6",
     classifiers=[
