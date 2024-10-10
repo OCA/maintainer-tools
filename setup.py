@@ -82,6 +82,7 @@ setuptools.setup(
             "oca-configure-travis= tools.configure_travis:main",
             "oca-create-branch = tools.create_branch:main",
             "oca-copier-update = tools.copier_update:main",
+            "oca-patch-branch = tools.patch_branch:main",
         ],
     },
 )
