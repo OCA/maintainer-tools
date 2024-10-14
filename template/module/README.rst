@@ -15,6 +15,9 @@ Please provide content in the ``readme`` directory:
 * CREDITS.rst (optional)
 * HISTORY.rst (optional, recommended)
 
+Instead of using reStructuredText (``.rst``), you may use Markdown (``.md``) to
+format your files.
+
 Content of this README will also be drawn from the addon manifest,
 from keys such as name, authors, maintainers, development_status,
 and license.
