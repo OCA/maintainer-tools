@@ -9,11 +9,11 @@ Please provide content in the ``readme`` directory:
 * INSTALL.rst (optional)
 * CONFIGURE.rst (optional)
 * **USAGE.rst** (optional, highly recommended)
-* DEVELOP.rst (optional)
 * ROADMAP.rst (optional)
-* HISTORY.rst (optional, recommended)
+* DEVELOP.rst (optional)
 * **CONTRIBUTORS.rst** (optional, highly recommended)
 * CREDITS.rst (optional)
+* HISTORY.rst (optional, recommended)
 
 Content of this README will also be drawn from the addon manifest,
 from keys such as name, authors, maintainers, development_status,
