@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 # License AGPLv3 (https://www.gnu.org/licenses/agpl-3.0-standalone.html)
-from __future__ import absolute_import, print_function
-
 """
 oca-copy-maintainers
 
@@ -10,15 +8,15 @@ GitHub teams
 
 """
 
+from __future__ import absolute_import, print_function
+
 import argparse
 import errno
 import os
 import sys
 from operator import attrgetter
-from . import github_login
-from . import odoo_login
-from . import colors
 
+from . import colors, github_login, odoo_login
 
 COPY_USERS_BLACKLIST = os.environ.get(
     "COPY_USERS_BLACKLIST", "~/.config/oca-copy-maintainers/copy_users_blacklist.txt"

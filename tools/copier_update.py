@@ -1,5 +1,5 @@
-"""Run copier update on a branch in all addons repos.
-"""
+"""Run copier update on a branch in all addons repos."""
+
 import subprocess
 import textwrap
 from pathlib import Path
@@ -9,7 +9,7 @@ import click
 import requests
 
 from .gitutils import commit_if_needed
-from .oca_projects import BranchNotFoundError, temporary_clone, get_repositories
+from .oca_projects import BranchNotFoundError, get_repositories, temporary_clone
 
 IGNORED_REJ_FILES = ["oca_dependencies.txt.rej"]
 

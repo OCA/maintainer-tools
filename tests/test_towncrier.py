@@ -6,6 +6,7 @@ import textwrap
 import pytest
 import toml
 from click.testing import CliRunner
+
 from tools.oca_towncrier import _make_issue_format, _prepare_config, oca_towncrier
 
 

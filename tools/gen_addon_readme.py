@@ -13,13 +13,13 @@ from typing import Union
 from urllib.parse import urljoin
 
 import click
+import pypandoc
 from docutils.core import publish_file
 from jinja2 import Template
-import pypandoc
 
-from .gitutils import commit_if_needed
-from .manifest import get_manifest_path, read_manifest, find_addons, NoManifestFound
 from ._hash import hash
+from .gitutils import commit_if_needed
+from .manifest import NoManifestFound, find_addons, get_manifest_path, read_manifest
 
 if sys.version_info >= (3, 8):
     from typing import Literal

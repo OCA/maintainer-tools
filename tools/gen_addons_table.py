@@ -18,6 +18,7 @@ does not matter, will be replaced by the script
 """
 
 from __future__ import print_function
+
 import ast
 import io
 import logging

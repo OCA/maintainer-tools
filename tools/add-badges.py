@@ -1,10 +1,10 @@
-import re
-import os
-import subprocess
 import fileinput
-import sys
-import shutil
+import os
 import pdb
+import re
+import shutil
+import subprocess
+import sys
 
 # Runbot urls need the repo id from the table in the runbot server.
 # This file is the output of a select id, name from there.
