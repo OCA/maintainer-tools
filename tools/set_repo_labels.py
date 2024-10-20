@@ -4,6 +4,7 @@
 Create and modify labels on github to have same labels and same color
 on all repo
 """
+
 from __future__ import print_function
 import click
 

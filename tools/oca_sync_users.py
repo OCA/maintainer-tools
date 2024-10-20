@@ -6,6 +6,7 @@ Create res.users for OCA members with a github login filled in.
 
 This enables adding them to project teams in the OCA instance.
 """
+
 from __future__ import absolute_import, print_function
 
 import xmlrpclib

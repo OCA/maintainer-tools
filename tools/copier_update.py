@@ -1,5 +1,5 @@
-"""Run copier update on a branch in all addons repos.
-"""
+"""Run copier update on a branch in all addons repos."""
+
 import subprocess
 import textwrap
 from pathlib import Path

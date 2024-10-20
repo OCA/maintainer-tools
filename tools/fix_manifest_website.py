@@ -1,4 +1,5 @@
 """Set the website key in addons manifests."""
+
 import os
 import re
 

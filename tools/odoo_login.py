@@ -58,7 +58,7 @@ def get_parser(with_help=False):
         action="store_true",
         help="Store the username and password in a "
         "configuration file. Warning, clear text!",
-    ),
+    )
     return parser
 
 

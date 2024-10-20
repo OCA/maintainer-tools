@@ -6,6 +6,7 @@ Data about OCA Projects, with a few helper functions.
 OCA_REPOSITORY_NAMES: list of OCA repository names
 
 """
+
 from __future__ import print_function
 from contextlib import contextmanager
 import os
