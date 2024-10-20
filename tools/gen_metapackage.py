@@ -7,13 +7,14 @@ import sys
 from pathlib import Path
 from typing import Any, List, Optional
 
-
+from manifestoo_core.addon import Addon, is_addon_dir
+from manifestoo_core.metadata import addon_name_to_requirement
 from manifestoo_core.odoo_series import (
     OdooSeries,
+)
+from manifestoo_core.odoo_series import (
     detect_from_addon_version as detect_odoo_series_from_addon_version,
 )
-from manifestoo_core.addon import is_addon_dir, Addon
-from manifestoo_core.metadata import addon_name_to_requirement
 
 from .compat import tomllib
 

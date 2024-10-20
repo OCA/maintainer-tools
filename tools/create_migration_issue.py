@@ -81,12 +81,13 @@ To contribute to this module, please visit http://odoo-community.org.
 """
 
 from __future__ import print_function
+
 import argparse
-from . import github_login
-from . import oca_projects
-from .config import read_config
 
 import github3
+
+from . import github_login, oca_projects
+from .config import read_config
 
 MANIFESTS = ("__openerp__.py", "__manifest__.py")
 

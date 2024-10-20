@@ -1,7 +1,7 @@
 # License AGPLv3 (https://www.gnu.org/licenses/agpl-3.0-standalone.html)
 import os
-import setuptools
 
+import setuptools
 
 here = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(here, "README.md")) as f:

@@ -6,7 +6,9 @@ import argparse
 import os
 import subprocess
 from getpass import getpass
+
 import github3
+
 from .config import read_config, write_config
 
 

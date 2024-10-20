@@ -1,6 +1,6 @@
-from tools._hash import hash, _walk
-
 import pytest
+
+from tools._hash import _walk, hash
 
 
 def test_hash(tmp_path):

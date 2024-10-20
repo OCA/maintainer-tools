@@ -2,10 +2,10 @@
 # License AGPLv3 (https://www.gnu.org/licenses/agpl-3.0-standalone.html)
 
 import argparse
+import os
 import subprocess
 
 from .oca_projects import OCA_REPOSITORY_NAMES, url
-import os
 
 
 def clone(organization_remotes=None, remove_old_repos=False, target_branch=False):

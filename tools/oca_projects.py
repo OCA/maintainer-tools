@@ -8,13 +8,15 @@ OCA_REPOSITORY_NAMES: list of OCA repository names
 """
 
 from __future__ import print_function
-from contextlib import contextmanager
+
 import os
 import shutil
 import subprocess
 import tempfile
+from contextlib import contextmanager
 
 import appdirs
+
 from .config import NOT_ADDONS, is_main_branch
 from .github_login import login
 

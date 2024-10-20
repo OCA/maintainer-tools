@@ -61,16 +61,18 @@ Options:
 """
 
 from __future__ import print_function
+
 import logging
 from getpass import getpass
-import click
-from selenium.common.exceptions import NoSuchElementException
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.chrome.options import Options
 
-from .oca_projects import get_repositories_and_branches, url
+import click
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+
 from .config import read_config
+from .oca_projects import get_repositories_and_branches, url
 
 _logger = logging.getLogger(__name__)
 
