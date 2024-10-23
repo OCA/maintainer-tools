@@ -81,6 +81,7 @@ setuptools.setup(
             "oca-fix-manifest-website = tools.fix_manifest_website:main",
             "oca-configure-travis= tools.configure_travis:main",
             "oca-copier-update = tools.copier_update:main",
+            "oca-patch-branch = tools.patch_branch:main",
         ],
     },
 )
