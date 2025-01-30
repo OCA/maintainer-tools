@@ -4,7 +4,6 @@ import os
 
 from tools import manifest
 
-
 HERE = os.path.dirname(__file__)
 TEST_REPO_DIR = os.path.join(HERE, "test_repo")
 

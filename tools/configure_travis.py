@@ -2,7 +2,6 @@
 import click
 import requests
 
-
 OCA_TRAVIS_GITHUB_USER = "oca-travis"
 OCA_TRAVIS_GITHUB_EMAIL = "oca+oca-travis@odoo-community.org"
 

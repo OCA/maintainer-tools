@@ -6,7 +6,7 @@ import os
 import subprocess
 import sys
 
-from tools.gen_addon_icon import ICONS_DIR, ICON_TYPE
+from tools.gen_addon_icon import ICON_TYPE, ICONS_DIR
 
 
 def test_gen_addon_icon(tmp_path):

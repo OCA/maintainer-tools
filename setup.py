@@ -1,7 +1,7 @@
 # License AGPLv3 (https://www.gnu.org/licenses/agpl-3.0-standalone.html)
 import os
-import setuptools
 
+import setuptools
 
 here = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(here, "README.md")) as f:
@@ -80,7 +80,6 @@ setuptools.setup(
             "tools.update_pre_commit_excluded_addons:main",
             "oca-fix-manifest-website = tools.fix_manifest_website:main",
             "oca-configure-travis= tools.configure_travis:main",
-            "oca-create-branch = tools.create_branch:main",
             "oca-copier-update = tools.copier_update:main",
         ],
     },

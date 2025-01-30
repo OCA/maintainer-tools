@@ -4,11 +4,11 @@
 
 import os
 import shutil
+
 import click
 
 from .gitutils import commit_if_needed
-from .manifest import read_manifest, find_addons, NoManifestFound
-
+from .manifest import NoManifestFound, find_addons, read_manifest
 
 ICONS_DIR = os.path.join("static", "description")
 

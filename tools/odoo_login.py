@@ -5,10 +5,11 @@ from __future__ import absolute_import, print_function
 import argparse
 import os
 import sys
-import erppeek
 from getpass import getpass
-from .config import read_config, write_config
 
+import erppeek
+
+from .config import read_config, write_config
 
 ODOO_URL = os.environ.get("ODOO_URL", "https://odoo-community.org")
 ODOO_DB = os.environ.get("ODOO_DB", "odoo_community_prod")
@@ -58,7 +59,7 @@ def get_parser(with_help=False):
         action="store_true",
         help="Store the username and password in a "
         "configuration file. Warning, clear text!",
-    ),
+    )
     return parser
 
 
