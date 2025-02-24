@@ -47,3 +47,16 @@ jobs:
       - name: Coveralls
         uses: coverallsapp/github-action@v2
         if: ${{ matrix.python-version != '3.6' }}
+        with:
+          flag-name: run-${{ matrix.python-version }}
+          parallel: true
+  finish:
+    needs: tests
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@v2
+      with:
+        parallel-finished: true
+        carryforward: "run-3.7,run-3.8,run-3.9,run-3.10,run-3.11,run-3.12"
