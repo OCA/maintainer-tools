@@ -26,7 +26,9 @@ ALL = ["OCA_REPOSITORY_NAMES", "url"]
 def get_repositories():
     gh = login()
     all_repos = [
-        repo.name for repo in gh.repositories_by("OCA") if repo.name not in NOT_ADDONS
+        repo.name
+        for repo in gh.repositories_by("OCA")
+        if repo.name not in NOT_ADDONS and not repo.archived
     ]
     return all_repos
 

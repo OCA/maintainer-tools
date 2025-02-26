@@ -5,6 +5,7 @@
 Please provide content in the ``readme`` directory:
 
 * **DESCRIPTION.rst** (required)
+* CONTEXT.rst (optional, strongly recommended)
 * INSTALL.rst (optional)
 * CONFIGURE.rst (optional)
 * **USAGE.rst** (optional, highly recommended)
