@@ -51,17 +51,17 @@ FRAGMENTS = {
 
 LICENSE_BADGES = {
     "AGPL-3": (
-        "https://img.shields.io/badge/licence-AGPL--3-blue.png",
+        "https://img.shields.io/badge/license-AGPL--3-blue.png",
         "http://www.gnu.org/licenses/agpl-3.0-standalone.html",
         "License: AGPL-3",
     ),
     "LGPL-3": (
-        "https://img.shields.io/badge/licence-LGPL--3-blue.png",
+        "https://img.shields.io/badge/license-LGPL--3-blue.png",
         "http://www.gnu.org/licenses/lgpl-3.0-standalone.html",
         "License: LGPL-3",
     ),
     "GPL-3": (
-        "https://img.shields.io/badge/licence-GPL--3-blue.png",
+        "https://img.shields.io/badge/license-GPL--3-blue.png",
         "http://www.gnu.org/licenses/gpl-3.0-standalone.html",
         "License: GPL-3",
     ),
