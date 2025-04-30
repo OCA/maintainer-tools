@@ -107,7 +107,7 @@ You can leverage them to give more quality to your modules and to respect OCA gu
 
 To provide high quality README for our modules we generate them automatically.
 The sections of the final README are organized in fragments.
-They must be put inside a `readme` folder respecting [this structure|./readme].
+They must be put inside a `readme` folder respecting [this structure](./template/module/readme).
 
 eg.
 To generate the final README for the module `auth_keycloak`:
