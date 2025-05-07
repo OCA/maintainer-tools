@@ -9,9 +9,13 @@
     $ cd maintainer-tools
     $ virtualenv env
     $ . env/bin/activate
-    $ python setup.py install
+    $ pip install -e .
 
-Alternatively if using pipx.
+Alternatively, you can install directly from PyPI:
+
+    $ pip install git+https://github.com/OCA/maintainer-tools 
+
+Or if using pipx:
 
     $ pipx install oca-maintainers-tools@git+https://github.com/OCA/maintainer-tools.git
 
@@ -146,7 +150,7 @@ A custom icon can be added using the `--src-icon` argument:
 ## Developers
 
 As a developer, you want to launch the scripts without installing the
-egg.
+package in your system.
 
     $ git clone git@github.com:OCA/maintainer-tools.git
     $ cd maintainer-tools
