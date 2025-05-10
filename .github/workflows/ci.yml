@@ -19,10 +19,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - python-version: "3.6"
-            machine: ubuntu-22.04
-          - python-version: "3.7"
-            machine: ubuntu-22.04
           - python-version: "3.8"
             machine: ubuntu-22.04
           - python-version: "3.10"
