@@ -35,7 +35,7 @@ dependencies = [
     "setuptools-odoo",  # for oca-gen-external-dependencies
     "whool",  # for oca-gen-external-dependencies
 ]
-requires-python = ">=3.6"
+requires-python = ">=3.8"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
