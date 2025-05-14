@@ -31,6 +31,7 @@ dependencies = [
     "selenium",
     "twine",
     "wheel",
+    "pyppeteer",  # to generate icons with oca-gen-addon-icon
     "pyproject_dependencies ; python_version>='3.7'",
     "setuptools-odoo",  # for oca-gen-external-dependencies
     "whool",  # for oca-gen-external-dependencies
