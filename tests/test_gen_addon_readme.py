@@ -162,7 +162,10 @@ def test_rst_error(tmp_path):
                 cmd + opts, stderr=subprocess.STDOUT, universal_newlines=True
             )
         except subprocess.CalledProcessError as e:
-            assert "Title level inconsistent" in e.output
+            assert (
+                "Inconsistent title style" in e.output
+                or "Title level inconsistent" in e.output
+            )
         else:
             assert False, "A rst syntax error should have been detected."
 
