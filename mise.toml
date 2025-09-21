@@ -1,0 +1,8 @@
+[settings.pipx]
+uvx = true
+
+[tools]
+github-cli = "latest"
+"pipx:copier" = "latest"
+python = ["3.13", "3.11", "3.8", "3.6"]
+uv = "latest"
