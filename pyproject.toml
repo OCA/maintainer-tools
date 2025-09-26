@@ -71,6 +71,7 @@ oca-update-pre-commit-excluded-addons = "tools.update_pre_commit_excluded_addons
 oca-fix-manifest-website = "tools.fix_manifest_website:main"
 oca-configure-travis= "tools.configure_travis:main"
 oca-copier-update = "tools.copier_update:main"
+oca-create-branch-from-previous = "tools.create_branch_from_previous:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["tools"]
