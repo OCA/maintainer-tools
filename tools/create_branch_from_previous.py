@@ -1,22 +1,9 @@
-import ast
-import re
 import subprocess
 from pathlib import Path
 
 import click
 
-
-def _mark_modules_uninstallable(addons_dir: Path) -> None:
-    for manifest_path in addons_dir.glob("*/__manifest__.py"):
-        manifest_text = manifest_path.read_text(encoding="utf-8")
-        manifest = ast.literal_eval(manifest_text)
-        if "installable" not in manifest:
-            src = r",?\s*}"
-            dest = ",\n    'installable': False,\n}"
-        else:
-            src = "[\"']installable[\"']: *True"
-            dest = '"installable": False'
-        manifest_path.write_text(re.sub(src, dest, manifest_text, re.DOTALL))
+from .manifest import mark_modules_uninstallable
 
 
 @click.command()
@@ -85,7 +72,7 @@ def main(
         raise SystemExit(
             "There are merge conflicts after copier update, please fix manually"
         )
-    _mark_modules_uninstallable(addons_dir)
+    mark_modules_uninstallable(addons_dir)
     if Path(".pre-commit-config.yaml").exists():
         # First run pre-commit on .pre-commit-config.yaml, to exclude
         # addons that are not installable.
