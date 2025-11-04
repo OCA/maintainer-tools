@@ -17,9 +17,7 @@ from .manifest import read_manifest
 
 
 def _make_issue_format(org, repo, fragment_format):
-    if fragment_format == "md":
-        return f"[#{{issue}}](https://github.com/{org}/{repo}/issues/{{issue}})"
-    return f"`#{{issue}} <https://github.com/{org}/{repo}/issues/{{issue}}>`_"
+    return "{issue}"
 
 
 def _get_towncrier_template(fragment_format):

@@ -8,7 +8,7 @@
 
 ODOO="git@github.com:/odoo/odoo.git"
 OCB="git@github.com:/OCA/OCB.git"
-BRANCHES="19.0 18.0 17.0 16.0 15.0"
+BRANCHES="19.0 18.0 17.0 16.0 15.0 14.0"
 GITDIR="/var/tmp/git"
 PUBDIR="/var/tmp/ocb-nightly"
 BUILDDIR="/var/tmp/ocb-build"
