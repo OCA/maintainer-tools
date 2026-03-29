@@ -6,11 +6,13 @@
 {{ fragments[name] }}
 {% endif %}
 {%- endmacro -%}
+{% if org_name == 'OCA' -%}
 
 .. image:: https://odoo-community.org/readme-banner-image
    :target: https://odoo-community.org/get-involved?utm_source=readme
    :alt: Odoo Community Association
 
+{% endif -%}
 {{ '=' * manifest.name|length }}
 {{ manifest.name }}
 {{ '=' * manifest.name|length }}
