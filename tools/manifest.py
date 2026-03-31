@@ -3,6 +3,8 @@
 
 import ast
 import os
+import re
+from pathlib import Path
 
 MANIFEST_NAMES = ("__manifest__.py", "__openerp__.py", "__terp__.py")
 
@@ -41,3 +43,21 @@ def find_addons(addons_dir, installable_only=True):
         if installable_only and not manifest.get("installable", True):
             continue
         yield addon_name, addon_dir, manifest
+
+
+def mark_manifest_uninstallable(manifest_text: str) -> str:
+    manifest = ast.literal_eval(manifest_text)
+    if "installable" not in manifest:
+        src = r",?\s*}\s*$"
+        dest = ",\n    'installable': False,\n}\n"
+    else:
+        src = "[\"']installable[\"']: *True"
+        dest = '"installable": False'
+    return re.sub(src, dest, manifest_text, re.DOTALL)
+
+
+def mark_modules_uninstallable(addons_dir: Path) -> None:
+    for manifest_path in addons_dir.glob("*/__manifest__.py"):
+        manifest_text = manifest_path.read_text(encoding="utf-8")
+        new_manifest_text = mark_manifest_uninstallable(manifest_text)
+        manifest_path.write_text(new_manifest_text, encoding="utf-8")
