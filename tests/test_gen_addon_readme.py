@@ -131,6 +131,52 @@ def test_gen_addon_readme_acme(addons_dir):
     _assert_expected(addons_dir, "acme")
 
 
+def test_required_description_fails(tmp_path):
+    addon_dir = tmp_path / "addon"
+    addon_dir.mkdir()
+    with (addon_dir / "__manifest__.py").open("w") as f:
+        f.write("{'name': 'addon'}")
+    with (addon_dir / "__init__.py").open("w") as f:
+        pass
+    cmd = [
+        sys.executable,
+        "-m",
+        "tools.gen_addon_readme",
+        "--addon-dir",
+        str(addon_dir),
+        "--repo-name",
+        "server-tools",
+        "--branch",
+        "12.0",
+    ]
+    with pytest.raises(subprocess.CalledProcessError) as exc:
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True)
+    assert "Addons missing DESCRIPTION" in exc.value.output
+    assert "--no-require-description" in exc.value.output
+
+
+def test_no_require_description_passes(tmp_path):
+    addon_dir = tmp_path / "addon"
+    addon_dir.mkdir()
+    with (addon_dir / "__manifest__.py").open("w") as f:
+        f.write("{'name': 'addon'}")
+    with (addon_dir / "__init__.py").open("w") as f:
+        pass
+    cmd = [
+        sys.executable,
+        "-m",
+        "tools.gen_addon_readme",
+        "--addon-dir",
+        str(addon_dir),
+        "--repo-name",
+        "server-tools",
+        "--branch",
+        "12.0",
+        "--no-require-description",
+    ]
+    subprocess.check_call(cmd)
+
+
 def test_rst_error(tmp_path):
     addon_dir = tmp_path / "addon"
     addon_dir.mkdir()
