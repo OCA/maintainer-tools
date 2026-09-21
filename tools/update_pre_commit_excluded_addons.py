@@ -55,31 +55,32 @@ def update_not_installable_addons_dir_in_file(
             line_format.format(addon_dir=addon_dir)
             for addon_dir in not_installable_addons_dir
         ]
-    if not_installable_addons_dir:
-        with open(file_path, "r+") as text_io:
-            lines = text_io.readlines()
-            text_io.seek(0)
-            replace_on = False
-            for line in lines:
-                if PRE_COMMIT_EXCLUDE_SEPARATOR_END in line:
-                    replace_on = False
-                if replace_on:
-                    continue
-                if PRE_COMMIT_EXCLUDE_SEPARATOR in line:
-                    replace_on = True
-                    text_io.write(line)
-                    preprend_spaces = line[: len(line) - len(line.lstrip(" "))]
-                    content_to_replace = line_end.join(
-                        [
-                            f"{preprend_spaces}{addon_dir}"
-                            for addon_dir in not_installable_addons_dir
-                        ]
-                    )
-                    content_to_replace += line_end
-                    text_io.write(content_to_replace)
-                    continue
+    with open(file_path, "r+") as text_io:
+        lines = text_io.readlines()
+        text_io.seek(0)
+        replace_on = False
+        for line in lines:
+            if PRE_COMMIT_EXCLUDE_SEPARATOR_END in line:
+                replace_on = False
+            if replace_on:
+                continue
+            if PRE_COMMIT_EXCLUDE_SEPARATOR in line:
+                replace_on = True
                 text_io.write(line)
-            text_io.truncate()
+                preprend_spaces = line[: len(line) - len(line.lstrip(" "))]
+                content_to_replace = line_end.join(
+                    [
+                        f"{preprend_spaces}{addon_dir}"
+                        for addon_dir in not_installable_addons_dir
+                    ]
+                )
+                if not content_to_replace:
+                    continue
+                content_to_replace += line_end
+                text_io.write(content_to_replace)
+                continue
+            text_io.write(line)
+        text_io.truncate()
 
 
 @click.command()
