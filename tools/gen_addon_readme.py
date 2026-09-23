@@ -518,6 +518,12 @@ def _get_source_digest(readme_filename: str) -> Union[str, None]:
     is_flag=True,
     default=False,
 )
+@click.option(
+    "--require-description/--no-require-description",
+    is_flag=True,
+    default=True,
+    help="Require DESCRIPTION fragment, fail if missing.",
+)
 def gen_addon_readme(
     org_name,
     repo_name,
@@ -530,10 +536,11 @@ def gen_addon_readme(
     if_fragments_changed,
     convert_fragments_to_markdown,
     keep_source_digest,
+    require_description,
 ):
     """Generate README.rst from fragments.
 
-    Do nothing if readme/DESCRIPTION(.rst|.md) is absent, otherwise overwrite
+    Raises an error if readme/DESCRIPTION(.rst|.md) is absent, otherwise overwrite
     existing README.rst with content generated from the template,
     fragments (DESCRIPTION(.rst|.md), USAGE(.rst|.md), etc) and the addon manifest.
     """
@@ -548,10 +555,13 @@ def gen_addon_readme(
             continue
         addons.append((addon_name, addon_dir, manifest))
     readme_filenames = []
+    addons_without_readme = []
     for addon_name, addon_dir, manifest in addons:
         if convert_fragments_to_markdown:
             convert_fragments_to_md(addon_dir)
         if not fragment_exists(addon_dir, "DESCRIPTION"):
+            if require_description:
+                addons_without_readme.append(addon_name)
             continue
         readme_filename = os.path.join(addon_dir, "README.rst")
         source_digest = hash(
@@ -585,6 +595,10 @@ def gen_addon_readme(
             )
             if index_filename:
                 readme_filenames.append(index_filename)
+    if addons_without_readme:
+        raise click.ClickException(
+            f"Addons missing DESCRIPTION: {addons_without_readme}\nTo skip this check, use --no-require-description"
+        )
     if commit:
         commit_if_needed(readme_filenames, "[UPD] README.rst")
 
