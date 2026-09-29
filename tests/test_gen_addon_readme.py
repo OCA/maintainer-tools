@@ -9,8 +9,10 @@ from pathlib import Path
 
 import pytest
 
+from tools import RepositoryType
 from tools.gen_addon_readme import (
     _get_source_digest,
+    make_repo_badge,
     get_fragment_format,
     get_fragments_format,
     safe_remove,
@@ -212,3 +214,24 @@ def test_get_source_digest(tmp_path):
     assert _get_source_digest(str(readme_path)) is None
     readme_path.write_text("!! source digest: ")
     assert _get_source_digest(str(readme_path)) is None
+
+
+def test_make_repo_badge():
+    assert make_repo_badge(
+        RepositoryType.github, "OCA", "web", "18.0", "web_responsive"
+    ) == (
+        "https://img.shields.io/badge/github-OCA%2Fweb-lightgray.png?logo=github",
+        "https://github.com/OCA/web/tree/18.0/web_responsive",
+        "OCA/web",
+    )
+    assert make_repo_badge(
+        RepositoryType.gitlab,
+        "odoo-driver",
+        "odoo-addons-driver",
+        "16.0",
+        "pos_driver_device_list",
+    ) == (
+        "https://img.shields.io/badge/gitlab-odoo--driver%2Fodoo--addons--driver-lightgray.png?logo=gitlab",
+        "https://gitlab.com/odoo-driver/odoo-addons-driver/-/tree/16.0/pos_driver_device_list",
+        "odoo-driver/odoo-addons-driver",
+    )
