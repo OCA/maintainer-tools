@@ -6,7 +6,6 @@ import atexit
 import functools
 import os
 import re
-import sys
 import tempfile
 from pathlib import Path
 from typing import Union
@@ -21,10 +20,7 @@ from ._hash import hash
 from .gitutils import commit_if_needed
 from .manifest import NoManifestFound, find_addons, get_manifest_path, read_manifest
 
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
+from typing import Literal
 
 
 class FragmentProperties:
