@@ -2,6 +2,7 @@
 # Copyright (c) 2018 ACSONE SA/NV
 # Copyright (c) 2018 GRAP (http://www.grap.coop)
 
+from . import RepositoryType
 import atexit
 import functools
 import os
@@ -153,29 +154,47 @@ def make_weblate_badge(repo_name, branch, addon_name):
     )
 
 
-def make_repo_badge(org_name, repo_name, branch, addon_name):
+def make_repo_badge(repo_type, org_name, repo_name, branch, addon_name):
     badge_repo_name = repo_name.replace("-", "--")
     badge_org_name = org_name.replace("-", "--")
-    return (
-        "https://img.shields.io/badge/github-{badge_org_name}%2F{badge_repo_name}"
-        "-lightgray.png?logo=github".format(**locals()),
-        "https://github.com/{org_name}/{repo_name}/tree/"
-        "{branch}/{addon_name}".format(**locals()),
-        "{org_name}/{repo_name}".format(**locals()),
-    )
+    if repo_type == RepositoryType.github:
+        return (
+            "https://img.shields.io/badge/github-{badge_org_name}%2F{badge_repo_name}"
+            "-lightgray.png?logo=github".format(**locals()),
+            "https://github.com/{org_name}/{repo_name}/tree/"
+            "{branch}/{addon_name}".format(**locals()),
+            "{org_name}/{repo_name}".format(**locals()),
+        )
+    elif repo_type == RepositoryType.gitlab:
+        return (
+            "https://img.shields.io/badge/gitlab-{badge_org_name}%2F{badge_repo_name}"
+            "-lightgray.png?logo=gitlab".format(**locals()),
+            "https://gitlab.com/{org_name}/{repo_name}/-/tree/"
+            "{branch}/{addon_name}".format(**locals()),
+            "{org_name}/{repo_name}".format(**locals()),
+        )
+    raise NotImplementedError
 
 
-def generate_fragment(org_name, repo_name, branch, addon_name, file):
+def generate_fragment(repo_type, org_name, repo_name, branch, addon_name, file):
     fragment_lines = file.readlines()
     if not fragment_lines:
         return False
 
     # Replace relative path by absolute path for figures
     image_path_re = re.compile(r".*\s*\.\..* (figure|image)::\s+(?P<path>.*?)\s*$")
-    module_url = (
-        "https://raw.githubusercontent.com/{org_name}/{repo_name}"
-        "/{branch}/{addon_name}/".format(**locals())
-    )
+    if repo_type == RepositoryType.github:
+        base_url = (
+            "https://raw.githubusercontent.com/{org_name}/{repo_name}"
+            "/{branch}/{addon_name}/".format(**locals())
+        )
+    elif repo_type == RepositoryType.gitlab:
+        base_url = (
+            "https://gitlab.com/{org_name}/{repo_name}"
+            "/-/raw/{branch}/{addon_name}/".format(**locals())
+        )
+    else:
+        raise NotImplementedError
     for index, fragment_line in enumerate(fragment_lines):
         mo = image_path_re.match(fragment_line)
         if not mo:
@@ -190,7 +209,7 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
             # on github interface, in the 'readme' subfolder
             relative_path = path.replace("../", "")
             fragment_lines[index] = fragment_line.replace(
-                path, urljoin(module_url, relative_path)
+                path, urljoin(base_url, relative_path)
             )
     fragment = "".join(fragment_lines)
 
@@ -332,6 +351,7 @@ def convert_fragments_to_md(addon_dir: str) -> None:
 
 
 def gen_one_addon_readme(
+    repo_type,
     org_name,
     repo_name,
     branch,
@@ -348,7 +368,9 @@ def gen_one_addon_readme(
         fragment_filename = prepare_rst_fragment(addon_dir, fragment_name)
         if fragment_filename:
             with open(fragment_filename, "r", encoding="utf8") as f:
-                fragment = generate_fragment(org_name, repo_name, branch, addon_name, f)
+                fragment = generate_fragment(
+                    repo_type, org_name, repo_name, branch, addon_name, f
+                )
                 if fragment:
                     fragments[fragment_name] = fragment
     badges = []
@@ -358,7 +380,7 @@ def gen_one_addon_readme(
     license = manifest.get("license")
     if license in LICENSE_BADGES:
         badges.append(LICENSE_BADGES[license])
-    badges.append(make_repo_badge(org_name, repo_name, branch, addon_name))
+    badges.append(make_repo_badge(repo_type, org_name, repo_name, branch, addon_name))
     if org_name == "OCA":
         badges.append(make_weblate_badge(repo_name, branch, addon_name))
     if org_name == "OCA":
@@ -462,6 +484,13 @@ def _get_source_digest(readme_filename: str) -> Union[str, None]:
 
 
 @click.command()
+@click.option(
+    "--repo-type",
+    type=click.Choice(RepositoryType, case_sensitive=False),
+    required=True,
+    default=RepositoryType.github,
+    help="Type of git repository. Possible values: 'github', 'gitlab'",
+)
 @click.option("--org-name", default="OCA", help="Organization name, eg. OCA.")
 @click.option("--repo-name", required=True, help="Repository name, eg. server-tools.")
 @click.option("--branch", required=True, help="Odoo series. eg 11.0.")
@@ -519,6 +548,7 @@ def _get_source_digest(readme_filename: str) -> Union[str, None]:
     default=False,
 )
 def gen_addon_readme(
+    repo_type,
     org_name,
     repo_name,
     branch,
@@ -565,6 +595,7 @@ def gen_addon_readme(
         if keep_source_digest:
             source_digest = _get_source_digest(readme_filename) or source_digest
         gen_one_addon_readme(
+            repo_type,
             org_name,
             repo_name,
             branch,
