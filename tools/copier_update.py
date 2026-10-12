@@ -64,8 +64,9 @@ def _make_update_dotfiles_pr(org: str, repo: str, branch: str) -> None:
                     """\
                         Dear maintainer,
 
-                        After updating the dotfiles, `pre-commit run -a`
-                        fails in a manner that cannot be resolved automatically.
+                        After updating the dotfiles, there are merge conflicts
+                        or `pre-commit run -a` fails in a manner that cannot be
+                        resolved automatically.
 
                         Can you please have a look, fix and merge?
 
@@ -162,6 +163,15 @@ def main(
                 r = subprocess.call(["copier", "update", "-f", "--trust"])
                 if r != 0:
                     print("$" * 10, f"copier update failed on {repo}")
+                    continue
+                # copier marks conflicting files as unmerged, before git add
+                unmerged = subprocess.check_output(
+                    ["git", "diff", "--name-only", "--diff-filter=U"], text=True
+                ).split()
+                if unmerged:
+                    print("$" * 10, f"merge conflicts in {repo}: {unmerged}")
+                    subprocess.check_call(["git", "add", "."])
+                    _make_update_dotfiles_pr(org, repo, branch)
                     continue
                 subprocess.check_call(["rm", "-f"] + IGNORED_REJ_FILES)
                 # git add updated files so pre-commit run -a will pick them up
