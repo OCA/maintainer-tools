@@ -200,6 +200,32 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
     return fragment
 
 
+SUBSTITUTION_DEF_RE = re.compile(r"^\.\. \|(?P<name>[^|]+)\| ", re.MULTILINE)
+
+
+def make_substitutions_unique(fragment, used_names):
+    """Rename substitutions already defined in a previous fragment."""
+    names = SUBSTITUTION_DEF_RE.findall(fragment)
+    taken = used_names | set(names)
+    renames = {}
+    for name in names:
+        if name not in used_names:
+            continue
+        i = 1
+        while f"{name}{i}" in taken:
+            i += 1
+        renames[name] = f"{name}{i}"
+        taken.add(renames[name])
+    if renames:
+        fragment = re.sub(
+            r"\|(%s)\|" % "|".join(re.escape(name) for name in renames),
+            lambda mo: f"|{renames[mo.group(1)]}|",
+            fragment,
+        )
+    used_names.update(renames.get(name, name) for name in names)
+    return fragment
+
+
 def get_fragment_format(
     addon_dir: str, fragment_name: str
 ) -> Union[FragmentFormat, None]:
@@ -344,13 +370,16 @@ def gen_one_addon_readme(
 ):
     fragments_format = get_fragments_format(addon_dir)
     fragments = {}
+    substitution_names = set()
     for fragment_name in FRAGMENTS:
         fragment_filename = prepare_rst_fragment(addon_dir, fragment_name)
         if fragment_filename:
             with open(fragment_filename, "r", encoding="utf8") as f:
                 fragment = generate_fragment(org_name, repo_name, branch, addon_name, f)
                 if fragment:
-                    fragments[fragment_name] = fragment
+                    fragments[fragment_name] = make_substitutions_unique(
+                        fragment, substitution_names
+                    )
     badges = []
     development_status = manifest.get("development_status", "Beta").lower()
     if development_status in DEVELOPMENT_STATUS_BADGES:

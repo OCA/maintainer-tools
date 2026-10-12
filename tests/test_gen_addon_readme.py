@@ -212,3 +212,37 @@ def test_get_source_digest(tmp_path):
     assert _get_source_digest(str(readme_path)) is None
     readme_path.write_text("!! source digest: ")
     assert _get_source_digest(str(readme_path)) is None
+
+
+def test_images_in_several_fragments(tmp_path):
+    addon_dir = tmp_path / "addon"
+    addon_dir.mkdir()
+    (addon_dir / "__manifest__.py").write_text("{'name': 'addon'}")
+    (addon_dir / "__init__.py").touch()
+    readme_dir = addon_dir / "readme"
+    readme_dir.mkdir()
+    (readme_dir / "DESCRIPTION.md").write_text(
+        "Description.\n\n![image](../static/description/one.png)\n"
+    )
+    (readme_dir / "CONFIGURE.md").write_text(
+        "Configure.\n\n![image](../static/description/two.png)\n"
+        "![image](../static/description/three.png)\n"
+    )
+    subprocess.check_call(
+        [
+            sys.executable,
+            "-m",
+            "tools.gen_addon_readme",
+            "--addon-dir",
+            str(addon_dir),
+            "--repo-name",
+            "server-tools",
+            "--branch",
+            "17.0",
+        ]
+    )
+    readme = (addon_dir / "README.rst").read_text()
+    assert readme.count(".. |image| image::") == 1
+    for png in ("one.png", "two.png", "three.png"):
+        assert png in readme
+    assert (addon_dir / "static" / "description" / "index.html").exists()
