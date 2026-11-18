@@ -75,6 +75,21 @@ def test_update_pre_commit_excluded_addons(tmp_path):
               python: python3
         """
     )
+    # addon1, addon2 and addon3 installable again
+    m2.write_text("{}")
+    m3.write_text("{}")
+    subprocess.check_call(["oca-update-pre-commit-excluded-addons"], cwd=str(tmp_path))
+    assert pre_commit.read_text() == textwrap.dedent(
+        """\
+            exclude: |
+              (?x)
+              # NOT INSTALLABLE ADDONS
+              # END NOT INSTALLABLE ADDONS
+              tail_exclude
+            default_language_version:
+              python: python3
+        """
+    )
 
 
 def test_update_pre_commit_excluded_addons_subdir(tmp_path):
