@@ -173,7 +173,7 @@ def generate_fragment(org_name, repo_name, branch, addon_name, file):
     # Replace relative path by absolute path for figures
     image_path_re = re.compile(r".*\s*\.\..* (figure|image)::\s+(?P<path>.*?)\s*$")
     module_url = (
-        "https://raw.githubusercontent.com/{org_name}/{repo_name}"
+        "https://github.com/{org_name}/{repo_name}/raw"
         "/{branch}/{addon_name}/".format(**locals())
     )
     for index, fragment_line in enumerate(fragment_lines):
